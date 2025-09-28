@@ -15,8 +15,8 @@ async function init() {
 
     const signer = provider.getSigner();
 
-    // Remix üzerinden deploy edilen contract adresini buraya koy
-    const contractAddress = "DEPOLYED_CONTRACT_ADDRESS";
+    // Remix üzerinden deploy edilen contract adresi
+    const contractAddress = "0xbdf087f85af5d5187de2c11f3bad90edbc6fe0bf";
 
     const abi = [
         "function submitProject(string memory _title, string memory _description, string memory _link) public",
