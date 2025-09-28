@@ -3,25 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>Celo Engage Hub</title>
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
 </head>
 <body>
     <h1>Celo Engage Hub</h1>
 
     <form id="projectForm">
         <label for="title">Project Title:</label><br>
-        <input type="text" id="title" name="title"><br><br>
+        <input type="text" id="title" name="title" required><br><br>
 
         <label for="description">Description:</label><br>
-        <input type="text" id="description" name="description"><br><br>
+        <input type="text" id="description" name="description" required><br><br>
 
         <label for="link">Project Link:</label><br>
-        <input type="text" id="link" name="link"><br><br>
+        <input type="text" id="link" name="link" required><br><br>
 
         <button type="button" id="submitButton">Submit Project</button>
     </form>
 
-    <!-- app.js bağlantısı -->
-    <script src="app.js"></script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>
