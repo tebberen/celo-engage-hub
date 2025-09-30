@@ -36,8 +36,8 @@
       align-items: center;
     }
     header {
-      background: #FFD700;
-      color: #000000;
+      background: linear-gradient(135deg, #FBCC5C 0%, #000000 100%);
+      color: white;
       padding: 25px;
       font-size: 28px;
       font-weight: bold;
@@ -56,10 +56,10 @@
       width: 100%;
     }
     .link-card {
-      border: 2px solid #FFD700;
+      border: 2px solid #FBCC5C;
       padding: 20px;
       border-radius: 12px;
-      background-color: #f8fafc;
+      background-color: #FFFDF6;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       transition: all 0.3s ease;
       height: 100%;
@@ -68,8 +68,8 @@
       justify-content: space-between;
     }
     .link-card.completed {
-      border-color: #10b981;
-      background-color: #ecfdf5;
+      border-color: #35D07F;
+      background-color: #F0FFF7;
     }
     .links-grid {
       display: grid;
@@ -79,8 +79,8 @@
       width: 100%;
     }
     button {
-      background: #FFD700;
-      color: #000000;
+      background: #FBCC5C;
+      color: black;
       border: none;
       padding: 12px 20px;
       border-radius: 8px;
@@ -91,7 +91,8 @@
       transition: all 0.3s ease;
     }
     button:hover {
-      background: #e6c200;
+      background: #000000;
+      color: #FBCC5C;
       transform: translateY(-2px);
     }
     button:disabled {
@@ -102,7 +103,7 @@
     input {
       padding: 12px;
       border-radius: 8px;
-      border: 2px solid #FFD700;
+      border: 2px solid #FBCC5C;
       width: 90%;
       max-width: 500px;
       margin: 15px 0;
@@ -111,15 +112,16 @@
     .wallet-info {
       margin: 0 0 20px 0;
       padding: 15px;
-      background-color: #fff9db;
+      background-color: #FFF9E6;
       border-radius: 10px;
       font-weight: bold;
-      border: 2px solid #FFD700;
+      border: 2px solid #FBCC5C;
       text-align: center;
       width: 100%;
     }
     .connect-btn {
-      background: #10b981;
+      background: #35D07F;
+      color: black;
       margin: 15px 0;
       padding: 15px 25px;
       font-size: 18px;
@@ -139,7 +141,7 @@
       color: #666;
       margin-bottom: 10px;
       font-weight: bold;
-      background: #fff9db;
+      background: #FFF0C2;
       padding: 5px 10px;
       border-radius: 20px;
       display: inline-block;
@@ -153,8 +155,8 @@
       width: 100%;
     }
     .step-container {
-      background: #f8fafc;
-      border: 2px solid #FFD700;
+      background: #FFFDF6;
+      border: 2px solid #FBCC5C;
       padding: 25px;
       border-radius: 12px;
       text-align: center;
@@ -165,8 +167,8 @@
       display: none !important;
     }
     .step-number {
-      background: #FFD700;
-      color: #000000;
+      background: #FBCC5C;
+      color: black;
       border-radius: 50%;
       width: 30px;
       height: 30px;
@@ -176,8 +178,8 @@
       margin-right: 10px;
     }
     .success-message {
-      background: #d1fae5;
-      border: 2px solid #10b981;
+      background: #E8FBF1;
+      border: 2px solid #35D07F;
       padding: 15px;
       margin: 15px auto;
       border-radius: 8px;
@@ -205,8 +207,8 @@
       color: #000000;
     }
     .submit-form {
-      background: #f8fafc;
-      border: 2px solid #FFD700;
+      background: #FFFDF6;
+      border: 2px solid #FBCC5C;
       padding: 30px;
       margin: 20px auto;
       border-radius: 12px;
@@ -215,7 +217,7 @@
       width: 100%;
     }
     .gas-info {
-      background: #fff9db;
+      background: #FFF0C2;
       padding: 10px;
       border-radius: 8px;
       margin: 10px 0;
@@ -224,8 +226,8 @@
       text-align: center;
     }
     .celo-ecosystem {
-      background: #FFD700;
-      color: #000000;
+      background: linear-gradient(135deg, #FBCC5C 0%, #000000 100%);
+      color: white;
       padding: 20px;
       border-radius: 12px;
       height: fit-content;
@@ -240,14 +242,14 @@
       align-items: center;
       padding: 10px;
       margin: 8px 0;
-      background: rgba(0,0,0,0.05);
+      background: rgba(255,255,255,0.1);
       border-radius: 8px;
       text-decoration: none;
-      color: #000000;
+      color: white;
       transition: all 0.3s ease;
     }
     .celo-link:hover {
-      background: rgba(0,0,0,0.1);
+      background: rgba(255,255,255,0.2);
       transform: translateX(5px);
     }
     .celo-link-icon {
@@ -255,12 +257,12 @@
       font-size: 18px;
     }
     .wallet-address {
-      background: #fff9db;
+      background: #FFF9E6;
       padding: 12px;
       border-radius: 8px;
       margin-bottom: 20px;
       font-weight: bold;
-      border: 2px solid #FFD700;
+      border: 2px solid #FBCC5C;
       text-align: center;
       width: 100%;
     }
@@ -290,7 +292,7 @@
 <body>
   <div class="centered-content">
     <header>
-      <div>Celo Engage Hub</div>
+      <div>🌐 Celo Engage Hub</div>
     </header>
     
     <div class="subheader">If you want support, support first</div>
@@ -305,49 +307,463 @@
       </div>
 
       <div class="celo-ecosystem">
-        <h3>🌐 Celo Ecosystem</h3>
+        <h3>🟡 Celo Ecosystem</h3>
         <a href="https://celo.org" target="_blank" class="celo-link">
-          <span class="celo-link-icon">🏠</span>Celo Official
+          <span class="celo-link-icon">🌐</span>Celo Official
         </a>
         <a href="https://docs.celo.org" target="_blank" class="celo-link">
           <span class="celo-link-icon">📚</span>Celo Documentation
         </a>
-        <a href="https://bridge.celo.org" target="_blank" class="celo-link">
-          <span class="celo-link-icon">🌉</span>Celo Bridge
+        <a href="https://developers.celo.org" target="_blank" class="celo-link">
+          <span class="celo-link-icon">💼</span>Developer Portal
         </a>
-        <a href="https://explorer.celo.org" target="_blank" class="celo-link">
+        <a href="https://celoscan.io" target="_blank" class="celo-link">
           <span class="celo-link-icon">🔍</span>Celo Explorer
         </a>
-        <a href="https://x.com/CeloOrg" target="_blank" class="celo-link">
+        <a href="https://forum.celo.org" target="_blank" class="celo-link">
+          <span class="celo-link-icon">💬</span>Celo Forum
+        </a>
+        <a href="https://x.com/Celo" target="_blank" class="celo-link">
           <span class="celo-link-icon">🐦</span>Celo Twitter
         </a>
-        <a href="https://warpcast.com/~/channel/celo" target="_blank" class="celo-link">
-          <span class="celo-link-icon">🔮</span>Celo Farcaster
+        <a href="https://chat.celo.org" target="_blank" class="celo-link">
+          <span class="celo-link-icon">💬</span>Celo Discord
+        </a>
+        <a href="https://blog.celo.org" target="_blank" class="celo-link">
+          <span class="celo-link-icon">📰</span>Celo Blog
         </a>
         <a href="https://github.com/celo-org" target="_blank" class="celo-link">
           <span class="celo-link-icon">💻</span>Celo GitHub
         </a>
-        <a href="https://medium.com/celoorg" target="_blank" class="celo-link">
-          <span class="celo-link-icon">📝</span>Celo Blog
-        </a>
-        <a href="https://celofoundation.org" target="_blank" class="celo-link">
-          <span class="celo-link-icon">💰</span>Celo Foundation
-        </a>
       </div>
     </div>
 
-    <!-- ✅ Main content kısmı (Base kodundaki gibi aynı kalıyor) -->
+    <div class="main-content">
+      <div class="main-sections">
+        <div id="step1" class="centered-content">
+          <div class="step-indicator">
+            <span class="step-number">1</span> Support Community Members
+          </div>
+          <div class="step-container">
+            <h3>📋 Support Others First</h3>
+            <p>To submit your link, you must first support at least one community member</p>
+            
+            <div class="links-grid" id="linksContainer">
+            </div>
+          </div>
+        </div>
 
+        <div class="centered-content" id="completedSection">
+          <div class="section-title">✅ Completed Links (5/5 Support)</div>
+          <div class="links-grid" id="completedLinks">
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- ✅ Ethers.js, Contract Address ve JS kodu kısmı -->
+  <div id="step2" class="hidden centered-content">
+    <div class="step-indicator">
+      <span class="step-number">2</span> Submit Your Link
+    </div>
+    
+    <div class="success-message">
+      ✅ Thank you for supporting! Now you can submit your own link
+    </div>
+    
+    <div class="submit-form">
+      <h3>🎉 Add Your Content</h3>
+      <input type="text" placeholder="Paste your X, Farcaster, GitHub, or any other link here..." id="userLink" />
+      <br>
+      <div class="gas-info">
+        ⛽ You'll only pay the normal network gas fee (no extra cost)
+      </div>
+      <button id="submitLinkBtn">✍️ Submit Link</button>
+      <p><small>🔒 Secure transaction on Celo network</small></p>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <script>
+    // State management
+    let provider = null;
+    let signer = null;
+    let isConnected = false;
+    let userAddress = '';
+    let hasSupported = false;
+
+    // ✅ CELO CONTRACT ADDRESS
     const CONTRACT_ADDRESS = "0xbdf087f85af5d5187de2c11f3bad90edbc6fe0bf";
+
+    // ✅ Contract ABI
     const CONTRACT_ABI = [
       "function submitLink(string memory _link) public"
     ];
-    // Base versiyonundaki tüm JS burada aynı şekilde kalıyor...
+
+    // Celo Network Configuration
+    const CELO_PARAMS = {
+      chainId: "0xA4EC", // 42220 in hex - Celo Mainnet
+      chainName: "Celo Mainnet",
+      nativeCurrency: {
+        name: "CELO",
+        symbol: "CELO",
+        decimals: 18
+      },
+      rpcUrls: ["https://forno.celo.org"],
+      blockExplorerUrls: ["https://celoscan.io/"]
+    };
+
+    // Initial support links
+    const initialSupportLinks = [
+      "https://farcaster.xyz/teberen/0x391c5713",
+      "https://farcaster.xyz/ertu",
+      "https://farcaster.xyz/ratmubaba",
+      "https://x.com/erturulsezar13?s=21&t=l2lmnRZcmeoUCu9IdzeRpA",
+      "https://x.com/egldmvx?s=21&t=l2lmnRZcmeoUCu9IdzeRpA",
+      "https://tebberen.github.io/celo-engage-hub/",
+      "https://x.com/meelioodas?s=21&t=l2lmnRZcmeoUCu9IdzeRpA",
+      "https://x.com/luckyfromnecef/status/1972371920290259437?s=46&t=l2lmnRZcmeoUCu9IdzeRpA",
+      "https://github.com/tebberen"
+    ];
+
+    // Load links from localStorage
+    function loadLinksFromStorage() {
+      const storedLinks = localStorage.getItem('celoEngageHubLinks');
+      if (storedLinks) {
+        return JSON.parse(storedLinks);
+      } else {
+        // Create initial links if first time
+        return initialSupportLinks.map(link => ({
+          link: link,
+          clickCount: 0,
+          timestamp: Date.now(),
+          submitter: "community"
+        }));
+      }
+    }
+
+    // Save links to localStorage
+    function saveLinksToStorage(links) {
+      localStorage.setItem('celoEngageHubLinks', JSON.stringify(links));
+    }
+
+    // All community links loaded from localStorage
+    let allCommunityLinks = loadLinksFromStorage();
+
+    // Utility functions
+    function getPlatformName(url) {
+      if (url.includes('x.com') || url.includes('twitter.com')) return '🐦 X';
+      if (url.includes('farcaster.xyz') || url.includes('warpcast.com')) return '🔮 Farcaster';
+      if (url.includes('github.com')) return '💻 GitHub';
+      if (url.includes('youtube.com')) return '📺 YouTube';
+      if (url.includes('discord.com')) return '💬 Discord';
+      return '🌐 Website';
+    }
+
+    function displaySupportLinks() {
+      const container = document.getElementById('linksContainer');
+      container.innerHTML = '';
+      
+      // Show only links with less than 5 clicks
+      const activeLinks = allCommunityLinks.filter(linkData => linkData.clickCount < 5);
+      
+      if (activeLinks.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1 / -1;">
+            <div class="link-card">
+              <p>🌟 All links have reached maximum support! Submit new links to continue.</p>
+            </div>
+          </div>
+        `;
+        return;
+      }
+      
+      // Show least clicked links first
+      activeLinks.sort((a, b) => a.clickCount - b.clickCount);
+      
+      activeLinks.forEach((linkData, index) => {
+        const platform = getPlatformName(linkData.link);
+        const linkCard = document.createElement('div');
+        linkCard.innerHTML = `
+          <div class="link-card">
+            <div>
+              <div class="link-platform">${platform}</div>
+              <a href="${linkData.link}" target="_blank" class="support-link" onclick="handleLinkClick('${linkData.link}')">
+                ${linkData.link}
+              </a>
+            </div>
+            <div class="link-stats">
+              <div class="stat-item">
+                <div>Supports</div>
+                <div class="stat-value">${linkData.clickCount}/5</div>
+              </div>
+            </div>
+            <button class="supportBtn" onclick="markAsSupported('${linkData.link}')">👍 Support This Content</button>
+          </div>
+        `;
+        container.appendChild(linkCard);
+      });
+    }
+
+    function displayCompletedLinks() {
+      const container = document.getElementById('completedLinks');
+      container.innerHTML = '';
+      
+      // Show links with 5 clicks
+      const completedLinks = allCommunityLinks.filter(linkData => linkData.clickCount >= 5);
+      
+      if (completedLinks.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1 / -1;">
+            <div class="link-card">
+              <p>No completed links yet. Start supporting! 🚀</p>
+            </div>
+          </div>
+        `;
+        return;
+      }
+      
+      completedLinks.forEach((linkData, index) => {
+        const platform = getPlatformName(linkData.link);
+        const submitDate = new Date(linkData.timestamp).toLocaleDateString();
+        
+        const linkCard = document.createElement('div');
+        linkCard.innerHTML = `
+          <div class="link-card completed">
+            <div>
+              <div class="link-platform">${platform}</div>
+              <a href="${linkData.link}" target="_blank" class="support-link">
+                ${linkData.link}
+              </a>
+            </div>
+            <div class="link-stats">
+              <div class="stat-item">
+                <div>Status</div>
+                <div class="stat-value">✅ Completed</div>
+              </div>
+              <div class="stat-item">
+                <div>Submitted</div>
+                <div class="stat-value">${submitDate}</div>
+              </div>
+            </div>
+          </div>
+        `;
+        container.appendChild(linkCard);
+      });
+    }
+
+    // Increase click counter when link is clicked
+    function handleLinkClick(linkUrl) {
+      const linkData = allCommunityLinks.find(item => item.link === linkUrl);
+      if (linkData && linkData.clickCount < 5) {
+        linkData.clickCount++;
+        console.log(`Link clicked: ${linkUrl} - Count: ${linkData.clickCount}`);
+        
+        // Save to localStorage
+        saveLinksToStorage(allCommunityLinks);
+        
+        // Update displays
+        displaySupportLinks();
+        displayCompletedLinks();
+      }
+    }
+
+    // When support button is clicked
+    function markAsSupported(linkUrl) {
+      handleLinkClick(linkUrl); // Increase click counter
+      hasSupported = true;
+      document.getElementById('step1').classList.add('hidden');
+      document.getElementById('step2').classList.remove('hidden');
+    }
+
+    async function switchToCeloNetwork() {
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: CELO_PARAMS.chainId }],
+        });
+        return true;
+      } catch (switchError) {
+        // If the chain hasn't been added to MetaMask
+        if (switchError.code === 4902) {
+          try {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [CELO_PARAMS],
+            });
+            return true;
+          } catch (addError) {
+            console.error("Error adding Celo network:", addError);
+            return false;
+          }
+        }
+        console.error("Error switching to Celo network:", switchError);
+        return false;
+      }
+    }
+
+    function checkMetaMask() {
+      if (typeof window.ethereum === 'undefined') {
+        alert("❌ MetaMask not detected. Please install MetaMask first.");
+        return false;
+      }
+      return true;
+    }
+
+    async function connectWallet() {
+      if (!checkMetaMask()) return false;
+
+      try {
+        // Switch to Celo network first
+        const networkSwitched = await switchToCeloNetwork();
+        if (!networkSwitched) {
+          alert("❌ Please switch to Celo network to continue");
+          return false;
+        }
+
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        signer = provider.getSigner();
+        userAddress = await signer.getAddress();
+        
+        document.getElementById('walletAddress').textContent = 
+          `${userAddress.substring(0, 6)}...${userAddress.substring(userAddress.length - 4)}`;
+        document.getElementById('walletInfo').classList.remove('hidden');
+        document.getElementById('connectWalletBtn').style.display = 'none';
+        
+        isConnected = true;
+        return true;
+        
+      } catch (error) {
+        console.error("Connection error:", error);
+        if (error.code === 4001) {
+          alert("❌ Connection rejected. Please connect to continue.");
+        } else {
+          alert("❌ Connection failed: " + error.message);
+        }
+        return false;
+      }
+    }
+
+    async function submitLink() {
+      if (!isConnected) {
+        const connected = await connectWallet();
+        if (!connected) return;
+      }
+
+      if (!hasSupported) {
+        alert("❌ Please support at least one community member first!");
+        return;
+      }
+
+      const userLink = document.getElementById("userLink").value.trim();
+      if (!userLink) {
+        alert("❌ Please enter your link first.");
+        return;
+      }
+
+      if (!userLink.startsWith('http://') && !userLink.startsWith('https://')) {
+        alert("❌ Please enter a valid URL starting with http:// or https://");
+        return;
+      }
+
+      try {
+        // Show loading state
+        document.getElementById("submitLinkBtn").disabled = true;
+        document.getElementById("submitLinkBtn").textContent = "⏳ Submitting...";
+
+        // Contract interaction
+        const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+
+        const tx = await contract.submitLink(userLink, {
+          gasLimit: 150000
+        });
+        
+        const receipt = await tx.wait();
+        
+        // Add new link to community list
+        const newLinkData = {
+          link: userLink,
+          clickCount: 0,
+          timestamp: Date.now(),
+          submitter: userAddress
+        };
+        
+        allCommunityLinks.unshift(newLinkData);
+        
+        // Save to localStorage
+        saveLinksToStorage(allCommunityLinks);
+        
+        // Update displays
+        displaySupportLinks();
+        displayCompletedLinks();
+        
+        // Reset form
+        document.getElementById("userLink").value = "";
+        hasSupported = false;
+        document.getElementById('step2').classList.add('hidden');
+        document.getElementById('step1').classList.remove('hidden');
+        
+      } catch (error) {
+        console.error("Submit error:", error);
+        
+        // Reset button state
+        document.getElementById("submitLinkBtn").disabled = false;
+        document.getElementById("submitLinkBtn").textContent = "✍️ Submit Link";
+        
+        if (error.code === 4001) {
+          console.log("Transaction rejected by user");
+        } else if (error.code === 'INSUFFICIENT_FUNDS') {
+          alert("❌ Insufficient funds for gas fee.");
+        } else {
+          alert("❌ Submission failed: " + error.message);
+        }
+      } finally {
+        // Ensure button is reset
+        document.getElementById("submitLinkBtn").disabled = false;
+        document.getElementById("submitLinkBtn").textContent = "✍️ Submit Link";
+      }
+    }
+
+    // Event listeners
+    document.getElementById("connectWalletBtn").addEventListener("click", connectWallet);
+    document.getElementById("submitLinkBtn").addEventListener("click", submitLink);
+
+    // Initialize application
+    window.addEventListener('load', function() {
+      displaySupportLinks();
+      displayCompletedLinks();
+      
+      // Check for existing wallet connection
+      if (checkMetaMask()) {
+        setTimeout(async () => {
+          try {
+            const tempProvider = new ethers.providers.Web3Provider(window.ethereum);
+            const accounts = await tempProvider.listAccounts();
+            
+            if (accounts.length > 0) {
+              provider = tempProvider;
+              signer = provider.getSigner();
+              userAddress = await signer.getAddress();
+              
+              document.getElementById('walletAddress').textContent = 
+                `${userAddress.substring(0, 6)}...${userAddress.substring(userAddress.length - 4)}`;
+              document.getElementById('walletInfo').classList.remove('hidden');
+              document.getElementById('connectWalletBtn').style.display = 'none';
+              
+              isConnected = true;
+            }
+          } catch (error) {
+            console.log("No previous connection found");
+          }
+        }, 500);
+      }
+    });
+
+    // Make functions globally available
+    window.markAsSupported = markAsSupported;
+    window.connectWallet = connectWallet;
+    window.handleLinkClick = handleLinkClick;
   </script>
 </body>
 </html>
