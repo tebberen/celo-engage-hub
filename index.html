@@ -42,13 +42,22 @@
       font-size: 28px;
       font-weight: bold;
       border-radius: 10px;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       text-align: center;
       width: 100%;
       max-width: 1400px;
     }
+    .slogan {
+      margin: 5px 0 15px 0;
+      font-size: 22px;
+      color: #000000;
+      font-weight: bold;
+      text-align: center;
+      width: 100%;
+      font-style: italic;
+    }
     .subheader {
-      margin: 15px 0 30px 0;
+      margin: 0 0 30px 0;
       font-size: 18px;
       color: #000000;
       font-weight: bold;
@@ -287,6 +296,30 @@
       text-align: center;
       width: 100%;
     }
+    .network-warning {
+      background: #FEF3CD;
+      border: 2px solid #F59E0B;
+      padding: 15px;
+      margin: 15px auto;
+      border-radius: 8px;
+      color: #92400E;
+      font-weight: bold;
+      max-width: 600px;
+      text-align: center;
+      width: 100%;
+    }
+    .content-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      width: 100%;
+    }
+    .submit-section {
+      order: 1;
+    }
+    .support-section {
+      order: 2;
+    }
   </style>
 </head>
 <body>
@@ -294,6 +327,11 @@
     <header>
       <div>🌐 Celo Engage Hub</div>
     </header>
+    
+    <!-- YENİ SLOGAN -->
+    <div class="slogan">
+      Social TX - Where Every Interaction Builds Real Value
+    </div>
     
     <div class="subheader">If you want support, support first</div>
 
@@ -304,6 +342,7 @@
     <div class="sidebar">
       <div id="walletInfo" class="wallet-address hidden">
         ✅ Connected: <span id="walletAddress"></span>
+        <div id="networkInfo" style="font-size: 12px; margin-top: 5px;"></div>
       </div>
 
       <div class="celo-ecosystem">
@@ -339,8 +378,35 @@
     </div>
 
     <div class="main-content">
-      <div class="main-sections">
-        <div id="step1" class="centered-content">
+      <div class="content-layout">
+        <!-- SUBMIT YOUR LINK SECTION - NOW AT THE TOP -->
+        <div id="step2" class="submit-section hidden">
+          <div class="step-indicator">
+            <span class="step-number">2</span> Submit Your Link
+          </div>
+          
+          <div class="success-message">
+            ✅ Thank you for supporting! Now you can submit your own link
+          </div>
+          
+          <div id="networkWarning" class="network-warning hidden">
+            ⚠️ Please switch to Celo Mainnet to submit your link
+          </div>
+          
+          <div class="submit-form">
+            <h3>🎉 Add Your Content</h3>
+            <input type="text" placeholder="Paste your X, Farcaster, GitHub, or any other link here..." id="userLink" />
+            <br>
+            <div class="gas-info">
+              ⛽ You'll only pay the normal network gas fee (no extra cost)
+            </div>
+            <button id="submitLinkBtn">✍️ Submit Link</button>
+            <p><small>🔒 Secure transaction on Celo network</small></p>
+          </div>
+        </div>
+
+        <!-- SUPPORT COMMUNITY SECTION -->
+        <div id="step1" class="support-section">
           <div class="step-indicator">
             <span class="step-number">1</span> Support Community Members
           </div>
@@ -352,34 +418,7 @@
             </div>
           </div>
         </div>
-
-        <div class="centered-content" id="completedSection">
-          <div class="section-title">✅ Completed Links (5/5 Support)</div>
-          <div class="links-grid" id="completedLinks">
-          </div>
-        </div>
       </div>
-    </div>
-  </div>
-
-  <div id="step2" class="hidden centered-content">
-    <div class="step-indicator">
-      <span class="step-number">2</span> Submit Your Link
-    </div>
-    
-    <div class="success-message">
-      ✅ Thank you for supporting! Now you can submit your own link
-    </div>
-    
-    <div class="submit-form">
-      <h3>🎉 Add Your Content</h3>
-      <input type="text" placeholder="Paste your X, Farcaster, GitHub, or any other link here..." id="userLink" />
-      <br>
-      <div class="gas-info">
-        ⛽ You'll only pay the normal network gas fee (no extra cost)
-      </div>
-      <button id="submitLinkBtn">✍️ Submit Link</button>
-      <p><small>🔒 Secure transaction on Celo network</small></p>
     </div>
   </div>
 
@@ -391,6 +430,7 @@
     let isConnected = false;
     let userAddress = '';
     let hasSupported = false;
+    let currentChainId = null;
 
     // ✅ CELO CONTRACT ADDRESS
     const CONTRACT_ADDRESS = "0xbdf087f85af5d5187de2c11f3bad90edbc6fe0bf";
@@ -401,7 +441,7 @@
     ];
 
     // Celo Network Configuration
-    const CELO_PARAMS = {
+    const CELO_MAINNET_PARAMS = {
       chainId: "0xA4EC", // 42220 in hex - Celo Mainnet
       chainName: "Celo Mainnet",
       nativeCurrency: {
@@ -411,6 +451,18 @@
       },
       rpcUrls: ["https://forno.celo.org"],
       blockExplorerUrls: ["https://celoscan.io/"]
+    };
+
+    const CELO_ALFAJORES_PARAMS = {
+      chainId: "0xAEF3", // 44787 in hex - Celo Alfajores Testnet
+      chainName: "Celo Alfajores Testnet",
+      nativeCurrency: {
+        name: "CELO",
+        symbol: "CELO",
+        decimals: 18
+      },
+      rpcUrls: ["https://alfajores-forno.celo-testnet.org"],
+      blockExplorerUrls: ["https://alfajores.celoscan.io/"]
     };
 
     // Initial support links
@@ -432,7 +484,6 @@
       if (storedLinks) {
         return JSON.parse(storedLinks);
       } else {
-        // Create initial links if first time
         return initialSupportLinks.map(link => ({
           link: link,
           clickCount: 0,
@@ -447,7 +498,6 @@
       localStorage.setItem('celoEngageHubLinks', JSON.stringify(links));
     }
 
-    // All community links loaded from localStorage
     let allCommunityLinks = loadLinksFromStorage();
 
     // Utility functions
@@ -464,7 +514,6 @@
       const container = document.getElementById('linksContainer');
       container.innerHTML = '';
       
-      // Show only links with less than 5 clicks
       const activeLinks = allCommunityLinks.filter(linkData => linkData.clickCount < 5);
       
       if (activeLinks.length === 0) {
@@ -478,7 +527,6 @@
         return;
       }
       
-      // Show least clicked links first
       activeLinks.sort((a, b) => a.clickCount - b.clickCount);
       
       activeLinks.forEach((linkData, index) => {
@@ -505,100 +553,96 @@
       });
     }
 
-    function displayCompletedLinks() {
-      const container = document.getElementById('completedLinks');
-      container.innerHTML = '';
-      
-      // Show links with 5 clicks
-      const completedLinks = allCommunityLinks.filter(linkData => linkData.clickCount >= 5);
-      
-      if (completedLinks.length === 0) {
-        container.innerHTML = `
-          <div style="grid-column: 1 / -1;">
-            <div class="link-card">
-              <p>No completed links yet. Start supporting! 🚀</p>
-            </div>
-          </div>
-        `;
-        return;
-      }
-      
-      completedLinks.forEach((linkData, index) => {
-        const platform = getPlatformName(linkData.link);
-        const submitDate = new Date(linkData.timestamp).toLocaleDateString();
+    // Network functions
+    async function switchToCeloNetwork() {
+      try {
+        // Önce Celo Mainnet'e geçmeyi dene
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: CELO_MAINNET_PARAMS.chainId }],
+          });
+          return true;
+        } catch (switchError) {
+          // Eğer chain ekli değilse, ekle
+          if (switchError.code === 4902) {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [CELO_MAINNET_PARAMS],
+            });
+            return true;
+          }
+          throw switchError;
+        }
+      } catch (error) {
+        console.error("Error switching to Celo:", error);
         
-        const linkCard = document.createElement('div');
-        linkCard.innerHTML = `
-          <div class="link-card completed">
-            <div>
-              <div class="link-platform">${platform}</div>
-              <a href="${linkData.link}" target="_blank" class="support-link">
-                ${linkData.link}
-              </a>
-            </div>
-            <div class="link-stats">
-              <div class="stat-item">
-                <div>Status</div>
-                <div class="stat-value">✅ Completed</div>
-              </div>
-              <div class="stat-item">
-                <div>Submitted</div>
-                <div class="stat-value">${submitDate}</div>
-              </div>
-            </div>
-          </div>
-        `;
-        container.appendChild(linkCard);
-      });
+        // Celo Mainnet başarısız olursa Alfajores Testnet'i dene
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: CELO_ALFAJORES_PARAMS.chainId }],
+          });
+          return true;
+        } catch (testnetError) {
+          if (testnetError.code === 4902) {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [CELO_ALFAJORES_PARAMS],
+            });
+            return true;
+          }
+          throw testnetError;
+        }
+      }
     }
 
-    // Increase click counter when link is clicked
+    async function checkCurrentNetwork() {
+      if (!provider) return false;
+      
+      try {
+        const network = await provider.getNetwork();
+        currentChainId = network.chainId.toString();
+        
+        const networkInfo = document.getElementById('networkInfo');
+        const networkWarning = document.getElementById('networkWarning');
+        
+        if (currentChainId === "42220" || currentChainId === "44787") {
+          // Celo network'ünde
+          networkInfo.innerHTML = `🌐 Celo ${currentChainId === "42220" ? "Mainnet" : "Alfajores"}`;
+          networkInfo.style.color = "#35D07F";
+          networkWarning.classList.add('hidden');
+          return true;
+        } else {
+          // Yanlış network'te
+          networkInfo.innerHTML = `⚠️ Wrong Network - Please switch to Celo`;
+          networkInfo.style.color = "#EF4444";
+          networkWarning.classList.remove('hidden');
+          return false;
+        }
+      } catch (error) {
+        console.error("Error checking network:", error);
+        return false;
+      }
+    }
+
     function handleLinkClick(linkUrl) {
       const linkData = allCommunityLinks.find(item => item.link === linkUrl);
       if (linkData && linkData.clickCount < 5) {
         linkData.clickCount++;
-        console.log(`Link clicked: ${linkUrl} - Count: ${linkData.clickCount}`);
-        
-        // Save to localStorage
         saveLinksToStorage(allCommunityLinks);
-        
-        // Update displays
         displaySupportLinks();
-        displayCompletedLinks();
       }
     }
 
-    // When support button is clicked
     function markAsSupported(linkUrl) {
-      handleLinkClick(linkUrl); // Increase click counter
+      handleLinkClick(linkUrl);
       hasSupported = true;
       document.getElementById('step1').classList.add('hidden');
       document.getElementById('step2').classList.remove('hidden');
-    }
-
-    async function switchToCeloNetwork() {
-      try {
-        await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: CELO_PARAMS.chainId }],
-        });
-        return true;
-      } catch (switchError) {
-        // If the chain hasn't been added to MetaMask
-        if (switchError.code === 4902) {
-          try {
-            await window.ethereum.request({
-              method: 'wallet_addEthereumChain',
-              params: [CELO_PARAMS],
-            });
-            return true;
-          } catch (addError) {
-            console.error("Error adding Celo network:", addError);
-            return false;
-          }
-        }
-        console.error("Error switching to Celo network:", switchError);
-        return false;
+      // Network kontrolünü yap
+      if (isConnected) {
+        checkCurrentNetwork();
       }
     }
 
@@ -614,14 +658,12 @@
       if (!checkMetaMask()) return false;
 
       try {
-        // Switch to Celo network first
-        const networkSwitched = await switchToCeloNetwork();
-        if (!networkSwitched) {
-          alert("❌ Please switch to Celo network to continue");
-          return false;
-        }
-
         provider = new ethers.providers.Web3Provider(window.ethereum);
+        
+        // Önce Celo network'üne geç
+        await switchToCeloNetwork();
+        
+        // Sonra wallet'ı bağla
         await window.ethereum.request({ method: 'eth_requestAccounts' });
         signer = provider.getSigner();
         userAddress = await signer.getAddress();
@@ -632,6 +674,10 @@
         document.getElementById('connectWalletBtn').style.display = 'none';
         
         isConnected = true;
+        
+        // Network kontrolü yap
+        await checkCurrentNetwork();
+        
         return true;
         
       } catch (error) {
@@ -656,6 +702,13 @@
         return;
       }
 
+      // Önce network kontrolü yap
+      const isCorrectNetwork = await checkCurrentNetwork();
+      if (!isCorrectNetwork) {
+        alert("❌ Please switch to Celo network to submit your link");
+        return;
+      }
+
       const userLink = document.getElementById("userLink").value.trim();
       if (!userLink) {
         alert("❌ Please enter your link first.");
@@ -668,11 +721,9 @@
       }
 
       try {
-        // Show loading state
         document.getElementById("submitLinkBtn").disabled = true;
         document.getElementById("submitLinkBtn").textContent = "⏳ Submitting...";
 
-        // Contract interaction
         const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
 
         const tx = await contract.submitLink(userLink, {
@@ -681,7 +732,6 @@
         
         const receipt = await tx.wait();
         
-        // Add new link to community list
         const newLinkData = {
           link: userLink,
           clickCount: 0,
@@ -690,36 +740,30 @@
         };
         
         allCommunityLinks.unshift(newLinkData);
-        
-        // Save to localStorage
         saveLinksToStorage(allCommunityLinks);
-        
-        // Update displays
         displaySupportLinks();
-        displayCompletedLinks();
         
-        // Reset form
         document.getElementById("userLink").value = "";
         hasSupported = false;
         document.getElementById('step2').classList.add('hidden');
         document.getElementById('step1').classList.remove('hidden');
         
+        alert("✅ Link submitted successfully!");
+        
       } catch (error) {
         console.error("Submit error:", error);
         
-        // Reset button state
         document.getElementById("submitLinkBtn").disabled = false;
         document.getElementById("submitLinkBtn").textContent = "✍️ Submit Link";
         
         if (error.code === 4001) {
-          console.log("Transaction rejected by user");
+          alert("❌ Transaction rejected by user");
         } else if (error.code === 'INSUFFICIENT_FUNDS') {
           alert("❌ Insufficient funds for gas fee.");
         } else {
           alert("❌ Submission failed: " + error.message);
         }
       } finally {
-        // Ensure button is reset
         document.getElementById("submitLinkBtn").disabled = false;
         document.getElementById("submitLinkBtn").textContent = "✍️ Submit Link";
       }
@@ -729,20 +773,26 @@
     document.getElementById("connectWalletBtn").addEventListener("click", connectWallet);
     document.getElementById("submitLinkBtn").addEventListener("click", submitLink);
 
+    // Network değişikliklerini dinle
+    if (window.ethereum) {
+      window.ethereum.on('chainChanged', (chainId) => {
+        console.log("Chain changed to:", chainId);
+        currentChainId = parseInt(chainId, 16).toString();
+        checkCurrentNetwork();
+      });
+    }
+
     // Initialize application
     window.addEventListener('load', function() {
       displaySupportLinks();
-      displayCompletedLinks();
       
-      // Check for existing wallet connection
       if (checkMetaMask()) {
         setTimeout(async () => {
           try {
-            const tempProvider = new ethers.providers.Web3Provider(window.ethereum);
-            const accounts = await tempProvider.listAccounts();
+            provider = new ethers.providers.Web3Provider(window.ethereum);
+            const accounts = await provider.listAccounts();
             
             if (accounts.length > 0) {
-              provider = tempProvider;
               signer = provider.getSigner();
               userAddress = await signer.getAddress();
               
@@ -752,6 +802,7 @@
               document.getElementById('connectWalletBtn').style.display = 'none';
               
               isConnected = true;
+              await checkCurrentNetwork();
             }
           } catch (error) {
             console.log("No previous connection found");
