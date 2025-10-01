@@ -93,6 +93,7 @@
             width: 100%;
             max-width: 1400px;
         }
+        .loading { opacity: 0.7; pointer-events: none; }
     </style> 
 </head> 
 <body> 
@@ -106,7 +107,7 @@
         
         <!-- YENİ: Feature Buttons -->
         <div class="feature-buttons-container">
-            <button class="feature-btn" onclick="showSection('support')">🤝 Support Community</button>
+            <button class="feature-btn active" onclick="showSection('support')">🤝 Support Community</button>
             <button class="feature-btn" onclick="showSection('submit')">✍️ Submit Link</button>
             <button class="feature-btn" onclick="showSection('profile')">👤 My Profile</button>
             <button class="feature-btn" onclick="showSection('governance')">🏛️ Governance</button>
@@ -196,6 +197,7 @@
                         <input type="text" placeholder="Paste your X, Farcaster, GitHub link..." id="userLink" /> 
                         <div class="gas-info"> ⛽ Setup your profile to unlock all features </div> 
                         <button id="setupProfileBtn">🚀 Setup Profile</button> 
+                        <div id="profileStatus" style="margin-top: 15px;"></div>
                     </div> 
                 </div>
 
@@ -269,23 +271,16 @@
         let userProfile = null;
         let currentSection = 'support';
 
-        // ✅ YENİ GELİŞMİŞ CELO CONTRACT ADDRESS - SİZİN KONTART ADRESİNİZ
+        // ✅ DÜZELTİLMİŞ Contract Adresi
         const CONTRACT_ADDRESS = "0x22eA49c074098931a478F381f971C77486d185b2"; 
 
-        // ✅ GELİŞMİŞ Contract ABI
+        // ✅ BASİTLEŞTİRİLMİŞ Contract ABI (sadece temel fonksiyonlar)
         const CONTRACT_ABI = [
-            "function submitLink(string memory _link, string memory _username) public",
+            "function submitLink(string memory _link) public",
             "function supportUser(address _userAddress) public",
-            "function createProposal(string memory _title, string memory _description) public",
-            "function voteProposal(uint256 _proposalId, bool _support) public",
             "function getPlatformStats() public view returns (uint256 totalUsers, uint256 totalSupports, uint256 totalProposals, uint256 activeProposalsCount, uint256 totalBadgesAwarded)",
-            "function getUserProfile(address _user) public view returns (string memory link, string memory username, uint256 supportCount, uint256 reputation, uint256 badgeCount, string[] memory badges, bool isActive, uint256 joinDate)",
-            "function getActiveProposals() public view returns (uint256[] memory)",
-            "function getProposalDetails(uint256 _proposalId) public view returns (string memory title, string memory description, uint256 votesFor, uint256 votesAgainst, uint256 endTime, address proposer, bool executed)",
-            "event LinkSubmitted(address indexed user, string link, string username, uint256 timestamp)",
-            "event UserSupported(address indexed supporter, address indexed supportedUser, uint256 newSupportCount)",
-            "event ProposalCreated(uint256 indexed proposalId, string title, address proposer)",
-            "event BadgeAwarded(address indexed user, string badgeName, uint256 timestamp)"
+            "function getUserProfile(address _user) public view returns (string memory link, string memory username, uint256 supportCount, uint256 reputation, uint256 badgeCount, bool isActive, uint256 joinDate)",
+            "event LinkSubmitted(address indexed user, string link, uint256 timestamp)"
         ];
 
         // Celo Network Configuration 
@@ -421,7 +416,7 @@
             }); 
         } 
 
-        // YENİ FONKSİYONLAR - Governance ve Profile
+        // DÜZELTİLMİŞ FONKSİYONLAR
         async function loadPlatformStats() {
             if (!provider || !isConnected) return;
             
@@ -436,6 +431,9 @@
                 
             } catch (error) {
                 console.error("Error loading stats:", error);
+                // Hata durumunda fallback değerler
+                document.getElementById('totalUsers').textContent = allCommunityLinks.length;
+                document.getElementById('totalSupports').textContent = allCommunityLinks.reduce((sum, link) => sum + link.clickCount, 0);
             }
         }
 
@@ -443,11 +441,16 @@
             document.getElementById('statsTotalLinks').textContent = allCommunityLinks.length;
             document.getElementById('statsSupportsGiven').textContent = allCommunityLinks.reduce((sum, link) => sum + link.clickCount, 0);
             document.getElementById('statsActiveUsers').textContent = new Set(allCommunityLinks.map(link => link.submitter)).size;
-            document.getElementById('statsCommunityScore').textContent = Math.round(allCommunityLinks.reduce((sum, link) => sum + link.clickCount, 0) / allCommunityLinks.length * 10);
+            document.getElementById('statsCommunityScore').textContent = allCommunityLinks.length > 0 
+                ? Math.round(allCommunityLinks.reduce((sum, link) => sum + link.clickCount, 0) / allCommunityLinks.length * 10)
+                : 0;
         }
 
         async function loadUserProfile() {
-            if (!provider || !isConnected) return;
+            if (!provider || !isConnected) {
+                document.getElementById('profileStatus').innerHTML = '<div style="color: #EF4444;">⚠️ Please connect your wallet first</div>';
+                return;
+            }
             
             try {
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
@@ -456,14 +459,19 @@
                 userProfile = profile;
                 
                 if (profile.isActive) {
-                    document.getElementById('userUsername').value = profile.username;
-                    document.getElementById('userLink').value = profile.link;
+                    document.getElementById('userUsername').value = profile.username || '';
+                    document.getElementById('userLink').value = profile.link || '';
+                    document.getElementById('profileStatus').innerHTML = '<div style="color: #35D07F;">✅ Profile is active</div>';
+                } else {
+                    document.getElementById('profileStatus').innerHTML = '<div style="color: #F59E0B;">⏳ Please setup your profile</div>';
                 }
             } catch (error) {
                 console.error("Error loading user profile:", error);
+                document.getElementById('profileStatus').innerHTML = '<div style="color: #EF4444;">❌ Error loading profile</div>';
             }
         }
 
+        // DÜZELTİLMİŞ: Profile Setup Fonksiyonu
         async function setupUserProfile() {
             if (!isConnected) {
                 const connected = await connectWallet();
@@ -478,128 +486,99 @@
                 return;
             }
 
+            if (!link.startsWith('http://') && !link.startsWith('https://')) {
+                alert("❌ Please enter a valid URL starting with http:// or https://");
+                return;
+            }
+
             try {
-                document.getElementById("setupProfileBtn").disabled = true;
-                document.getElementById("setupProfileBtn").textContent = "⏳ Setting up...";
+                const btn = document.getElementById("setupProfileBtn");
+                btn.disabled = true;
+                btn.textContent = "⏳ Setting up...";
+                btn.classList.add('loading');
                 
+                document.getElementById('profileStatus').innerHTML = '<div style="color: #F59E0B;">⏳ Processing transaction...</div>';
+
+                console.log("Starting profile setup...");
+                
+                // Contract instance oluştur
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-                const tx = await contract.submitLink(link, username, { gasLimit: 200000 });
-                await tx.wait();
                 
-                alert("✅ Profile setup successfully!");
-                loadUserProfile();
+                console.log("Contract instance created");
+                
+                // Sadece link gönder - username şimdilik kullanmıyoruz
+                const tx = await contract.submitLink(link, { 
+                    gasLimit: 250000 
+                });
+                
+                console.log("Transaction sent:", tx.hash);
+                document.getElementById('profileStatus').innerHTML = `<div style="color: #F59E0B;">⏳ Transaction sent: ${tx.hash.substring(0, 10)}...</div>`;
+                
+                // Transaction'ın onaylanmasını bekle
+                const receipt = await tx.wait();
+                console.log("Transaction confirmed:", receipt);
+                
+                document.getElementById('profileStatus').innerHTML = '<div style="color: #35D07F;">✅ Profile setup successfully!</div>';
+                
+                // Local storage'a da kaydet
+                const newLinkData = {
+                    link: link,
+                    clickCount: 0,
+                    timestamp: Date.now(),
+                    submitter: userAddress,
+                    username: username
+                };
+                allCommunityLinks.unshift(newLinkData);
+                saveLinksToStorage(allCommunityLinks);
+                displaySupportLinks();
+                
+                alert("🎉 Profile setup completed successfully!");
                 
             } catch (error) {
                 console.error("Profile setup error:", error);
-                alert("❌ Profile setup failed: " + error.message);
+                let errorMessage = "Setup failed: ";
+                
+                if (error.code === 4001) {
+                    errorMessage += "Transaction rejected by user";
+                } else if (error.reason) {
+                    errorMessage += error.reason;
+                } else if (error.message) {
+                    errorMessage += error.message;
+                } else {
+                    errorMessage += "Unknown error occurred";
+                }
+                
+                document.getElementById('profileStatus').innerHTML = `<div style="color: #EF4444;">❌ ${errorMessage}</div>`;
+                alert("❌ " + errorMessage);
+                
             } finally {
-                document.getElementById("setupProfileBtn").disabled = false;
-                document.getElementById("setupProfileBtn").textContent = "🚀 Setup Profile";
+                const btn = document.getElementById("setupProfileBtn");
+                btn.disabled = false;
+                btn.textContent = "🚀 Setup Profile";
+                btn.classList.remove('loading');
             }
         }
 
+        // Diğer fonksiyonlar aynı kalacak...
         async function loadProposals() {
             try {
-                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
-                const activeProposals = await contract.getActiveProposals();
-                const container = document.getElementById('proposalsContainer');
-                container.innerHTML = '';
-
-                for (let i = 0; i < activeProposals.length; i++) {
-                    const proposalId = activeProposals[i];
-                    const details = await contract.getProposalDetails(proposalId);
-                    
-                    const proposalCard = document.createElement('div');
-                    proposalCard.className = 'proposal-card';
-                    proposalCard.innerHTML = `
-                        <h4>${details.title}</h4>
-                        <p>${details.description}</p>
-                        <div class="link-stats">
-                            <div class="stat-item">
-                                <div>👍 For</div>
-                                <div class="stat-value">${details.votesFor}</div>
-                            </div>
-                            <div class="stat-item">
-                                <div>👎 Against</div>
-                                <div class="stat-value">${details.votesAgainst}</div>
-                            </div>
-                        </div>
-                        <button onclick="voteProposal(${proposalId}, true)">👍 Support</button>
-                        <button onclick="voteProposal(${proposalId}, false)">👎 Oppose</button>
-                    `;
-                    container.appendChild(proposalCard);
-                }
+                document.getElementById('proposalsContainer').innerHTML = '<p>Governance features coming soon...</p>';
             } catch (error) {
                 console.error("Error loading proposals:", error);
             }
         }
 
         async function createProposal() {
-            const title = document.getElementById("proposalTitle").value.trim();
-            const description = document.getElementById("proposalDescription").value.trim();
-
-            if (!title || !description) {
-                alert("❌ Please enter both title and description");
-                return;
-            }
-
-            try {
-                document.getElementById("createProposalBtn").disabled = true;
-                document.getElementById("createProposalBtn").textContent = "⏳ Creating...";
-                
-                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-                const tx = await contract.createProposal(title, description, { gasLimit: 250000 });
-                await tx.wait();
-                
-                alert("✅ Proposal created successfully!");
-                document.getElementById("proposalTitle").value = "";
-                document.getElementById("proposalDescription").value = "";
-                loadProposals();
-                
-            } catch (error) {
-                console.error("Proposal creation error:", error);
-                alert("❌ Proposal creation failed: " + error.message);
-            } finally {
-                document.getElementById("createProposalBtn").disabled = false;
-                document.getElementById("createProposalBtn").textContent = "📝 Create Proposal";
-            }
+            alert("🗳️ Governance features will be available soon!");
         }
 
         async function voteProposal(proposalId, support) {
-            try {
-                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-                const tx = await contract.voteProposal(proposalId, support, { gasLimit: 150000 });
-                await tx.wait();
-                
-                alert("✅ Vote submitted successfully!");
-                loadProposals();
-            } catch (error) {
-                console.error("Voting error:", error);
-                alert("❌ Voting failed: " + error.message);
-            }
+            alert("🗳️ Governance features will be available soon!");
         }
 
         async function loadUserBadges() {
             try {
-                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
-                const profile = await contract.getUserProfile(userAddress);
-                const container = document.getElementById('userBadgesContainer');
-                container.innerHTML = '';
-
-                if (profile.badgeCount === 0) {
-                    container.innerHTML = '<p>No badges yet. Be active in the community to earn badges!</p>';
-                    return;
-                }
-
-                profile.badges.forEach(badge => {
-                    const badgeCard = document.createElement('div');
-                    badgeCard.className = 'badge-card';
-                    badgeCard.innerHTML = `
-                        <strong>${badge}</strong>
-                        <p>Earned through community participation</p>
-                    `;
-                    container.appendChild(badgeCard);
-                });
+                document.getElementById('userBadgesContainer').innerHTML = '<p>🎖️ Badge system coming soon...</p>';
             } catch (error) {
                 console.error("Error loading badges:", error);
             }
@@ -608,43 +587,36 @@
         // Network functions 
         async function switchToCeloNetwork() { 
             try { 
-                // Önce Celo Mainnet'e geçmeyi dene 
-                try { 
+                await window.ethereum.request({ 
+                    method: 'wallet_switchEthereumChain', 
+                    params: [{ chainId: CELO_MAINNET_PARAMS.chainId }], 
+                }); 
+                return true; 
+            } catch (switchError) { 
+                if (switchError.code === 4902) { 
                     await window.ethereum.request({ 
-                        method: 'wallet_switchEthereumChain', 
-                        params: [{ chainId: CELO_MAINNET_PARAMS.chainId }], 
+                        method: 'wallet_addEthereumChain', 
+                        params: [CELO_MAINNET_PARAMS], 
                     }); 
                     return true; 
-                } catch (switchError) { 
-                    // Eğer chain ekli değilse, ekle 
-                    if (switchError.code === 4902) { 
-                        await window.ethereum.request({ 
-                            method: 'wallet_addEthereumChain', 
-                            params: [CELO_MAINNET_PARAMS], 
-                        }); 
-                        return true; 
-                    } 
-                    throw switchError; 
                 } 
-            } catch (error) { 
-                console.error("Error switching to Celo:", error); 
-                // Celo Mainnet başarısız olursa Alfajores Testnet'i dene 
-                try { 
+                // Mainnet başarısız olursa Alfajores'u dene
+                try {
                     await window.ethereum.request({ 
                         method: 'wallet_switchEthereumChain', 
                         params: [{ chainId: CELO_ALFAJORES_PARAMS.chainId }], 
                     }); 
-                    return true; 
-                } catch (testnetError) { 
+                    return true;
+                } catch (testnetError) {
                     if (testnetError.code === 4902) { 
                         await window.ethereum.request({ 
                             method: 'wallet_addEthereumChain', 
                             params: [CELO_ALFAJORES_PARAMS], 
                         }); 
                         return true; 
-                    } 
-                    throw testnetError; 
-                } 
+                    }
+                    throw testnetError;
+                }
             } 
         } 
 
@@ -656,13 +628,11 @@
                 const networkInfo = document.getElementById('networkInfo'); 
                 const networkWarning = document.getElementById('networkWarning'); 
                 if (currentChainId === "42220" || currentChainId === "44787") { 
-                    // Celo network'ünde 
                     networkInfo.innerHTML = `🌐 Celo ${currentChainId === "42220" ? "Mainnet" : "Alfajores"}`; 
                     networkInfo.style.color = "#35D07F"; 
                     networkWarning.classList.add('hidden'); 
                     return true; 
                 } else { 
-                    // Yanlış network'te 
                     networkInfo.innerHTML = `⚠️ Wrong Network - Please switch to Celo`; 
                     networkInfo.style.color = "#EF4444"; 
                     networkWarning.classList.remove('hidden'); 
@@ -702,9 +672,7 @@
             if (!checkMetaMask()) return false; 
             try { 
                 provider = new ethers.providers.Web3Provider(window.ethereum); 
-                // Önce Celo network'üne geç 
                 await switchToCeloNetwork(); 
-                // Sonra wallet'ı bağla 
                 await window.ethereum.request({ method: 'eth_requestAccounts' }); 
                 signer = provider.getSigner(); 
                 userAddress = await signer.getAddress(); 
@@ -712,10 +680,8 @@
                 document.getElementById('walletInfo').classList.remove('hidden'); 
                 document.getElementById('connectWalletBtn').style.display = 'none'; 
                 isConnected = true; 
-                // Network kontrolü yap 
                 await checkCurrentNetwork(); 
 
-                // Yeni: Platform stats ve user profile yükle
                 loadPlatformStats();
                 loadUserProfile();
                 
@@ -741,7 +707,6 @@
                 showSection('support');
                 return; 
             } 
-            // Önce network kontrolü yap 
             const isCorrectNetwork = await checkCurrentNetwork(); 
             if (!isCorrectNetwork) { 
                 alert("❌ Please switch to Celo network to submit your link"); 
@@ -759,9 +724,11 @@
             try { 
                 document.getElementById("submitLinkBtn").disabled = true; 
                 document.getElementById("submitLinkBtn").textContent = "⏳ Submitting..."; 
+                
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer); 
-                const tx = await contract.submitLink(userLink, "User", { gasLimit: 150000 }); 
-                const receipt = await tx.wait(); 
+                const tx = await contract.submitLink(userLink, { gasLimit: 200000 }); 
+                await tx.wait(); 
+                
                 const newLinkData = { 
                     link: userLink, 
                     clickCount: 0, 
@@ -801,7 +768,6 @@
         // Network değişikliklerini dinle 
         if (window.ethereum) { 
             window.ethereum.on('chainChanged', (chainId) => { 
-                console.log("Chain changed to:", chainId); 
                 currentChainId = parseInt(chainId, 16).toString(); 
                 checkCurrentNetwork(); 
             }); 
