@@ -53,6 +53,46 @@
         .badge-card { border: 2px solid #FBCC5C; padding: 15px; border-radius: 12px; background-color: #FFF9E6; margin: 10px 0; }
         .stats-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
         .stat-card { background: #FFFDF6; border: 2px solid #FBCC5C; padding: 15px; border-radius: 8px; text-align: center; }
+        
+        /* YENİ: Feature Buttons Stilleri */
+        .feature-buttons-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0 30px 0;
+            width: 100%;
+            max-width: 1400px;
+        }
+        .feature-btn {
+            background: linear-gradient(135deg, #35D07F 0%, #FBCC5C 100%);
+            color: black;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 180px;
+            justify-content: center;
+        }
+        .feature-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+        .feature-btn.active {
+            background: linear-gradient(135deg, #000000 0%, #FBCC5C 100%);
+            color: white;
+        }
+        .feature-section {
+            width: 100%;
+            max-width: 1400px;
+        }
     </style> 
 </head> 
 <body> 
@@ -63,6 +103,16 @@
         <div class="slogan"> Social TX - Where Every Interaction Builds Real Value </div> 
         <div class="subheader">If you want support, support first</div> 
         <button id="connectWalletBtn" class="connect-btn">🔗 Connect MetaMask</button> 
+        
+        <!-- YENİ: Feature Buttons -->
+        <div class="feature-buttons-container">
+            <button class="feature-btn" onclick="showSection('support')">🤝 Support Community</button>
+            <button class="feature-btn" onclick="showSection('submit')">✍️ Submit Link</button>
+            <button class="feature-btn" onclick="showSection('profile')">👤 My Profile</button>
+            <button class="feature-btn" onclick="showSection('governance')">🏛️ Governance</button>
+            <button class="feature-btn" onclick="showSection('badges')">🎖️ My Badges</button>
+            <button class="feature-btn" onclick="showSection('stats')">📊 Platform Stats</button>
+        </div>
     </div> 
 
     <div class="container"> 
@@ -85,7 +135,7 @@
             </div> 
 
             <!-- Platform Stats -->
-            <div id="platformStats" class="stats-container hidden">
+            <div id="platformStats" class="stats-container">
                 <div class="stat-card">
                     <div>👥 Total Users</div>
                     <div class="stat-value" id="totalUsers">0</div>
@@ -107,8 +157,36 @@
 
         <div class="main-content"> 
             <div class="content-layout"> 
+                <!-- SUPPORT COMMUNITY SECTION -->
+                <div id="supportSection" class="feature-section"> 
+                    <div class="step-indicator"> 
+                        <span class="step-number">1</span> Support Community Members 
+                    </div> 
+                    <div class="step-container"> 
+                        <h3>📋 Support Others First</h3> 
+                        <p>To submit your link, you must first support at least one community member</p> 
+                        <div class="links-grid" id="linksContainer"> </div> 
+                    </div> 
+                </div>
+
+                <!-- SUBMIT YOUR LINK SECTION -->
+                <div id="submitSection" class="feature-section hidden"> 
+                    <div class="step-indicator"> 
+                        <span class="step-number">2</span> Submit Your Link 
+                    </div> 
+                    <div id="networkWarning" class="network-warning hidden"> ⚠️ Please switch to Celo Mainnet to submit your link </div> 
+                    <div class="submit-form"> 
+                        <h3>🎉 Add Your Content</h3> 
+                        <input type="text" placeholder="Paste your X, Farcaster, GitHub, or any other link here..." id="userLinkInput" /> 
+                        <br> 
+                        <div class="gas-info"> ⛽ You'll only pay the normal network gas fee (no extra cost) </div> 
+                        <button id="submitLinkBtn">✍️ Submit Link</button> 
+                        <p><small>🔒 Secure transaction on Celo network</small></p> 
+                    </div> 
+                </div> 
+
                 <!-- USER PROFILE SECTION -->
-                <div id="userProfileSection" class="hidden">
+                <div id="profileSection" class="feature-section hidden">
                     <div class="step-indicator"> 
                         <span class="step-number">👤</span> Your Profile 
                     </div> 
@@ -121,37 +199,8 @@
                     </div> 
                 </div>
 
-                <!-- SUBMIT YOUR LINK SECTION -->
-                <div id="step2" class="submit-section hidden"> 
-                    <div class="step-indicator"> 
-                        <span class="step-number">2</span> Submit Your Link 
-                    </div> 
-                    <div class="success-message"> ✅ Thank you for supporting! Now you can submit your own link </div> 
-                    <div id="networkWarning" class="network-warning hidden"> ⚠️ Please switch to Celo Mainnet to submit your link </div> 
-                    <div class="submit-form"> 
-                        <h3>🎉 Add Your Content</h3> 
-                        <input type="text" placeholder="Paste your X, Farcaster, GitHub, or any other link here..." id="userLinkInput" /> 
-                        <br> 
-                        <div class="gas-info"> ⛽ You'll only pay the normal network gas fee (no extra cost) </div> 
-                        <button id="submitLinkBtn">✍️ Submit Link</button> 
-                        <p><small>🔒 Secure transaction on Celo network</small></p> 
-                    </div> 
-                </div> 
-
-                <!-- SUPPORT COMMUNITY SECTION -->
-                <div id="step1" class="support-section"> 
-                    <div class="step-indicator"> 
-                        <span class="step-number">1</span> Support Community Members 
-                    </div> 
-                    <div class="step-container"> 
-                        <h3>📋 Support Others First</h3> 
-                        <p>To submit your link, you must first support at least one community member</p> 
-                        <div class="links-grid" id="linksContainer"> </div> 
-                    </div> 
-                </div>
-
                 <!-- GOVERNANCE SECTION -->
-                <div id="governanceSection" class="governance-section hidden">
+                <div id="governanceSection" class="feature-section hidden">
                     <div class="step-indicator"> 
                         <span class="step-number">🏛️</span> Community Governance 
                     </div> 
@@ -167,13 +216,41 @@
                 </div>
 
                 <!-- BADGES SECTION -->
-                <div id="badgesSection" class="badge-section hidden">
+                <div id="badgesSection" class="feature-section hidden">
                     <div class="step-indicator"> 
                         <span class="step-number">🎖️</span> Your Badges 
                     </div> 
                     <div class="step-container"> 
                         <h3>🏆 Your Achievements</h3>
                         <div id="userBadgesContainer"></div>
+                    </div> 
+                </div>
+
+                <!-- STATS SECTION -->
+                <div id="statsSection" class="feature-section hidden">
+                    <div class="step-indicator"> 
+                        <span class="step-number">📊</span> Platform Statistics 
+                    </div> 
+                    <div class="step-container"> 
+                        <h3>📈 Engagement Analytics</h3>
+                        <div class="stats-container">
+                            <div class="stat-card">
+                                <div>🌐 Total Links</div>
+                                <div class="stat-value" id="statsTotalLinks">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div>🤝 Supports Given</div>
+                                <div class="stat-value" id="statsSupportsGiven">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div>📊 Active Users</div>
+                                <div class="stat-value" id="statsActiveUsers">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div>🚀 Community Score</div>
+                                <div class="stat-value" id="statsCommunityScore">0</div>
+                            </div>
+                        </div>
                     </div> 
                 </div>
             </div> 
@@ -190,6 +267,7 @@
         let hasSupported = false; 
         let currentChainId = null; 
         let userProfile = null;
+        let currentSection = 'support';
 
         // ✅ YENİ GELİŞMİŞ CELO CONTRACT ADDRESS - SİZİN KONTART ADRESİNİZ
         const CONTRACT_ADDRESS = "0x22eA49c074098931a478F381f971C77486d185b2"; 
@@ -257,6 +335,43 @@
 
         let allCommunityLinks = loadLinksFromStorage(); 
 
+        // YENİ: Section gösterim fonksiyonu
+        function showSection(sectionName) {
+            // Tüm section'ları gizle
+            document.querySelectorAll('.feature-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Tüm butonlardan active class'ını kaldır
+            document.querySelectorAll('.feature-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Seçilen section'ı göster
+            document.getElementById(sectionName + 'Section').classList.remove('hidden');
+            
+            // Seçilen butona active class'ını ekle
+            event.target.classList.add('active');
+            
+            currentSection = sectionName;
+            
+            // Section'a özel verileri yükle
+            switch(sectionName) {
+                case 'governance':
+                    loadProposals();
+                    break;
+                case 'badges':
+                    loadUserBadges();
+                    break;
+                case 'stats':
+                    loadDetailedStats();
+                    break;
+                case 'profile':
+                    loadUserProfile();
+                    break;
+            }
+        }
+
         // Utility functions 
         function getPlatformName(url) { 
             if (url.includes('x.com') || url.includes('twitter.com')) return '🐦 X'; 
@@ -319,10 +434,16 @@
                 document.getElementById('totalProposals').textContent = stats.totalProposals.toString();
                 document.getElementById('totalBadges').textContent = stats.totalBadgesAwarded.toString();
                 
-                document.getElementById('platformStats').classList.remove('hidden');
             } catch (error) {
                 console.error("Error loading stats:", error);
             }
+        }
+
+        async function loadDetailedStats() {
+            document.getElementById('statsTotalLinks').textContent = allCommunityLinks.length;
+            document.getElementById('statsSupportsGiven').textContent = allCommunityLinks.reduce((sum, link) => sum + link.clickCount, 0);
+            document.getElementById('statsActiveUsers').textContent = new Set(allCommunityLinks.map(link => link.submitter)).size;
+            document.getElementById('statsCommunityScore').textContent = Math.round(allCommunityLinks.reduce((sum, link) => sum + link.clickCount, 0) / allCommunityLinks.length * 10);
         }
 
         async function loadUserProfile() {
@@ -335,15 +456,8 @@
                 userProfile = profile;
                 
                 if (profile.isActive) {
-                    // User has profile, show main features
-                    document.getElementById('userProfileSection').classList.add('hidden');
-                    document.getElementById('governanceSection').classList.remove('hidden');
-                    document.getElementById('badgesSection').classList.remove('hidden');
-                    loadUserBadges();
-                    loadProposals();
-                } else {
-                    // User needs to setup profile
-                    document.getElementById('userProfileSection').classList.remove('hidden');
+                    document.getElementById('userUsername').value = profile.username;
+                    document.getElementById('userLink').value = profile.link;
                 }
             } catch (error) {
                 console.error("Error loading user profile:", error);
@@ -472,7 +586,7 @@
                 const container = document.getElementById('userBadgesContainer');
                 container.innerHTML = '';
 
-                if (profile.badges.length === 0) {
+                if (profile.badgeCount === 0) {
                     container.innerHTML = '<p>No badges yet. Be active in the community to earn badges!</p>';
                     return;
                 }
@@ -572,12 +686,8 @@
         function markAsSupported(linkUrl) { 
             handleLinkClick(linkUrl); 
             hasSupported = true; 
-            document.getElementById('step1').classList.add('hidden'); 
-            document.getElementById('step2').classList.remove('hidden'); 
-            // Network kontrolünü yap 
-            if (isConnected) { 
-                checkCurrentNetwork(); 
-            } 
+            alert("✅ Thank you for supporting! You can now submit your own link.");
+            showSection('submit');
         } 
 
         function checkMetaMask() { 
@@ -628,6 +738,7 @@
             } 
             if (!hasSupported) { 
                 alert("❌ Please support at least one community member first!"); 
+                showSection('support');
                 return; 
             } 
             // Önce network kontrolü yap 
@@ -662,9 +773,8 @@
                 displaySupportLinks(); 
                 document.getElementById("userLinkInput").value = ""; 
                 hasSupported = false; 
-                document.getElementById('step2').classList.add('hidden'); 
-                document.getElementById('step1').classList.remove('hidden'); 
-                alert("✅ Link submitted successfully!"); 
+                alert("✅ Link submitted successfully! Thank you for contributing to the community."); 
+                showSection('support');
             } catch (error) { 
                 console.error("Submit error:", error); 
                 document.getElementById("submitLinkBtn").disabled = false; 
@@ -700,6 +810,7 @@
         // Initialize application 
         window.addEventListener('load', function() { 
             displaySupportLinks(); 
+            loadDetailedStats();
             if (checkMetaMask()) { 
                 setTimeout(async () => { 
                     try { 
@@ -728,6 +839,7 @@
         window.connectWallet = connectWallet; 
         window.handleLinkClick = handleLinkClick; 
         window.voteProposal = voteProposal;
+        window.showSection = showSection;
     </script> 
 </body> 
 </html>
