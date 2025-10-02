@@ -271,16 +271,575 @@
         let userProfile = null;
         let currentSection = 'support';
 
-        // ✅ DÜZELTİLMİŞ Contract Adresi
+        // ✅ Contract Adresi
         const CONTRACT_ADDRESS = "0x22eA49c074098931a478F381f971C77486d185b2"; 
 
-        // ✅ BASİTLEŞTİRİLMİŞ Contract ABI (sadece temel fonksiyonlar)
+        // ✅ GERÇEK ABI - Remix'ten aldığınız ABI
         const CONTRACT_ABI = [
-            "function submitLink(string memory _link) public",
-            "function supportUser(address _userAddress) public",
-            "function getPlatformStats() public view returns (uint256 totalUsers, uint256 totalSupports, uint256 totalProposals, uint256 activeProposalsCount, uint256 totalBadgesAwarded)",
-            "function getUserProfile(address _user) public view returns (string memory link, string memory username, uint256 supportCount, uint256 reputation, uint256 badgeCount, bool isActive, uint256 joinDate)",
-            "event LinkSubmitted(address indexed user, string link, uint256 timestamp)"
+            {
+                "inputs": [],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "string",
+                        "name": "badge",
+                        "type": "string"
+                    }
+                ],
+                "name": "BadgeAwarded",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "uint256",
+                        "name": "proposalId",
+                        "type": "uint256"
+                    },
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "creator",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "string",
+                        "name": "title",
+                        "type": "string"
+                    }
+                ],
+                "name": "ProposalCreated",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "string",
+                        "name": "username",
+                        "type": "string"
+                    }
+                ],
+                "name": "UserRegistered",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "uint256",
+                        "name": "proposalId",
+                        "type": "uint256"
+                    },
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "voter",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "bool",
+                        "name": "support",
+                        "type": "bool"
+                    }
+                ],
+                "name": "Voted",
+                "type": "event"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "activeProposals",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "_user",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "_badge",
+                        "type": "string"
+                    }
+                ],
+                "name": "awardBadge",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "string",
+                        "name": "_title",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "_description",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "_duration",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "createProposal",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getActiveProposals",
+                "outputs": [
+                    {
+                        "internalType": "uint256[]",
+                        "name": "",
+                        "type": "uint256[]"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getAllUsers",
+                "outputs": [
+                    {
+                        "internalType": "address[]",
+                        "name": "",
+                        "type": "address[]"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "_proposalId",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "getProposalDetails",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "_user",
+                        "type": "address"
+                    }
+                ],
+                "name": "getUserBadges",
+                "outputs": [
+                    {
+                        "internalType": "string[]",
+                        "name": "",
+                        "type": "string[]"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "_user",
+                        "type": "address"
+                    }
+                ],
+                "name": "getUserProfile",
+                "outputs": [
+                    {
+                        "internalType": "string",
+                        "name": "",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "hasVoted",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "owner",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "proposalCount",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "proposals",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "id",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "title",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "description",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "creator",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "votesFor",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "votesAgainst",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "deadline",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "executed",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "string",
+                        "name": "_username",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "_link",
+                        "type": "string"
+                    }
+                ],
+                "name": "registerUser",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "totalUsers",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "string",
+                        "name": "_username",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "_link",
+                        "type": "string"
+                    }
+                ],
+                "name": "updateProfile",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "userAddresses",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "userBadges",
+                "outputs": [
+                    {
+                        "internalType": "string",
+                        "name": "",
+                        "type": "string"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "name": "users",
+                "outputs": [
+                    {
+                        "internalType": "string",
+                        "name": "link",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "username",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "supportCount",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "reputation",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "badgeCount",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "isActive",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "timestamp",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "_proposalId",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "_support",
+                        "type": "bool"
+                    }
+                ],
+                "name": "voteProposal",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            }
         ];
 
         // Celo Network Configuration 
@@ -422,12 +981,12 @@
             
             try {
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
-                const stats = await contract.getPlatformStats();
+                const totalUsers = await contract.totalUsers();
                 
-                document.getElementById('totalUsers').textContent = stats.totalUsers.toString();
-                document.getElementById('totalSupports').textContent = stats.totalSupports.toString();
-                document.getElementById('totalProposals').textContent = stats.totalProposals.toString();
-                document.getElementById('totalBadges').textContent = stats.totalBadgesAwarded.toString();
+                document.getElementById('totalUsers').textContent = totalUsers.toString();
+                document.getElementById('totalSupports').textContent = "0";
+                document.getElementById('totalProposals').textContent = "0";
+                document.getElementById('totalBadges').textContent = "0";
                 
             } catch (error) {
                 console.error("Error loading stats:", error);
@@ -471,7 +1030,7 @@
             }
         }
 
-        // DÜZELTİLMİŞ: Profile Setup Fonksiyonu
+        // ✅ DÜZELTİLMİŞ: Profile Setup Fonksiyonu - registerUser kullanıyor
         async function setupUserProfile() {
             if (!isConnected) {
                 const connected = await connectWallet();
@@ -499,16 +1058,16 @@
                 
                 document.getElementById('profileStatus').innerHTML = '<div style="color: #F59E0B;">⏳ Processing transaction...</div>';
 
-                console.log("Starting profile setup...");
+                console.log("Starting profile setup with:", { username, link });
                 
                 // Contract instance oluştur
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
                 
                 console.log("Contract instance created");
                 
-                // Sadece link gönder - username şimdilik kullanmıyoruz
-                const tx = await contract.submitLink(link, { 
-                    gasLimit: 250000 
+                // ✅ DOĞRU FONKSİYON: registerUser kullan
+                const tx = await contract.registerUser(username, link, { 
+                    gasLimit: 300000 
                 });
                 
                 console.log("Transaction sent:", tx.hash);
@@ -559,7 +1118,7 @@
             }
         }
 
-        // Diğer fonksiyonlar aynı kalacak...
+        // Diğer fonksiyonlar...
         async function loadProposals() {
             try {
                 document.getElementById('proposalsContainer').innerHTML = '<p>Governance features coming soon...</p>';
@@ -697,6 +1256,7 @@
             } 
         } 
 
+        // ✅ DÜZELTİLMİŞ: Submit Link Fonksiyonu - registerUser kullanıyor
         async function submitLink() { 
             if (!isConnected) { 
                 const connected = await connectWallet(); 
@@ -726,7 +1286,8 @@
                 document.getElementById("submitLinkBtn").textContent = "⏳ Submitting..."; 
                 
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer); 
-                const tx = await contract.submitLink(userLink, { gasLimit: 200000 }); 
+                // ✅ DOĞRU FONKSİYON: registerUser kullan (username olarak "User" kullan)
+                const tx = await contract.registerUser("User", userLink, { gasLimit: 300000 }); 
                 await tx.wait(); 
                 
                 const newLinkData = { 
