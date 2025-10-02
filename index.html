@@ -317,14 +317,11 @@
             try {
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
                 
-                // Ayrı ayrı fonksiyonları çağır
                 const totalUsers = await contract.totalUsers();
                 const proposalCount = await contract.proposalCount();
                 
                 document.getElementById('totalUsers').textContent = totalUsers.toString();
                 document.getElementById('totalProposals').textContent = proposalCount.toString();
-                
-                // Tahmini değerler (kontratta bu istatistikler yok)
                 document.getElementById('totalBadges').textContent = "0";
                 document.getElementById('totalSupports').textContent = "0";
                 
@@ -342,7 +339,6 @@
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
                 const profile = await contract.getUserProfile(userAddress);
                 
-                // ✅ DÜZELTME: 7 değer döndürüyor
                 userProfile = {
                     link: profile[0],
                     username: profile[1],
@@ -354,24 +350,21 @@
                 };
                 
                 if (userProfile.isActive) {
-                    // User has profile, show main features
                     document.getElementById('userProfileSection').classList.add('hidden');
                     document.getElementById('governanceSection').classList.remove('hidden');
                     document.getElementById('badgesSection').classList.remove('hidden');
                     loadUserBadges();
                     loadProposals();
                 } else {
-                    // User needs to setup profile
                     document.getElementById('userProfileSection').classList.remove('hidden');
                 }
             } catch (error) {
                 console.error("Error loading user profile:", error);
-                // Profile yoksa setup göster
                 document.getElementById('userProfileSection').classList.remove('hidden');
             }
         }
 
-        // Profile Setup
+        // ✅ SOLIDITY 0.8.24 İÇİN OPTİMİZE EDİLMİŞ PROFILE SETUP
         async function setupUserProfile() {
             if (!isConnected) {
                 const connected = await connectWallet();
@@ -392,20 +385,36 @@
                 
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
                 
-                // ✅ DEĞİŞİKLİK: registerUser kullan ve gaz limitini artır
+                // ✅ SOLIDITY 0.8.24 OPTIMIZATION: Daha yüksek gas limit ve basit ayarlar
                 const tx = await contract.registerUser(username, link, { 
-                    gasLimit: 300000,
-                    gasPrice: await provider.getGasPrice()
+                    gasLimit: 400000  // Artırılmış gas limit
+                    // gasPrice OTOMATİK - Celo kendi ayarlıyor
                 });
                 
-                await tx.wait();
+                console.log("🔄 Transaction sent:", tx.hash);
+                alert(`⏳ Profile setup submitted!\nTX Hash: ${tx.hash}`);
+                
+                const receipt = await tx.wait();
+                console.log("✅ Transaction confirmed:", receipt);
                 
                 alert("✅ Profile setup successfully!");
                 loadUserProfile();
                 
             } catch (error) {
-                console.error("Profile setup error:", error);
-                alert("❌ Profile setup failed: " + error.message);
+                console.error("❌ Profile setup error:", error);
+                
+                // ✅ SOLIDITY 0.8.24 CUSTOM ERROR HANDLING
+                if (error.code === 4001) {
+                    alert("❌ Transaction rejected by user");
+                } else if (error.reason) {
+                    alert(`❌ Contract error: ${error.reason}`);
+                } else if (error.message.includes("revert")) {
+                    alert("❌ Transaction reverted. You may already be registered.");
+                } else if (error.message.includes("gas")) {
+                    alert("❌ Gas error. Please try again.");
+                } else {
+                    alert("❌ Setup failed: " + error.message);
+                }
             } finally {
                 document.getElementById("setupProfileBtn").disabled = false;
                 document.getElementById("setupProfileBtn").textContent = "🚀 Setup Profile";
@@ -454,7 +463,7 @@
             }
         }
 
-        // Proposal Oluşturma
+        // ✅ SOLIDITY 0.8.24 İÇİN OPTİMİZE EDİLMİŞ PROPOSAL CREATION
         async function createProposal() {
             const title = document.getElementById("proposalTitle").value.trim();
             const description = document.getElementById("proposalDescription").value.trim();
@@ -470,44 +479,68 @@
                 
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
                 
-                // ✅ DEĞİŞİKLİK: duration parametresi ekle (3 gün)
                 const duration = 3 * 24 * 60 * 60; // 3 gün
+                
+                // ✅ SOLIDITY 0.8.24 OPTIMIZATION
                 const tx = await contract.createProposal(title, description, duration, { 
-                    gasLimit: 350000,
-                    gasPrice: await provider.getGasPrice()
+                    gasLimit: 500000  // Daha yüksek gas limit
                 });
                 
-                await tx.wait();
+                console.log("🔄 Proposal TX sent:", tx.hash);
+                alert(`⏳ Proposal submitted!\nTX Hash: ${tx.hash}`);
                 
+                await tx.wait();
                 alert("✅ Proposal created successfully!");
+                
                 document.getElementById("proposalTitle").value = "";
                 document.getElementById("proposalDescription").value = "";
                 loadProposals();
                 
             } catch (error) {
-                console.error("Proposal creation error:", error);
-                alert("❌ Proposal creation failed: " + error.message);
+                console.error("❌ Proposal creation error:", error);
+                
+                // ✅ SOLIDITY 0.8.24 ERROR HANDLING
+                if (error.code === 4001) {
+                    alert("❌ Transaction rejected by user");
+                } else if (error.reason) {
+                    alert(`❌ Contract error: ${error.reason}`);
+                } else if (error.message.includes("revert")) {
+                    alert("❌ Transaction reverted. Check proposal requirements.");
+                } else {
+                    alert("❌ Proposal creation failed: " + error.message);
+                }
             } finally {
                 document.getElementById("createProposalBtn").disabled = false;
                 document.getElementById("createProposalBtn").textContent = "📝 Create Proposal";
             }
         }
 
-        // Oy Kullanma
+        // ✅ SOLIDITY 0.8.24 İÇİN OPTİMİZE EDİLMİŞ VOTE
         async function voteProposal(proposalId, support) {
             try {
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
                 const tx = await contract.voteProposal(proposalId, support, { 
-                    gasLimit: 200000,
-                    gasPrice: await provider.getGasPrice()
+                    gasLimit: 300000
                 });
-                await tx.wait();
                 
+                console.log("🔄 Vote TX sent:", tx.hash);
+                alert(`⏳ Vote submitted!\nTX Hash: ${tx.hash}`);
+                
+                await tx.wait();
                 alert("✅ Vote submitted successfully!");
                 loadProposals();
             } catch (error) {
-                console.error("Voting error:", error);
-                alert("❌ Voting failed: " + error.message);
+                console.error("❌ Voting error:", error);
+                
+                if (error.code === 4001) {
+                    alert("❌ Transaction rejected by user");
+                } else if (error.reason) {
+                    alert(`❌ Contract error: ${error.reason}`);
+                } else if (error.message.includes("revert")) {
+                    alert("❌ Transaction reverted. You may have already voted.");
+                } else {
+                    alert("❌ Voting failed: " + error.message);
+                }
             }
         }
 
@@ -541,7 +574,6 @@
         // Network functions 
         async function switchToCeloNetwork() { 
             try { 
-                // Önce Celo Mainnet'e geçmeyi dene 
                 try { 
                     await window.ethereum.request({ 
                         method: 'wallet_switchEthereumChain', 
@@ -549,7 +581,6 @@
                     }); 
                     return true; 
                 } catch (switchError) { 
-                    // Eğer chain ekli değilse, ekle 
                     if (switchError.code === 4902) { 
                         await window.ethereum.request({ 
                             method: 'wallet_addEthereumChain', 
@@ -561,7 +592,6 @@
                 } 
             } catch (error) { 
                 console.error("Error switching to Celo:", error); 
-                // Celo Mainnet başarısız olursa Alfajores Testnet'i dene 
                 try { 
                     await window.ethereum.request({ 
                         method: 'wallet_switchEthereumChain', 
@@ -589,13 +619,11 @@
                 const networkInfo = document.getElementById('networkInfo'); 
                 const networkWarning = document.getElementById('networkWarning'); 
                 if (currentChainId === "42220" || currentChainId === "44787") { 
-                    // Celo network'ünde 
                     networkInfo.innerHTML = `🌐 Celo ${currentChainId === "42220" ? "Mainnet" : "Alfajores"}`; 
                     networkInfo.style.color = "#35D07F"; 
                     networkWarning.classList.add('hidden'); 
                     return true; 
                 } else { 
-                    // Yanlış network'te 
                     networkInfo.innerHTML = `⚠️ Wrong Network - Please switch to Celo`; 
                     networkInfo.style.color = "#EF4444"; 
                     networkWarning.classList.remove('hidden'); 
@@ -621,7 +649,6 @@
             hasSupported = true; 
             document.getElementById('step1').classList.add('hidden'); 
             document.getElementById('step2').classList.remove('hidden'); 
-            // Network kontrolünü yap 
             if (isConnected) { 
                 checkCurrentNetwork(); 
             } 
@@ -639,9 +666,7 @@
             if (!checkMetaMask()) return false; 
             try { 
                 provider = new ethers.providers.Web3Provider(window.ethereum); 
-                // Önce Celo network'üne geç 
                 await switchToCeloNetwork(); 
-                // Sonra wallet'ı bağla 
                 await window.ethereum.request({ method: 'eth_requestAccounts' }); 
                 signer = provider.getSigner(); 
                 userAddress = await signer.getAddress(); 
@@ -649,10 +674,8 @@
                 document.getElementById('walletInfo').classList.remove('hidden'); 
                 document.getElementById('connectWalletBtn').style.display = 'none'; 
                 isConnected = true; 
-                // Network kontrolü yap 
                 await checkCurrentNetwork(); 
 
-                // Platform stats ve user profile yükle
                 loadPlatformStats();
                 loadUserProfile();
                 
@@ -668,6 +691,7 @@
             } 
         } 
 
+        // ✅ SOLIDITY 0.8.24 İÇİN OPTİMİZE EDİLMİŞ SUBMIT LINK
         async function submitLink() { 
             if (!isConnected) { 
                 const connected = await connectWallet(); 
@@ -677,7 +701,6 @@
                 alert("❌ Please support at least one community member first!"); 
                 return; 
             } 
-            // Önce network kontrolü yap 
             const isCorrectNetwork = await checkCurrentNetwork(); 
             if (!isCorrectNetwork) { 
                 alert("❌ Please switch to Celo network to submit your link"); 
@@ -695,16 +718,19 @@
             try { 
                 document.getElementById("submitLinkBtn").disabled = true; 
                 document.getElementById("submitLinkBtn").textContent = "⏳ Submitting..."; 
+                
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer); 
                 
-                // ✅ DEĞİŞİKLİK: registerUser kullan ve gaz limitini artır
+                // ✅ SOLIDITY 0.8.24 OPTIMIZATION: Basit ve yüksek gas limit
                 const tx = await contract.registerUser("User", userLink, { 
-                    gasLimit: 300000,
-                    gasPrice: await provider.getGasPrice()
+                    gasLimit: 400000
                 }); 
                 
-                console.log("Transaction sent:", tx.hash);
+                console.log("🔄 Transaction sent:", tx.hash);
+                alert(`⏳ Link submission submitted!\nTX Hash: ${tx.hash}`);
+                
                 const receipt = await tx.wait(); 
+                console.log("✅ Transaction confirmed:", receipt);
                 
                 if (receipt.status === 1) {
                     const newLinkData = { 
@@ -720,22 +746,24 @@
                     hasSupported = false; 
                     document.getElementById('step2').classList.add('hidden'); 
                     document.getElementById('step1').classList.remove('hidden'); 
-                    alert("✅ Link submitted successfully! TX: " + tx.hash); 
+                    alert("✅ Link submitted successfully!"); 
                 } else {
                     alert("❌ Transaction failed!");
                 }
             } catch (error) { 
-                console.error("Submit error:", error); 
-                document.getElementById("submitLinkBtn").disabled = false; 
-                document.getElementById("submitLinkBtn").textContent = "✍️ Submit Link"; 
+                console.error("❌ Submit error:", error); 
+                
+                // ✅ SOLIDITY 0.8.24 CUSTOM ERROR HANDLING
                 if (error.code === 4001) { 
                     alert("❌ Transaction rejected by user"); 
                 } else if (error.code === 'INSUFFICIENT_FUNDS') { 
-                    alert("❌ Insufficient funds for gas fee."); 
+                    alert("❌ Insufficient funds for gas fee. Please add CELO to your wallet."); 
                 } else if (error.reason) {
-                    alert("❌ Contract error: " + error.reason);
+                    alert(`❌ Contract error: ${error.reason}`);
                 } else if (error.message.includes("revert")) {
-                    alert("❌ Transaction reverted. Check contract requirements.");
+                    alert("❌ Transaction reverted. You may already be registered.");
+                } else if (error.message.includes("gas")) {
+                    alert("❌ Gas error. Please try again with higher gas limit.");
                 } else { 
                     alert("❌ Submission failed: " + error.message); 
                 } 
@@ -757,7 +785,6 @@
                 console.log("Chain changed to:", chainId); 
                 currentChainId = parseInt(chainId, 16).toString(); 
                 checkCurrentNetwork(); 
-                // Yeniden bağlan
                 if (isConnected) {
                     loadPlatformStats();
                     loadUserProfile();
