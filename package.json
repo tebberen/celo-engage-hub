@@ -1,20 +1,44 @@
 {
-  "name": "celo-engage-hub",
+  "name": "@tebberen/celo-engage-hub",
   "version": "1.0.0",
-  "description": "A decentralized social engagement platform on Celo blockchain with governance, badges, and community-driven content curation",
+  "description": "Enterprise-grade decentralized social engagement platform on Celo blockchain featuring community governance, badge rewards, and social verification mechanisms",
   "main": "index.html",
+  "type": "module",
   "scripts": {
-    "dev": "live-server --port=3000 --host=localhost",
+    "dev": "live-server --port=3000 --host=localhost --no-browser --wait=500",
     "start": "npm run dev",
-    "build": "echo 'Building Celo Engage Hub...' && npm run test",
-    "test": "echo 'No tests yet - run basic validation' && node -e \"console.log('✅ Basic JavaScript validation passed');\"",
-    "test:ci": "npm test",
-    "lint": "echo 'Linting would run here'",
-    "format": "echo 'Formatting would run here'",
-    "deploy": "gh-pages -d .",
-    "predeploy": "npm run build",
-    "validate": "npm run test && npm run lint",
-    "prepare": "npm run validate"
+    "build": "npm run validate && npm run security:audit && npm run test:coverage && npm run bundle:analyze",
+    "build:production": "NODE_ENV=production npm run build",
+    "test": "npm run test:unit && npm run test:integration && npm run test:e2e",
+    "test:unit": "vitest run --coverage",
+    "test:integration": "vitest run --config vitest.integration.config.js",
+    "test:e2e": "playwright test",
+    "test:coverage": "vitest run --coverage --reporter=html",
+    "test:ci": "npm run test:coverage -- --reporter=json",
+    "test:contracts": "hardhat test",
+    "lint": "eslint . --ext .js,.html,.json --fix --max-warnings=0",
+    "lint:ci": "eslint . --ext .js,.html,.json --max-warnings=0",
+    "format": "prettier --write .",
+    "format:ci": "prettier --check .",
+    "type-check": "tsc --noEmit",
+    "security:audit": "npm audit --audit-level high && npx audit-ci --moderate",
+    "security:fix": "npm audit fix --force",
+    "bundle:analyze": "webpack-bundle-analyzer dist/bundle.js",
+    "deploy": "gh-pages -d . --dotfiles --message 'Deploy Celo Engage Hub v${npm_package_version}'",
+    "predeploy": "npm run build:production",
+    "validate": "npm run lint:ci && npm run format:ci && npm run type-check",
+    "prepare": "husky install",
+    "release": "standard-version",
+    "release:major": "npm run release -- --release-as major",
+    "release:minor": "npm run release -- --release-as minor",
+    "release:patch": "npm run release -- --release-as patch",
+    "docs": "typedoc --out docs src",
+    "docs:serve": "serve docs",
+    "clean": "rimraf dist docs coverage .nyc_output",
+    "clean:all": "npm run clean && rimraf node_modules package-lock.json",
+    "docker:build": "docker build -t celo-engage-hub .",
+    "docker:run": "docker run -p 3000:3000 celo-engage-hub",
+    "postinstall": "echo '🚀 Celo Engage Hub installed! Run npm run dev to start development'"
   },
   "keywords": [
     "celo",
@@ -28,46 +52,151 @@
     "celo-ecosystem",
     "decentralized-social",
     "web3-social",
+    "celo-blockchain",
+    "ethers-js",
+    "metamask",
+    "valora",
     "decentralized-governance",
-    "community-platform"
+    "community-platform",
+    "builder-rewards",
+    "social-verification",
+    "on-chain-governance",
+    "badge-system",
+    "enterprise",
+    "typescript",
+    "vitest",
+    "playwright"
   ],
   "author": {
     "name": "tebberen",
+    "email": "your-email@example.com",
     "url": "https://github.com/tebberen"
   },
+  "contributors": [],
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tebberen/celo-engage-hub.git"
+    "url": "git+https://github.com/tebberen/celo-engage-hub.git"
   },
   "homepage": "https://tebberen.github.io/celo-engage-hub/",
   "bugs": {
     "url": "https://github.com/tebberen/celo-engage-hub/issues"
   },
   "engines": {
-    "node": ">=16.0.0",
-    "npm": ">=7.0.0"
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ],
   "devDependencies": {
+    "@commitlint/cli": "^17.7.1",
+    "@commitlint/config-conventional": "^17.7.0",
+    "@typescript-eslint/eslint-plugin": "^6.4.0",
+    "@typescript-eslint/parser": "^6.4.0",
+    "@vitest/coverage-v8": "^0.34.0",
+    "audit-ci": "^6.6.1",
+    "eslint": "^8.47.0",
+    "eslint-config-prettier": "^8.10.0",
+    "eslint-plugin-html": "^7.1.0",
+    "eslint-plugin-import": "^2.28.1",
+    "eslint-plugin-security": "^1.7.1",
+    "gh-pages": "^6.0.0",
+    "hardhat": "^2.17.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.3.0",
     "live-server": "^1.2.2",
-    "gh-pages": "^5.0.0"
+    "playwright": "^1.37.1",
+    "prettier": "^3.0.2",
+    "rimraf": "^5.0.1",
+    "serve": "^14.2.0",
+    "standard-version": "^9.5.0",
+    "typedoc": "^0.24.8",
+    "typescript": "^5.1.6",
+    "vitest": "^0.34.0",
+    "webpack-bundle-analyzer": "^4.9.0"
   },
   "dependencies": {
-    "ethers": "^5.7.2"
+    "ethers": "^5.7.2",
+    "@celo/contractkit": "^7.0.0",
+    "axios": "^1.5.0",
+    "qrcode": "^1.5.3"
   },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead"
-  ],
+  "peerDependencies": {
+    "typescript": "^5.1.6"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all",
+      "last 2 versions",
+      "since 2018",
+      "Firefox ESR",
+      "not ie > 0"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
   "celo": {
     "network": "mainnet",
     "contractAddress": "0x22eA49c074098931a478F381f971C77486d185b2",
-    "chainId": 42220
+    "chainId": 42220,
+    "explorer": "https://celoscan.io",
+    "rpcUrl": "https://forno.celo.org",
+    "testnet": {
+      "chainId": 44787,
+      "rpcUrl": "https://alfajores-forno.celo-testnet.org",
+      "explorer": "https://alfajores.celoscan.io"
+    }
   },
-  "contributors": [],
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
   "funding": {
     "type": "individual",
     "url": "https://github.com/sponsors/tebberen"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "files": [
+    "index.html",
+    "README.md",
+    "LICENSE",
+    "CONTRIBUTING.md",
+    "src/",
+    "dist/",
+    "!dist/*.map"
+  ],
+  "volta": {
+    "node": "18.17.0",
+    "npm": "9.6.7"
+  },
+  "lint-staged": {
+    "*.{js,ts,html,json}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{md,yml,yaml}": [
+      "prettier --write"
+    ]
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
   }
 }
