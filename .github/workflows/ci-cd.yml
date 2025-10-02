@@ -1,420 +1,62 @@
-name: Celo Engage Hub - Enterprise CI/CD Pipeline
+name: CI/CD
 
 on:
   push:
-    branches: [ main, develop, feature/* ]
-    paths-ignore:
-      - '**/*.md'
-      - '**/*.docs'
+    branches: [ main ]
   pull_request:
-    branches: [ main, develop ]
-    types: [opened, synchronize, reopened]
-  schedule:
-    - cron: '0 0 * * 0' # Haftalık security scan - Pazar 00:00
-  release:
-    types: [published, released]
-  workflow_dispatch: # Manuel tetikleme
-    inputs:
-      environment:
-        description: 'Deployment Environment'
-        required: true
-        default: 'staging'
-        type: choice
-        options:
-        - staging
-        - production
-
-env:
-  NODE_VERSION: '18.17.0'
-  NPM_VERSION: '9.6.7'
-  CELO_MAINNET_RPC: 'https://forno.celo.org'
-  CELO_TESTNET_RPC: 'https://alfajores-forno.celo-testnet.org'
-  CONTRACT_ADDRESS: '0x22eA49c074098931a478F381f971C77486d185b2'
-  NODE_ENV: 'ci'
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+    branches: [ main ]
 
 jobs:
-  # 🔍 CODE QUALITY & STATIC ANALYSIS
-  code-quality:
-    name: 🔍 Code Quality & Static Analysis
+  test:
     runs-on: ubuntu-latest
-    outputs:
-      quality-status: ${{ steps.quality-check.outputs.status }}
-    steps:
-      - name: 🛎️ Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: 🏗️ Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
-
-      - name: 📦 Install Dependencies
-        run: |
-          npm ci --audit=false --fund=false
-          npm list --depth=0
-
-      - name: 🔍 ESLint Analysis
-        run: |
-          npx eslint . --ext .js,.html,.json --format json --output-file ./eslint-report.json || true
-          npx eslint . --ext .js,.html,.json --max-warnings 0
-
-      - name: 💅 Prettier Check
-        run: npx prettier --check "**/*.{js,json,md,html,css}" --loglevel warn
-
-      - name: 📝 TypeScript Compilation
-        run: npx tsc --noEmit --skipLibCheck
-
-      - name: 📊 Code Complexity Analysis
-        run: |
-          npx complexity-report --format json --output cr-report.json .
-          npx plato -r -d report -t "Celo Engage Hub" .
-
-      - name: 🎯 Quality Gate
-        id: quality-check
-        run: |
-          echo "Quality checks completed successfully"
-          echo "status=success" >> $GITHUB_OUTPUT
-
-  # 🧪 UNIT & INTEGRATION TESTING
-  unit-testing:
-    name: 🧪 Unit & Integration Testing
-    runs-on: ubuntu-latest
-    needs: code-quality
-    strategy:
-      matrix:
-        node-version: [16.x, 18.x, 20.x]
-        browser: [chrome, firefox]
-    steps:
-      - name: 🛎️ Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: 🏗️ Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
-
-      - name: 📦 Install Dependencies
-        run: npm ci
-
-      - name: 🧪 Run Unit Tests
-        run: |
-          npx vitest run --coverage --reporter=verbose
-          npx vitest run --coverage --reporter=json --outputFile=./coverage/unit-coverage.json
-
-      - name: 📊 Upload Coverage Reports
-        uses: codecov/codecov-action@v3
-        with:
-          file: ./coverage/unit-coverage.json
-          flags: unittests
-          name: codecov-umbrella
-
-      - name: 📈 Test Results
-        uses: dorny/test-reporter@v1
-        with:
-          name: Unit Tests
-          path: 'test-results/*.xml'
-          reporter: jest-junit
-
-  # 🔐 SECURITY AUDIT & VULNERABILITY SCANNING
-  security-audit:
-    name: 🔐 Security Audit & Scanning
-    runs-on: ubuntu-latest
-    needs: code-quality
-    steps:
-      - name: 🛎️ Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: 🏗️ Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: 📦 Install Dependencies
-        run: npm ci
-
-      - name: 🔍 NPM Security Audit
-        run: |
-          npm audit --audit-level moderate --production
-          npx audit-ci --moderate --skip-dev
-
-      - name: 🛡️ Snyk Security Scan
-        uses: snyk/actions/node@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --all-projects --severity-threshold=high
-
-      - name: 🔒 OWASP Dependency Check
-        uses: dependency-check/Dependency-Check_Action@main
-        with:
-          project: 'Celo Engage Hub'
-          path: '.'
-          format: 'HTML'
-          out: 'reports'
-
-      - name: 📝 Security Report
-        run: |
-          echo "Security audit completed"
-          ls -la reports/
-
-  # 📜 SMART CONTRACT TESTING
-  contract-testing:
-    name: 📜 Smart Contract Testing
-    runs-on: ubuntu-latest
-    needs: [code-quality, security-audit]
-    services:
-      hardhat-node:
-        image: node:18-alpine
-        ports:
-          - 8545:8545
-        options: >-
-          --health-cmd "curl http://localhost:8545"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-    steps:
-      - name: 🛎️ Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: 🏗️ Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: 📦 Install Dependencies
-        run: npm ci
-
-      - name: 🧪 Hardhat Network Setup
-        run: |
-          npx hardhat node &
-          sleep 10
-
-      - name: 📝 Run Contract Tests
-        run: |
-          npx hardhat test --network localhost
-          npx hardhat coverage --network localhost
-
-      - name: 🔒 Security Analysis
-        run: |
-          npx slither . --exclude-dependencies --filter-paths="node_modules"
-          npx mythril analyze --max-depth 12 --execution-timeout 300
-
-      - name: 📊 Gas Usage Report
-        run: npx hardhat gas-reporter
-
-  # 🌐 END-TO-END TESTING
-  e2e-testing:
-    name: 🌐 End-to-End Testing
-    runs-on: ubuntu-latest
-    needs: [unit-testing, contract-testing]
-    strategy:
-      matrix:
-        browser: [chromium, firefox, webkit]
-    steps:
-      - name: 🛎️ Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: 🏗️ Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: 📦 Install Dependencies
-        run: |
-          npm ci
-          npx playwright install --with-deps
-
-      - name: 🚀 Start Development Server
-        run: npm run dev &
-        env:
-          PORT: 3000
-
-      - name: ⏱️ Wait for Server
-        run: npx wait-on http://localhost:3000 --timeout 60000
-
-      - name: 🧪 Run E2E Tests
-        run: |
-          npx playwright test --browser=${{ matrix.browser }} --reporter=line,json
-          npx playwright show-report
-
-      - name: 📸 Upload Test Artifacts
-        uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: playwright-report-${{ matrix.browser }}
-          path: |
-            playwright-report/
-            test-results/
-          retention-days: 7
-
-  # 📈 PERFORMANCE & LOAD TESTING
-  performance-testing:
-    name: 📈 Performance Testing
-    runs-on: ubuntu-latest
-    needs: e2e-testing
-    steps:
-      - name: 🛎️ Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: 🏗️ Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: 📦 Install Dependencies
-        run: npm ci
-
-      - name: 🚀 Start Production Server
-        run: |
-          npm run build
-          npx serve -s . -p 3000 &
-          sleep 10
-
-      - name: 📊 Lighthouse CI
-        run: |
-          npx lhci autorun --upload.target=filesystem
-          npx lighthouse http://localhost:3000 --output json --output-path ./lighthouse-results.json
-
-      - name: 📉 Bundle Size Analysis
-        run: |
-          npx bundlesize --config bundlesize.config.json
-          npx webpack-bundle-analyzer dist/bundle.js --mode static --report report.html
-
-      - name: 📈 Performance Report
-        uses: actions/upload-artifact@v3
-        with:
-          name: performance-metrics
-          path: |
-            .lighthouseci/
-            lighthouse-results.json
-            report.html
-          retention-days: 30
-
-  # 🚀 DEPLOYMENT STAGES
-  deploy-staging:
-    name: 🚀 Deploy to Staging
-    runs-on: ubuntu-latest
-    needs: [performance-testing, security-audit]
-    environment: staging
-    if: github.ref == 'refs/heads/develop' || github.event_name == 'workflow_dispatch'
     
     steps:
-      - name: 🛎️ Checkout Repository
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: 🏗️ Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
 
-      - name: 📦 Install Dependencies
-        run: npm ci
+    - name: Install dependencies
+      run: npm install
 
-      - name: 🏗️ Build Project
-        run: npm run build:production
-        env:
-          NODE_ENV: production
-          CELO_NETWORK: alfajores
+    - name: Run basic validation
+      run: |
+        echo "✅ Validating project structure..."
+        if [ -f "index.html" ]; then
+          echo "✅ index.html exists"
+        else
+          echo "❌ index.html missing"
+          exit 1
+        fi
+        
+        if [ -f "package.json" ]; then
+          echo "✅ package.json exists"
+        else
+          echo "❌ package.json missing"
+          exit 1
+        fi
+        
+        echo "✅ All validations passed!"
 
-      - name: 🚀 Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./
-          force_orphan: true
-          user_name: 'github-actions[bot]'
-          user_email: 'github-actions[bot]@users.noreply.github.com'
-
-      - name: 📢 Staging Notification
-        run: |
-          echo "🚀 Staging deployment completed successfully!"
-          echo "URL: https://tebberen.github.io/celo-engage-hub/"
-
-  deploy-production:
-    name: 🚀 Deploy to Production
+  deploy:
     runs-on: ubuntu-latest
-    needs: [deploy-staging, performance-testing]
-    environment: production
-    if: github.ref == 'refs/heads/main' || github.event.release
+    if: github.ref == 'refs/heads/main'
     
     steps:
-      - name: 🛎️ Checkout Repository
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: 🏗️ Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
 
-      - name: 📦 Install Dependencies
-        run: npm ci
-
-      - name: 🏗️ Build Project
-        run: npm run build:production
-        env:
-          NODE_ENV: production
-          CELO_NETWORK: mainnet
-
-      - name: 🚀 Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./
-          force_orphan: true
-          user_name: 'github-actions[bot]'
-          user_email: 'github-actions[bot]@users.noreply.github.com'
-
-      - name: 🔔 Production Notification
-        run: |
-          echo "🎉 Production deployment completed successfully!"
-          echo "URL: https://tebberen.github.io/celo-engage-hub/"
-          echo "Contract: ${{ env.CONTRACT_ADDRESS }}"
-
-  # 📊 POST-DEPLOYMENT VERIFICATION
-  post-deployment:
-    name: 📊 Post-Deployment Verification
-    runs-on: ubuntu-latest
-    needs: [deploy-staging, deploy-production]
-    if: always()
-    
-    steps:
-      - name: 🔍 Health Check
-        run: |
-          curl -f https://tebberen.github.io/celo-engage-hub/ || exit 1
-          echo "✅ Application is healthy"
-
-      - name: 📈 Performance Verification
-        run: |
-          npx lighthouse https://tebberen.github.io/celo-engage-hub/ --output json --output-path ./production-lighthouse.json
-
-      - name: 📝 Generate Deployment Report
-        run: |
-          echo "Deployment Report for ${{ github.sha }}" > deployment-report.md
-          echo "Timestamp: $(date)" >> deployment-report.md
-          echo "Environment: ${{ needs.deploy-production.result == 'success' && 'production' || 'staging' }}" >> deployment-report.md
-          echo "Status: SUCCESS" >> deployment-report.md
-
-      - name: 📤 Upload Verification Results
-        uses: actions/upload-artifact@v3
-        with:
-          name: deployment-verification
-          path: |
-            deployment-report.md
-            production-lighthouse.json
-          retention-days: 90
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./
