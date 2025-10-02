@@ -1,0 +1,592 @@
+# ================================================================
+# Celo Engage Hub - Enterprise Grade .gitignore
+# Comprehensive exclusion patterns for professional development
+# ================================================================
+
+# 🚀 DEPENDENCIES & PACKAGE MANAGERS
+# ===================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+bower_components/
+.jspm_packages/
+.webpack/
+.parcel-cache/
+.pnpm-store/
+.yarn/
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+.yarnrc.yml
+lerna-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+shrinkwrap.yaml
+npm-shrinkwrap.json
+bun.lockb
+
+# 🏗️ BUILD SYSTEMS & COMPILERS
+# =============================
+dist/
+build/
+.out/
+.next/
+.nuxt/
+.cache/
+.astro/
+.vuepress/dist/
+.svelte-kit/
+.vercel/
+.netlify/
+.rollup.cache/
+.rspack/
+.rpt2_cache/
+.esbuild/
+.webpack/
+.parcel-cache/
+.tsbuildinfo
+*.tsbuildinfo
+
+# 🔐 ENVIRONMENT & CONFIGURATION
+# ==============================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+.env.vault
+.venv
+.envrc
+.env.production
+.env.staging
+.env.development
+.env.test
+.env.ci
+.env.qa
+config/local.json
+config/development.json
+config/staging.json
+config/production.json
+config/credentials*.json
+config/secrets*.json
+
+# 🔧 IDE & EDITOR CONFIGURATIONS
+# ==============================
+## VS Code
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/snippets/
+.vscode/launch.json
+.vscode/tasks.json
+
+## IntelliJ Platform
+.idea/
+*.iws
+*.iml
+*.ipr
+*.ids
+*.orig
+atlassian-ide-plugin.xml
+compiler.xml
+encodings.xml
+jarRepositories.xml
+jsLibraryMappings.xml
+modules.xml
+runConfigurations/
+workspace.xml
+dynamic.xml
+dataSources/
+dataSources.local.xml
+sqltool.properties
+
+## Eclipse
+.settings/
+.project
+.classpath
+.factorypath
+.checkstyle
+.springBeans
+
+## Sublime Text
+*.sublime-project
+*.sublime-workspace
+*.sublime-cache
+
+## Atom
+.atomic_design
+.atom/
+.atom-build.json
+.atom-compile-cache/
+
+## EMACS
+*~
+\#*\#
+.\#*
+*.*~
+*.elc
+auto-save-list
+tramp
+.\#*
+
+## Vim
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
+*~
+
+## General IDE
+*.swp
+*.swo
+*~
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.directory
+.AppleDouble
+.LSOverride
+Icon
+.Spotlight-V100
+.Trashes
+**/.Trash-*
+
+# 🐛 DEBUGGING, LOGS & RUNTIME
+# =============================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+debug.log
+*.pid
+*.pid.lock
+*.seed
+*.pid.lock
+pids
+*.pid
+*.seed
+*.pid.lock
+.npm
+.node_repl_history
+*.tgz
+.yarn-integrity
+.rts_node_*
+.rts_*
+
+# 📊 TESTING & QUALITY ASSURANCE
+# ==============================
+## Coverage
+coverage/
+.nyc_output/
+.nyc_output/
+*.lcov
+.clover
+coverage/
+*.cover
+*.cover.html
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+coverage.json
+
+## Testing Frameworks
+cypress/screenshots/
+cypress/videos/
+playwright-report/
+test-results/
+playwright/.cache/
+.vitest/
+jest-cache/
+.jest/
+.karma/
+.mocha/
+.ava/
+.xvfb/
+test-results.xml
+test-report.html
+junit.xml
+TEST-*.xml
+
+# 🔒 SECURITY & CRYPTOGRAPHY
+# ==========================
+## Keys & Certificates
+*.pem
+*.key
+*.crt
+*.csr
+*.p12
+*.pfx
+*.der
+*.secret
+*.private
+*.gpg
+*.pgp
+*.asc
+*.keystore
+*.jks
+*.truststore
+
+## Authentication
+credentials.json
+service-account-key.json
+firebase-debug.log
+firebase-debug.*.log
+auth.json
+token.json
+*.token
+*.auth
+*.credential
+
+## Blockchain Private Keys
+*.env.encrypted
+*.key.enc
+*.privkey
+*.priv
+*_rsa
+*_dsa
+*_ecdsa
+*_ed25519
+
+# 🗄️ DATABASE & PERSISTENCE
+# ==========================
+## SQL Databases
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+*.mdb
+*.accdb
+*.frm
+*.myd
+*.myi
+*.ibd
+*.mdf
+*.ldf
+
+## NoSQL Databases
+*.ns
+mongod.lock
+/db/
+/data/
+*.rdb
+*.aof
+*.dump
+
+## ORM & Migration Files
+migrations/*.js
+!migrations/*.ts
+.prisma/
+migrations/
+*.db-journal
+
+# 🛠️ BLOCKCHAIN & WEB3 SPECIFIC
+# ==============================
+## Hardhat
+artifacts/
+cache/
+typechain/
+typechain-types/
+generated/
+broadcast/
+/deployments/localhost/
+/deployments/hardhat/
+
+## Truffle
+build/
+.drizzle/
+.mythril/
+
+## Foundry
+out/
+broadcast/
+cache/
+/lib/
+
+## General Blockchain
+/contracts/flattened/
+/abi/
+/deployments/
+!/deployments/.gitkeep
+*.sol.js
+*.sol.d.ts
+*_temp.sol
+*_backup.sol
+
+## Celo Specific
+.celo/
+celo-config.json
+.mnemonic
+.privatekey
+.keystore/
+
+# 🚀 DEPLOYMENT & CI/CD
+# =====================
+.gh-pages/
+.surge/
+.netlify/
+.vercel/
+.railway/
+.heroku/
+.firebase/
+.azure/
+.gcloud/
+.aws/
+.docker/
+.kubernetes/
+.terraform/
+.pulumi/
+.cdk/
+.serverless/
+.elasticbeanstalk/
+.fly/
+.render.yaml
+.railway.json
+.vercel.json
+.netlify.json
+.heroku.yml
+.azure-pipelines.yml
+.gitlab-ci.yml
+.circleci/config.yml
+.travis.yml
+.jenkins/
+.buildkite/
+
+# 📝 DOCUMENTATION & ASSETS
+# =========================
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+.docusaurus/
+.gitbook/
+.mkdocs/
+docs/_build/
+docs/site/
+readme.html
+CHANGELOG.html
+
+# 🎨 DESIGN & CREATIVE ASSETS
+# ===========================
+*.sketch
+*.fig
+*.xd
+*.ai
+*.psd
+*.afdesign
+*.afphoto
+*.aep
+*.prproj
+*.aet
+*.c4d
+*.blend
+*.fbx
+*.obj
+*.mtl
+*.stl
+
+# 🔄 TEMPORARY & CACHE FILES
+# ===========================
+*.tmp
+*.temp
+*.bak
+*.backup
+*.sav
+*.save
+*.old
+*.orig
+*_backup
+.cache/
+.tmp/
+temp/
+tmp/
+.cache-loader/
+.fusebox/
+
+# 🗜️ ARCHIVES & COMPRESSED FILES
+# ==============================
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+*.xz
+*.bz2
+*.tgz
+*.tbz2
+*.lzma
+*.deb
+*.rpm
+*.pkg
+
+# 🧪 DEVELOPMENT TOOLS
+# ====================
+## Webpack
+.webpack/
+.webpack-analyze/
+.stats.json
+.webpack-stats.json
+
+## Babel
+.babel-cache/
+
+## ESLint
+.eslintcache
+
+## Prettier
+.prettiercache
+
+## TypeScript
+.tscache/
+.tsbuildinfo
+
+## Rome
+.rome/
+
+## Biome
+.biome/
+
+## Turbo
+.turbo/
+.turbopack/
+
+## Nx
+.nx/
+nx.json
+
+## Lerna
+lerna-debug.log*
+
+## Rush
+common/temp/
+*.rush/temp/
+
+# 🔍 ANALYTICS & MONITORING
+# ==========================
+.audit
+.bundle-size
+.webpack-analyze
+.stats.html
+.bundle-analyzer/
+.source-map-explorer/
+.lighthouseci/
+.webpagetest/
+.pagespeed/
+
+# 🐳 DOCKER & CONTAINERS
+# ======================
+.docker/
+docker-compose.override.yml
+.dockerignore
+Dockerfile.dev
+Dockerfile.test
+Dockerfile.staging
+.dockerenv
+
+# ☁️ CLOUD PROVIDERS
+# ==================
+## AWS
+.aws/
+aws-config.json
+.awsrc
+
+## Google Cloud
+.gcloud/
+gcloud-config.json
+.gcloudignore
+
+## Azure
+.azure/
+azure-config.json
+
+# 📱 MOBILE & DESKTOP
+# ===================
+*.app
+*.apk
+*.ipa
+*.dmg
+*.pkg
+*.exe
+*.msi
+*.appx
+*.appxbundle
+
+# 🎯 CELO ENGAGE HUB SPECIFIC
+# ============================
+## Contract Deployment Artifacts
+/deployments/
+!/deployments/.gitkeep
+/deployments/localhost/
+/deployments/hardhat/
+
+## ABI Management
+/abi-exports/
+/abi-backups/
+
+## Gas Reports
+gas-reports/
+*.gas.json
+*.gas.md
+
+## Security Scans
+.security/
+.slither/
+.mythril/
+.oyente/
+
+## Audit Reports
+/audits/
+/security-scans/
+*.audit.json
+*.security.md
+
+# 🧹 CLEANUP & MAINTENANCE
+# =========================
+## Backup Files
+*_backup*
+*backup*
+*.backup*
+backup/
+
+## Patch Files
+*.patch
+*.diff
+
+## Recycle Bin
+$RECYCLE.BIN/
+.Recycle.Bin/
+
+## System Files
+.DS_Store
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# ================================================================
+# END OF ENTERPRISE .gitignore FOR CELO ENGAGE HUB
+# ================================================================
+
+# 💡 NOTE: This file is maintained automatically
+# Any additions should be categorized and documented above
