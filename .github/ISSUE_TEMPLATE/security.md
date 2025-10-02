@@ -1,60 +1,48 @@
 ---
-name: Security Vulnerability Report
+name: Security Vulnerability
 about: Report a security vulnerability in Celo Engage Hub
 title: '[SECURITY] '
 labels: ['security', 'critical']
 assignees: ''
 ---
 
-## 🔒 Security Vulnerability Report
+**IMPORTANT: For sensitive security issues, please email [your-email@example.com] instead of creating a public issue.**
 
-> **IMPORTANT**: Please do not disclose security vulnerabilities publicly. For sensitive issues, email: [YOUR-EMAIL] or create a private security advisory.
+**Describe the security vulnerability**
+A clear and concise description of the security issue.
 
-### Vulnerability Description
-**Type of vulnerability:**
+**Vulnerability Type**
 - [ ] Smart Contract Vulnerability
-- [ ] Frontend Security Issue  
-- [ ] Authentication/Authorization Bypass
+- [ ] Frontend Security Issue
+- [ ] Authentication Bypass
 - [ ] Data Exposure
-- [ ] Other (please specify)
+- [ ] Other
 
-**Severity Level:**
-- [ ] Critical (Funds at risk, system compromise)
-- [ ] High (Significant security impact)
-- [ ] Medium (Limited security impact)
-- [ ] Low (Minor security concern)
+**Severity Level**
+- [ ] Critical (Funds at risk)
+- [ ] High (Significant impact)
+- [ ] Medium (Limited impact)
+- [ ] Low (Minor issue)
 
-### Technical Details
-**Attack Vector:**
-<!-- How can this vulnerability be exploited? -->
-
-**Impact Assessment:**
-<!-- What is the potential damage? -->
-
-**Proof of Concept:**
-<!-- Steps to reproduce the vulnerability -->
+**Steps to reproduce**
 1. 
 2. 
 3. 
 
-### Environment Information
-**Contract Address:** `0x22eA49c074098931a478F381f971C77486d185b2`
-**Network:** [e.g., Celo Mainnet, Alfajores Testnet]
-**Application Version:** [e.g., 1.0.0]
+**Expected behavior**
+What should happen normally.
 
-**Wallet & Browser:**
-- Wallet: [e.g., MetaMask, Valora]
-- Browser: [e.g., Chrome, Firefox]
-- OS: [e.g., Windows, macOS]
+**Actual behavior**
+What actually happens due to the vulnerability.
 
-### Additional Context
-<!-- Any other relevant information -->
+**Contract Information**
+- Contract Address: `0x22eA49c074098931a478F381f971C77486d185b2`
+- Network: [e.g., Celo Mainnet]
 
-### Responsible Disclosure
-- [ ] I agree to follow responsible disclosure practices
-- [ ] I will not disclose this vulnerability publicly until it's resolved
-- [ ] I have provided accurate information to the best of my knowledge
+**Environment**
+- Wallet: [e.g., MetaMask]
+- Browser: [e.g., Chrome]
+- OS: [e.g., Windows]
 
----
-
-*For urgent security issues, please contact maintainers directly.*
+**Additional context**
+Add any other context about the vulnerability here.
