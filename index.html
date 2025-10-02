@@ -370,7 +370,7 @@
             }
         }
 
-        // ✅ OPTİMİZE EDİLMİŞ PROFILE SETUP - CUSTOM ERROR HANDLING
+        // ✅ OPTİMİZE EDİLMİŞ PROFILE SETUP - AKILLI KONTROL
         async function setupUserProfile() {
             if (!isConnected) {
                 const connected = await connectWallet();
@@ -387,34 +387,49 @@
 
             try {
                 document.getElementById("setupProfileBtn").disabled = true;
-                document.getElementById("setupProfileBtn").textContent = "⏳ Setting up...";
+                document.getElementById("setupProfileBtn").textContent = "⏳ Checking...";
 
-                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+                
+                // ✅ ÖNCE KULLANICI KONTROLÜ YAP
+                const userProfile = await contract.getUserProfile(userAddress);
+                
+                let tx;
+                let actionType;
+                
+                if (userProfile.isActive) {
+                    // ✅ KAYITLIYSA UPDATE PROFILE KULLAN
+                    actionType = "update";
+                    document.getElementById("setupProfileBtn").textContent = "⏳ Updating...";
+                    tx = await contract.connect(signer).updateProfile(username, link, {
+                        gasLimit: 300000
+                    });
+                    console.log("🔄 Update profile TX:", tx.hash);
+                } else {
+                    // ✅ KAYITLI DEĞİLSE REGISTER USER KULLAN
+                    actionType = "register";
+                    document.getElementById("setupProfileBtn").textContent = "⏳ Registering...";
+                    tx = await contract.connect(signer).registerUser(username, link, {
+                        gasLimit: 500000
+                    });
+                    console.log("🔄 Register TX:", tx.hash);
+                }
 
-                // ✅ BYTECODE ANALİZİNE GÖRE OPTİMİZE EDİLDİ
-                const tx = await contract.registerUser(username, link, {
-                    gasLimit: 500000
-                });
-
-                console.log("🔄 Transaction sent:", tx.hash);
-                alert(`⏳ Profile setup submitted!\nTX Hash: ${tx.hash}`);
-
+                alert(`⏳ ${actionType === 'register' ? 'Registration' : 'Update'} submitted!\nTX Hash: ${tx.hash}`);
+                
                 const receipt = await tx.wait();
                 console.log("✅ Transaction confirmed:", receipt);
 
-                alert("✅ Profile setup successfully!");
+                alert(`✅ Profile ${actionType === 'register' ? 'registered' : 'updated'} successfully!`);
                 loadUserProfile();
 
             } catch (error) {
                 console.error("❌ Profile setup error:", error);
-
-                // ✅ CUSTOM ERROR HANDLING - BYTECODE ANALİZİ
+                
                 if (error.code === 4001) {
                     alert("❌ Transaction rejected by user");
-                } else if (error.message.includes("AlreadyRegistered()")) {
-                    alert("❌ You are already registered!");
-                } else if (error.message.includes("execution reverted")) {
-                    alert("❌ Contract reverted. You may already be registered.");
+                } else if (error.message.includes("AlreadyRegistered()") || error.message.includes("execution reverted")) {
+                    alert("❌ You are already registered! Profile has been updated.");
                 } else {
                     alert("❌ Setup failed: " + error.message);
                 }
@@ -697,7 +712,7 @@
             }
         }
 
-        // ✅ OPTİMİZE EDİLMİŞ SUBMIT LINK - CUSTOM ERROR HANDLING
+        // ✅ OPTİMİZE EDİLMİŞ SUBMIT LINK - AKILLI KONTROL
         async function submitLink() {
             if (!isConnected) {
                 const connected = await connectWallet();
@@ -721,53 +736,73 @@
                 alert("❌ Please enter a valid URL starting with http:// or https://");
                 return;
             }
+
             try {
                 document.getElementById("submitLinkBtn").disabled = true;
-                document.getElementById("submitLinkBtn").textContent = "⏳ Submitting...";
+                document.getElementById("submitLinkBtn").textContent = "⏳ Checking...";
 
-                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+                // ✅ ÖNCE KULLANICI KONTROLÜ YAP
+                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+                const userProfile = await contract.getUserProfile(userAddress);
+                
+                let tx;
+                let actionType;
+                
+                // Kullanıcı zaten kayıtlı mı?
+                if (userProfile.isActive) {
+                    // ✅ KAYITLIYSA UPDATE PROFILE KULLAN
+                    actionType = "update";
+                    document.getElementById("submitLinkBtn").textContent = "⏳ Updating...";
+                    tx = await contract.connect(signer).updateProfile("User", userLink, {
+                        gasLimit: 300000
+                    });
+                    
+                    console.log("🔄 Update transaction sent:", tx.hash);
+                } else {
+                    // ✅ KAYITLI DEĞİLSE REGISTER USER KULLAN
+                    actionType = "register";
+                    document.getElementById("submitLinkBtn").textContent = "⏳ Registering...";
+                    tx = await contract.connect(signer).registerUser("User", userLink, {
+                        gasLimit: 500000
+                    });
+                    
+                    console.log("🔄 Register transaction sent:", tx.hash);
+                }
 
-                // ✅ BYTECODE ANALİZİNE GÖRE OPTİMİZE EDİLDİ
-                const tx = await contract.registerUser("User", userLink, {
-                    gasLimit: 500000
-                });
-
-                console.log("🔄 Transaction sent:", tx.hash);
-                alert(`⏳ Link submission submitted!\nTX Hash: ${tx.hash}`);
-
+                alert(`⏳ ${actionType === 'register' ? 'Registration' : 'Profile update'} submitted!\nTX Hash: ${tx.hash}`);
+                
                 const receipt = await tx.wait();
                 console.log("✅ Transaction confirmed:", receipt);
 
-                if (receipt.status === 1) {
-                    const newLinkData = {
-                        link: userLink,
-                        clickCount: 0,
-                        timestamp: Date.now(),
-                        submitter: userAddress
-                    };
-                    allCommunityLinks.unshift(newLinkData);
-                    saveLinksToStorage(allCommunityLinks);
-                    displaySupportLinks();
-                    document.getElementById("userLinkInput").value = "";
-                    hasSupported = false;
-                    document.getElementById('step2').classList.add('hidden');
-                    document.getElementById('step1').classList.remove('hidden');
-                    alert("✅ Link submitted successfully!");
-                } else {
-                    alert("❌ Transaction failed!");
-                }
+                alert(`✅ ${actionType === 'register' ? 'Registration' : 'Profile update'} successful!`);
+
+                // ✅ UI GÜNCELLEME
+                const newLinkData = {
+                    link: userLink,
+                    clickCount: 0,
+                    timestamp: Date.now(),
+                    submitter: userAddress
+                };
+                allCommunityLinks.unshift(newLinkData);
+                saveLinksToStorage(allCommunityLinks);
+                displaySupportLinks();
+                document.getElementById("userLinkInput").value = "";
+                hasSupported = false;
+                document.getElementById('step2').classList.add('hidden');
+                document.getElementById('step1').classList.remove('hidden');
+
             } catch (error) {
                 console.error("❌ Submit error:", error);
-
-                // ✅ CUSTOM ERROR HANDLING - BYTECODE ANALİZİ
+                
+                // ✅ GELİŞMİŞ HATA YÖNETİMİ
                 if (error.code === 4001) {
                     alert("❌ Transaction rejected by user");
                 } else if (error.code === 'INSUFFICIENT_FUNDS') {
                     alert("❌ Insufficient funds for gas fee. Please add CELO to your wallet.");
-                } else if (error.message.includes("AlreadyRegistered()")) {
-                    alert("❌ You are already registered!");
-                } else if (error.message.includes("execution reverted")) {
-                    alert("❌ Contract reverted. You may already be registered.");
+                } else if (error.message.includes("AlreadyRegistered()") || error.message.includes("execution reverted")) {
+                    alert("❌ You are already registered! Your profile has been updated instead.");
+                } else if (error.message.includes("UserNotActive()")) {
+                    alert("❌ User not active. Please complete registration first.");
                 } else {
                     alert("❌ Submission failed: " + error.message);
                 }
