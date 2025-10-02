@@ -54,7 +54,7 @@
         .stats-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
         .stat-card { background: #FFFDF6; border: 2px solid #FBCC5C; padding: 15px; border-radius: 8px; text-align: center; }
         
-        /* YENİ: Feature Buttons Stilleri */
+        /* Feature Buttons Stilleri */
         .feature-buttons-container {
             display: flex;
             justify-content: center;
@@ -105,7 +105,7 @@
         <div class="subheader">If you want support, support first</div> 
         <button id="connectWalletBtn" class="connect-btn">🔗 Connect MetaMask</button> 
         
-        <!-- YENİ: Feature Buttons -->
+        <!-- Feature Buttons -->
         <div class="feature-buttons-container">
             <button class="feature-btn active" onclick="showSection('support')">🤝 Support Community</button>
             <button class="feature-btn" onclick="showSection('submit')">✍️ Submit Link</button>
@@ -178,6 +178,7 @@
                     <div id="networkWarning" class="network-warning hidden"> ⚠️ Please switch to Celo Mainnet to submit your link </div> 
                     <div class="submit-form"> 
                         <h3>🎉 Add Your Content</h3> 
+                        <input type="text" placeholder="Enter your username..." id="userUsernameInput" />
                         <input type="text" placeholder="Paste your X, Farcaster, GitHub, or any other link here..." id="userLinkInput" /> 
                         <br> 
                         <div class="gas-info"> ⛽ You'll only pay the normal network gas fee (no extra cost) </div> 
@@ -271,580 +272,25 @@
         let userProfile = null;
         let currentSection = 'support';
 
-        // ✅ Contract Adresi
+        // ✅ SİZİN CONTRACT ADRESİNİZ
         const CONTRACT_ADDRESS = "0x22eA49c074098931a478F381f971C77486d185b2"; 
 
-        // ✅ GERÇEK ABI - Remix'ten aldığınız ABI
+        // ✅ SADECE SİZİN CONTRACT'INIZDAKİ FONKSİYONLAR
         const CONTRACT_ABI = [
-            {
-                "inputs": [],
-                "stateMutability": "nonpayable",
-                "type": "constructor"
-            },
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": true,
-                        "internalType": "address",
-                        "name": "user",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "string",
-                        "name": "badge",
-                        "type": "string"
-                    }
-                ],
-                "name": "BadgeAwarded",
-                "type": "event"
-            },
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": true,
-                        "internalType": "uint256",
-                        "name": "proposalId",
-                        "type": "uint256"
-                    },
-                    {
-                        "indexed": true,
-                        "internalType": "address",
-                        "name": "creator",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "string",
-                        "name": "title",
-                        "type": "string"
-                    }
-                ],
-                "name": "ProposalCreated",
-                "type": "event"
-            },
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": true,
-                        "internalType": "address",
-                        "name": "user",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "string",
-                        "name": "username",
-                        "type": "string"
-                    }
-                ],
-                "name": "UserRegistered",
-                "type": "event"
-            },
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": true,
-                        "internalType": "uint256",
-                        "name": "proposalId",
-                        "type": "uint256"
-                    },
-                    {
-                        "indexed": true,
-                        "internalType": "address",
-                        "name": "voter",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "bool",
-                        "name": "support",
-                        "type": "bool"
-                    }
-                ],
-                "name": "Voted",
-                "type": "event"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "activeProposals",
-                "outputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "_user",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "_badge",
-                        "type": "string"
-                    }
-                ],
-                "name": "awardBadge",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "string",
-                        "name": "_title",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "_description",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "_duration",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "createProposal",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "getActiveProposals",
-                "outputs": [
-                    {
-                        "internalType": "uint256[]",
-                        "name": "",
-                        "type": "uint256[]"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "getAllUsers",
-                "outputs": [
-                    {
-                        "internalType": "address[]",
-                        "name": "",
-                        "type": "address[]"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "_proposalId",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "getProposalDetails",
-                "outputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "bool",
-                        "name": "",
-                        "type": "bool"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "_user",
-                        "type": "address"
-                    }
-                ],
-                "name": "getUserBadges",
-                "outputs": [
-                    {
-                        "internalType": "string[]",
-                        "name": "",
-                        "type": "string[]"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "_user",
-                        "type": "address"
-                    }
-                ],
-                "name": "getUserProfile",
-                "outputs": [
-                    {
-                        "internalType": "string",
-                        "name": "",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "bool",
-                        "name": "",
-                        "type": "bool"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "hasVoted",
-                "outputs": [
-                    {
-                        "internalType": "bool",
-                        "name": "",
-                        "type": "bool"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "owner",
-                "outputs": [
-                    {
-                        "internalType": "address",
-                        "name": "",
-                        "type": "address"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "proposalCount",
-                "outputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "proposals",
-                "outputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "id",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "title",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "description",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "creator",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "votesFor",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "votesAgainst",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "deadline",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "bool",
-                        "name": "executed",
-                        "type": "bool"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "string",
-                        "name": "_username",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "_link",
-                        "type": "string"
-                    }
-                ],
-                "name": "registerUser",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "totalUsers",
-                "outputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "string",
-                        "name": "_username",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "_link",
-                        "type": "string"
-                    }
-                ],
-                "name": "updateProfile",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "userAddresses",
-                "outputs": [
-                    {
-                        "internalType": "address",
-                        "name": "",
-                        "type": "address"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "userBadges",
-                "outputs": [
-                    {
-                        "internalType": "string",
-                        "name": "",
-                        "type": "string"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "",
-                        "type": "address"
-                    }
-                ],
-                "name": "users",
-                "outputs": [
-                    {
-                        "internalType": "string",
-                        "name": "link",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "username",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "supportCount",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "reputation",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "badgeCount",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "bool",
-                        "name": "isActive",
-                        "type": "bool"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "timestamp",
-                        "type": "uint256"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "_proposalId",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "bool",
-                        "name": "_support",
-                        "type": "bool"
-                    }
-                ],
-                "name": "voteProposal",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            }
+            "function registerUser(string _username, string _link) public",
+            "function updateProfile(string _username, string _link) public", 
+            "function totalUsers() public view returns (uint256)",
+            "function getUserProfile(address _user) public view returns (string link, string username, uint256 supportCount, uint256 reputation, uint256 badgeCount, bool isActive, uint256 timestamp)",
+            "function getUserBadges(address _user) public view returns (string[] memory)",
+            "function createProposal(string _title, string _description, uint256 _duration) public",
+            "function getActiveProposals() public view returns (uint256[] memory)",
+            "function getProposalDetails(uint256 _proposalId) public view returns (uint256 id, string title, string description, address creator, uint256 votesFor, uint256 votesAgainst, uint256 deadline, bool executed)",
+            "function voteProposal(uint256 _proposalId, bool _support) public"
         ];
 
         // Celo Network Configuration 
         const CELO_MAINNET_PARAMS = { 
-            chainId: "0xA4EC", // 42220 in hex - Celo Mainnet 
+            chainId: "0xA4EC", // 42220
             chainName: "Celo Mainnet", 
             nativeCurrency: { name: "CELO", symbol: "CELO", decimals: 18 }, 
             rpcUrls: ["https://forno.celo.org"], 
@@ -852,7 +298,7 @@
         }; 
 
         const CELO_ALFAJORES_PARAMS = { 
-            chainId: "0xAEF3", // 44787 in hex - Celo Alfajores Testnet 
+            chainId: "0xAEF3", // 44787
             chainName: "Celo Alfajores Testnet", 
             nativeCurrency: { name: "CELO", symbol: "CELO", decimals: 18 }, 
             rpcUrls: ["https://alfajores-forno.celo-testnet.org"], 
@@ -889,27 +335,21 @@
 
         let allCommunityLinks = loadLinksFromStorage(); 
 
-        // YENİ: Section gösterim fonksiyonu
+        // Section gösterim fonksiyonu
         function showSection(sectionName) {
-            // Tüm section'ları gizle
             document.querySelectorAll('.feature-section').forEach(section => {
                 section.classList.add('hidden');
             });
             
-            // Tüm butonlardan active class'ını kaldır
             document.querySelectorAll('.feature-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             
-            // Seçilen section'ı göster
             document.getElementById(sectionName + 'Section').classList.remove('hidden');
-            
-            // Seçilen butona active class'ını ekle
             event.target.classList.add('active');
             
             currentSection = sectionName;
             
-            // Section'a özel verileri yükle
             switch(sectionName) {
                 case 'governance':
                     loadProposals();
@@ -931,8 +371,6 @@
             if (url.includes('x.com') || url.includes('twitter.com')) return '🐦 X'; 
             if (url.includes('farcaster.xyz') || url.includes('warpcast.com')) return '🔮 Farcaster'; 
             if (url.includes('github.com')) return '💻 GitHub'; 
-            if (url.includes('youtube.com')) return '📺 YouTube'; 
-            if (url.includes('discord.com')) return '💬 Discord'; 
             return '🌐 Website'; 
         } 
 
@@ -975,62 +413,7 @@
             }); 
         } 
 
-        // DÜZELTİLMİŞ FONKSİYONLAR
-        async function loadPlatformStats() {
-            if (!provider || !isConnected) return;
-            
-            try {
-                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
-                const totalUsers = await contract.totalUsers();
-                
-                document.getElementById('totalUsers').textContent = totalUsers.toString();
-                document.getElementById('totalSupports').textContent = "0";
-                document.getElementById('totalProposals').textContent = "0";
-                document.getElementById('totalBadges').textContent = "0";
-                
-            } catch (error) {
-                console.error("Error loading stats:", error);
-                // Hata durumunda fallback değerler
-                document.getElementById('totalUsers').textContent = allCommunityLinks.length;
-                document.getElementById('totalSupports').textContent = allCommunityLinks.reduce((sum, link) => sum + link.clickCount, 0);
-            }
-        }
-
-        async function loadDetailedStats() {
-            document.getElementById('statsTotalLinks').textContent = allCommunityLinks.length;
-            document.getElementById('statsSupportsGiven').textContent = allCommunityLinks.reduce((sum, link) => sum + link.clickCount, 0);
-            document.getElementById('statsActiveUsers').textContent = new Set(allCommunityLinks.map(link => link.submitter)).size;
-            document.getElementById('statsCommunityScore').textContent = allCommunityLinks.length > 0 
-                ? Math.round(allCommunityLinks.reduce((sum, link) => sum + link.clickCount, 0) / allCommunityLinks.length * 10)
-                : 0;
-        }
-
-        async function loadUserProfile() {
-            if (!provider || !isConnected) {
-                document.getElementById('profileStatus').innerHTML = '<div style="color: #EF4444;">⚠️ Please connect your wallet first</div>';
-                return;
-            }
-            
-            try {
-                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
-                const profile = await contract.getUserProfile(userAddress);
-                
-                userProfile = profile;
-                
-                if (profile.isActive) {
-                    document.getElementById('userUsername').value = profile.username || '';
-                    document.getElementById('userLink').value = profile.link || '';
-                    document.getElementById('profileStatus').innerHTML = '<div style="color: #35D07F;">✅ Profile is active</div>';
-                } else {
-                    document.getElementById('profileStatus').innerHTML = '<div style="color: #F59E0B;">⏳ Please setup your profile</div>';
-                }
-            } catch (error) {
-                console.error("Error loading user profile:", error);
-                document.getElementById('profileStatus').innerHTML = '<div style="color: #EF4444;">❌ Error loading profile</div>';
-            }
-        }
-
-        // ✅ DÜZELTİLMİŞ: Profile Setup Fonksiyonu - registerUser kullanıyor
+        // ✅ DOĞRU: registerUser fonksiyonunu kullan
         async function setupUserProfile() {
             if (!isConnected) {
                 const connected = await connectWallet();
@@ -1045,53 +428,25 @@
                 return;
             }
 
-            if (!link.startsWith('http://') && !link.startsWith('https://')) {
-                alert("❌ Please enter a valid URL starting with http:// or https://");
-                return;
-            }
-
             try {
-                const btn = document.getElementById("setupProfileBtn");
-                btn.disabled = true;
-                btn.textContent = "⏳ Setting up...";
-                btn.classList.add('loading');
+                document.getElementById("setupProfileBtn").disabled = true;
+                document.getElementById("setupProfileBtn").textContent = "⏳ Setting up...";
                 
                 document.getElementById('profileStatus').innerHTML = '<div style="color: #F59E0B;">⏳ Processing transaction...</div>';
 
-                console.log("Starting profile setup with:", { username, link });
-                
-                // Contract instance oluştur
+                // ✅ DOĞRU FONKSİYON: registerUser
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-                
-                console.log("Contract instance created");
-                
-                // ✅ DOĞRU FONKSİYON: registerUser kullan
                 const tx = await contract.registerUser(username, link, { 
                     gasLimit: 300000 
                 });
                 
-                console.log("Transaction sent:", tx.hash);
                 document.getElementById('profileStatus').innerHTML = `<div style="color: #F59E0B;">⏳ Transaction sent: ${tx.hash.substring(0, 10)}...</div>`;
                 
-                // Transaction'ın onaylanmasını bekle
                 const receipt = await tx.wait();
-                console.log("Transaction confirmed:", receipt);
-                
                 document.getElementById('profileStatus').innerHTML = '<div style="color: #35D07F;">✅ Profile setup successfully!</div>';
                 
-                // Local storage'a da kaydet
-                const newLinkData = {
-                    link: link,
-                    clickCount: 0,
-                    timestamp: Date.now(),
-                    submitter: userAddress,
-                    username: username
-                };
-                allCommunityLinks.unshift(newLinkData);
-                saveLinksToStorage(allCommunityLinks);
-                displaySupportLinks();
-                
                 alert("🎉 Profile setup completed successfully!");
+                loadUserProfile();
                 
             } catch (error) {
                 console.error("Profile setup error:", error);
@@ -1101,24 +456,103 @@
                     errorMessage += "Transaction rejected by user";
                 } else if (error.reason) {
                     errorMessage += error.reason;
-                } else if (error.message) {
-                    errorMessage += error.message;
                 } else {
-                    errorMessage += "Unknown error occurred";
+                    errorMessage += error.message;
                 }
                 
                 document.getElementById('profileStatus').innerHTML = `<div style="color: #EF4444;">❌ ${errorMessage}</div>`;
                 alert("❌ " + errorMessage);
                 
             } finally {
-                const btn = document.getElementById("setupProfileBtn");
-                btn.disabled = false;
-                btn.textContent = "🚀 Setup Profile";
-                btn.classList.remove('loading');
+                document.getElementById("setupProfileBtn").disabled = false;
+                document.getElementById("setupProfileBtn").textContent = "🚀 Setup Profile";
             }
         }
 
-        // Diğer fonksiyonlar...
+        // ✅ DOĞRU: registerUser fonksiyonunu kullan
+        async function submitLink() { 
+            if (!isConnected) { 
+                const connected = await connectWallet(); 
+                if (!connected) return; 
+            } 
+            if (!hasSupported) { 
+                alert("❌ Please support at least one community member first!"); 
+                showSection('support');
+                return; 
+            } 
+            
+            const username = document.getElementById("userUsernameInput").value.trim();
+            const userLink = document.getElementById("userLinkInput").value.trim(); 
+
+            if (!username || !userLink) { 
+                alert("❌ Please enter both username and link"); 
+                return; 
+            } 
+
+            try { 
+                document.getElementById("submitLinkBtn").disabled = true; 
+                document.getElementById("submitLinkBtn").textContent = "⏳ Submitting..."; 
+                
+                // ✅ DOĞRU FONKSİYON: registerUser
+                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer); 
+                const tx = await contract.registerUser(username, userLink, { gasLimit: 300000 }); 
+                await tx.wait(); 
+                
+                document.getElementById("userLinkInput").value = ""; 
+                document.getElementById("userUsernameInput").value = "";
+                hasSupported = false; 
+                alert("✅ Link submitted successfully!"); 
+                showSection('support');
+            } catch (error) { 
+                console.error("Submit error:", error); 
+                if (error.code === 4001) { 
+                    alert("❌ Transaction rejected by user"); 
+                } else { 
+                    alert("❌ Submission failed: " + error.message); 
+                } 
+            } finally { 
+                document.getElementById("submitLinkBtn").disabled = false; 
+                document.getElementById("submitLinkBtn").textContent = "✍️ Submit Link"; 
+            } 
+        } 
+
+        // Diğer fonksiyonlar aynı...
+        async function loadUserProfile() {
+            if (!provider || !isConnected) return;
+            
+            try {
+                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+                const profile = await contract.getUserProfile(userAddress);
+                
+                userProfile = profile;
+                
+                if (profile.isActive) {
+                    document.getElementById('userUsername').value = profile.username || '';
+                    document.getElementById('userLink').value = profile.link || '';
+                    document.getElementById('profileStatus').innerHTML = '<div style="color: #35D07F;">✅ Profile is active</div>';
+                }
+            } catch (error) {
+                console.error("Error loading user profile:", error);
+            }
+        }
+
+        async function loadPlatformStats() {
+            if (!provider || !isConnected) return;
+            
+            try {
+                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+                const totalUsers = await contract.totalUsers();
+                document.getElementById('totalUsers').textContent = totalUsers.toString();
+            } catch (error) {
+                console.error("Error loading stats:", error);
+            }
+        }
+
+        function loadDetailedStats() {
+            document.getElementById('statsTotalLinks').textContent = allCommunityLinks.length;
+            document.getElementById('statsSupportsGiven').textContent = allCommunityLinks.reduce((sum, link) => sum + link.clickCount, 0);
+        }
+
         async function loadProposals() {
             try {
                 document.getElementById('proposalsContainer').innerHTML = '<p>Governance features coming soon...</p>';
@@ -1128,10 +562,6 @@
         }
 
         async function createProposal() {
-            alert("🗳️ Governance features will be available soon!");
-        }
-
-        async function voteProposal(proposalId, support) {
             alert("🗳️ Governance features will be available soon!");
         }
 
@@ -1159,23 +589,7 @@
                     }); 
                     return true; 
                 } 
-                // Mainnet başarısız olursa Alfajores'u dene
-                try {
-                    await window.ethereum.request({ 
-                        method: 'wallet_switchEthereumChain', 
-                        params: [{ chainId: CELO_ALFAJORES_PARAMS.chainId }], 
-                    }); 
-                    return true;
-                } catch (testnetError) {
-                    if (testnetError.code === 4902) { 
-                        await window.ethereum.request({ 
-                            method: 'wallet_addEthereumChain', 
-                            params: [CELO_ALFAJORES_PARAMS], 
-                        }); 
-                        return true; 
-                    }
-                    throw testnetError;
-                }
+                return false;
             } 
         } 
 
@@ -1256,70 +670,6 @@
             } 
         } 
 
-        // ✅ DÜZELTİLMİŞ: Submit Link Fonksiyonu - registerUser kullanıyor
-        async function submitLink() { 
-            if (!isConnected) { 
-                const connected = await connectWallet(); 
-                if (!connected) return; 
-            } 
-            if (!hasSupported) { 
-                alert("❌ Please support at least one community member first!"); 
-                showSection('support');
-                return; 
-            } 
-            const isCorrectNetwork = await checkCurrentNetwork(); 
-            if (!isCorrectNetwork) { 
-                alert("❌ Please switch to Celo network to submit your link"); 
-                return; 
-            } 
-            const userLink = document.getElementById("userLinkInput").value.trim(); 
-            if (!userLink) { 
-                alert("❌ Please enter your link first."); 
-                return; 
-            } 
-            if (!userLink.startsWith('http://') && !userLink.startsWith('https://')) { 
-                alert("❌ Please enter a valid URL starting with http:// or https://"); 
-                return; 
-            } 
-            try { 
-                document.getElementById("submitLinkBtn").disabled = true; 
-                document.getElementById("submitLinkBtn").textContent = "⏳ Submitting..."; 
-                
-                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer); 
-                // ✅ DOĞRU FONKSİYON: registerUser kullan (username olarak "User" kullan)
-                const tx = await contract.registerUser("User", userLink, { gasLimit: 300000 }); 
-                await tx.wait(); 
-                
-                const newLinkData = { 
-                    link: userLink, 
-                    clickCount: 0, 
-                    timestamp: Date.now(), 
-                    submitter: userAddress 
-                }; 
-                allCommunityLinks.unshift(newLinkData); 
-                saveLinksToStorage(allCommunityLinks); 
-                displaySupportLinks(); 
-                document.getElementById("userLinkInput").value = ""; 
-                hasSupported = false; 
-                alert("✅ Link submitted successfully! Thank you for contributing to the community."); 
-                showSection('support');
-            } catch (error) { 
-                console.error("Submit error:", error); 
-                document.getElementById("submitLinkBtn").disabled = false; 
-                document.getElementById("submitLinkBtn").textContent = "✍️ Submit Link"; 
-                if (error.code === 4001) { 
-                    alert("❌ Transaction rejected by user"); 
-                } else if (error.code === 'INSUFFICIENT_FUNDS') { 
-                    alert("❌ Insufficient funds for gas fee."); 
-                } else { 
-                    alert("❌ Submission failed: " + error.message); 
-                } 
-            } finally { 
-                document.getElementById("submitLinkBtn").disabled = false; 
-                document.getElementById("submitLinkBtn").textContent = "✍️ Submit Link"; 
-            } 
-        } 
-
         // Event listeners 
         document.getElementById("connectWalletBtn").addEventListener("click", connectWallet); 
         document.getElementById("submitLinkBtn").addEventListener("click", submitLink); 
@@ -1365,7 +715,6 @@
         window.markAsSupported = markAsSupported; 
         window.connectWallet = connectWallet; 
         window.handleLinkClick = handleLinkClick; 
-        window.voteProposal = voteProposal;
         window.showSection = showSection;
     </script> 
 </body> 
