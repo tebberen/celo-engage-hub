@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📧 Email Support
+    url: mailto:sametkocali1905@gmail.com
+    about: Contact maintainers directly for sensitive issues
+  - name: 💬 Celo Discord
+    url: https://chat.celo.org
+    about: Join Celo community for general questions
+  - name: 🌐 Live Demo
+    url: https://tebberen.github.io/celo-engage-hub/
+    about: Test the application
+  - name: 📜 Smart Contract
+    url: https://celoscan.io/address/0x22eA49c074098931a478F381f971C77486d185b2
+    about: View the smart contract on CeloScan
