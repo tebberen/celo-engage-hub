@@ -1,10 +1,8 @@
----
 name: "🐛 Bug Report - Celo Engage Hub"
 about: Report a bug in the Celo Engage Hub dApp
 title: "[BUG] "
 labels: ["bug", "dapp", "celo"]
 assignees: "tebberen"
----
 
 ## 🐛 Bug Description
 _A clear and concise description of what the bug is_
