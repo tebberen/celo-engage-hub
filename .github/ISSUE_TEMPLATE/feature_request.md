@@ -1,24 +1,19 @@
 ---
 name: Feature Request
-description: Suggest a new feature for Celo Engage Hub
-title: "[FEATURE] "
-labels: ["enhancement"]
+about: Suggest an idea for this project
+title: '[FEATURE] '
+labels: enhancement
+assignees: ''
 ---
 
-## Feature Description
-**What problem does this feature solve?**
+**Is your feature request related to a problem? Please describe.**
+A clear and concise description of what the problem is.
 
 **Describe the solution you'd like**
+A clear and concise description of what you want to happen.
 
 **Describe alternatives you've considered**
-
-## Technical Details
-**Does this require smart contract changes?**
-- [ ] Yes
-- [ ] No
-
-**Does this require frontend changes?**
-- [ ] Yes
-- [ ] No
+A clear and concise description of any alternative solutions or features you've considered.
 
 **Additional context**
+Add any other context or screenshots about the feature request here.
