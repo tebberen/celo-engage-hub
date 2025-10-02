@@ -49,12 +49,13 @@
         .support-section { order: 2; }
         .governance-section { order: 3; }
         .badge-section { order: 4; }
+        .factory-section { order: 5; }
         .proposal-card { border: 2px solid #35D07F; padding: 20px; border-radius: 12px; background-color: #F0FFF7; margin: 15px 0; }
         .badge-card { border: 2px solid #FBCC5C; padding: 15px; border-radius: 12px; background-color: #FFF9E6; margin: 10px 0; }
         .stats-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
         .stat-card { background: #FFFDF6; border: 2px solid #FBCC5C; padding: 15px; border-radius: 8px; text-align: center; }
-        .create2-card { border: 2px solid #8B5CF6; background: #F8F5FF; }
-        .create2-btn { background: #8B5CF6; color: white; }
+        .factory-card { border: 2px solid #9B87F5; padding: 20px; border-radius: 12px; background-color: #F8F5FF; margin: 15px 0; }
+        .factory-result { background: #F0F4FF; padding: 15px; border-radius: 8px; margin: 15px 0; word-break: break-all; }
     </style>
 </head>
 <body>
@@ -152,46 +153,6 @@
                     </div>
                 </div>
 
-                <!-- CREATE2 FACTORY SECTION -->
-                <div id="create2Section" class="step-container hidden">
-                    <div class="step-indicator">
-                        <span class="step-number">🏭</span> CREATE2 Factory
-                    </div>
-                    
-                    <div class="submit-form">
-                        <h3>🚀 Smart Contract Factory</h3>
-                        <p>Deploy contracts to predictable addresses using CREATE2</p>
-                        
-                        <div class="link-card create2-card">
-                            <h4>💾 Simple Storage Contract</h4>
-                            <p>Deploy a basic storage contract to test CREATE2</p>
-                            <div class="gas-info">
-                                ⚡ Deterministic addressing - Same code + salt = Same address
-                            </div>
-                            <button onclick="createSimpleStorage()" class="create2-btn">
-                                🏗️ Deploy Storage Contract
-                            </button>
-                        </div>
-                        
-                        <div class="link-card create2-card">
-                            <h4>🔧 Advanced Deployment</h4>
-                            <p>Custom deployment with specific salt</p>
-                            <input type="number" id="customSalt" placeholder="Enter custom salt number..." style="margin: 10px 0; padding: 10px; width: 90%;">
-                            <button onclick="deployWithCustomSalt()" class="create2-btn">
-                                🛠️ Deploy with Custom Salt
-                            </button>
-                        </div>
-                        
-                        <div class="gas-info">
-                            📖 <strong>CREATE2 Avantajları:</strong><br>
-                            • Öngörülebilir kontrat adresleri<br>
-                            • Aynı kod + aynı salt = aynı adres<br>
-                            • Kontrat upgrade stratejileri<br>
-                            • Gas optimizasyonu
-                        </div>
-                    </div>
-                </div>
-
                 <!-- GOVERNANCE SECTION -->
                 <div id="governanceSection" class="governance-section hidden">
                     <div class="step-indicator">
@@ -218,6 +179,40 @@
                         <div id="userBadgesContainer"></div>
                     </div>
                 </div>
+
+                <!-- CREATE2 FACTORY SECTION - YENİ EKLENEN BÖLÜM -->
+                <div id="factorySection" class="factory-section hidden">
+                    <div class="step-indicator">
+                        <span class="step-number">🏭</span> Create2 Factory
+                    </div>
+                    <div class="step-container">
+                        <h3>🚀 Smart Contract Deployment</h3>
+                        <p>Deploy new contracts using CREATE2 for deterministic addresses</p>
+                        
+                        <div class="factory-card">
+                            <h4>📝 Deploy New Contract</h4>
+                            <textarea placeholder="Enter contract bytecode (0x...)" id="contractBytecode" rows="4"></textarea>
+                            <input type="number" placeholder="Salt value (number)" id="contractSalt" />
+                            <div class="gas-info">⛽ Gas estimate: ~200,000 - 500,000</div>
+                            <button id="deployContractBtn">🏭 Deploy Contract</button>
+                        </div>
+
+                        <div class="factory-card">
+                            <h4>🔍 Compute Contract Address</h4>
+                            <textarea placeholder="Enter bytecode to compute address" id="computeBytecode" rows="3"></textarea>
+                            <input type="number" placeholder="Salt value" id="computeSalt" />
+                            <button id="computeAddressBtn">🧮 Compute Address</button>
+                            <div id="computedAddress" class="factory-result hidden"></div>
+                        </div>
+
+                        <div class="factory-card">
+                            <h4>💰 Check Contract Balance</h4>
+                            <input type="text" placeholder="Contract address (0x...)" id="balanceContractAddress" />
+                            <button id="checkBalanceBtn">📊 Check Balance</button>
+                            <div id="contractBalance" class="factory-result hidden"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -235,6 +230,9 @@
 
         // ✅ GÜNCEL CELO CONTRACT ADDRESS
         const CONTRACT_ADDRESS = "0x22eA49c074098931a478F381f971C77486d185b2";
+
+        // ✅ CREATE2 FACTORY CONTRACT ADDRESS
+        const FACTORY_ADDRESS = "0xe557Eb1ce745EB272Fd99941C9AD1E2867C7E01A";
 
         // ✅ GÜNCEL Contract ABI - BYTECODE ANALİZİNE GÖRE GÜNCELLENDİ
         const CONTRACT_ABI = [
@@ -262,111 +260,105 @@
             "error AlreadyVoted()"
         ];
 
-        // ✅ CREATE2 FACTORY CONTRACT
-        const CREATE2_FACTORY = {
-            address: "0xe557eb1ce745eb272fd99941c9ad1e2867c7e01a",
-            abi: [
-                {
-                    "anonymous": false,
-                    "inputs": [
-                        {
-                            "indexed": false,
-                            "internalType": "address",
-                            "name": "deployedAddress",
-                            "type": "address"
-                        },
-                        {
-                            "indexed": false,
-                            "internalType": "address",
-                            "name": "creator",
-                            "type": "address"
-                        },
-                        {
-                            "indexed": false,
-                            "internalType": "uint256",
-                            "name": "salt",
-                            "type": "uint256"
-                        }
-                    ],
-                    "name": "ContractDeployed",
-                    "type": "event"
-                },
-                {
-                    "inputs": [
-                        {
-                            "internalType": "bytes",
-                            "name": "bytecode",
-                            "type": "bytes"
-                        },
-                        {
-                            "internalType": "uint256",
-                            "name": "salt",
-                            "type": "uint256"
-                        }
-                    ],
-                    "name": "deploy",
-                    "outputs": [
-                        {
-                            "internalType": "address",
-                            "name": "",
-                            "type": "address"
-                        }
-                    ],
-                    "stateMutability": "nonpayable",
-                    "type": "function"
-                },
-                {
-                    "inputs": [
-                        {
-                            "internalType": "bytes",
-                            "name": "bytecode",
-                            "type": "bytes"
-                        },
-                        {
-                            "internalType": "uint256",
-                            "name": "salt",
-                            "type": "uint256"
-                        }
-                    ],
-                    "name": "computeAddress",
-                    "outputs": [
-                        {
-                            "internalType": "address",
-                            "name": "",
-                            "type": "address"
-                        }
-                    ],
-                    "stateMutability": "view",
-                    "type": "function"
-                },
-                {
-                    "inputs": [
-                        {
-                            "internalType": "address",
-                            "name": "contractAddress",
-                            "type": "address"
-                        }
-                    ],
-                    "name": "getContractBalance",
-                    "outputs": [
-                        {
-                            "internalType": "uint256",
-                            "name": "",
-                            "type": "uint256"
-                        }
-                    ],
-                    "stateMutability": "view",
-                    "type": "function"
-                }
-            ]
-        };
-
-        // Simple Storage Contract Bytecode
-        const SIMPLE_STORAGE_BYTECODE = "0x608060405234801561001057600080fd5b50610150806100206000396000f3fe608060405234801561001057600080fd5b50600436106100365760003560e01c806360fe47b11461003b5780636d4ce63c14610057575b600080fd5b6100556004803603810190610050919061009d565b610075565b005b61005f61007f565b60405161006c91906100d9565b60405180910390f35b8060008190555050565b60008054905090565b600080fd5b6000819050919050565b61009a81610087565b81146100a557600080fd5b50565b6000813590506100b781610091565b92915050565b6000602082840312156100d3576100d2610082565b5b60006100e1848285016100a8565b91505092915050565b60006020820190506100ff6000830184610096565b9291505056fe";
+        // ✅ CREATE2 FACTORY ABI
+        const FACTORY_ABI = [
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": false,
+                        "internalType": "address",
+                        "name": "deployedAddress",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "address",
+                        "name": "creator",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "salt",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "ContractDeployed",
+                "type": "event"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "bytes",
+                        "name": "bytecode",
+                        "type": "bytes"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "salt",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "deploy",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "bytes",
+                        "name": "bytecode",
+                        "type": "bytes"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "salt",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "computeAddress",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "contractAddress",
+                        "type": "address"
+                    }
+                ],
+                "name": "getContractBalance",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            }
+        ];
 
         // Celo Network Configuration
         const CELO_MAINNET_PARAMS = {
-            chainId: "0xA4EC",
+            chainId: "0xA4EC", // 42220 in hex - Celo Mainnet
             chainName: "Celo Mainnet",
             nativeCurrency: { name: "CELO", symbol: "CELO", decimals: 18 },
             rpcUrls: ["https://forno.celo.org"],
@@ -374,7 +366,7 @@
         };
 
         const CELO_ALFAJORES_PARAMS = {
-            chainId: "0xAEF3",
+            chainId: "0xAEF3", // 44787 in hex - Celo Alfajores Testnet
             chainName: "Celo Alfajores Testnet",
             nativeCurrency: { name: "CELO", symbol: "CELO", decimals: 18 },
             rpcUrls: ["https://alfajores-forno.celo-testnet.org"],
@@ -503,7 +495,7 @@
                     document.getElementById('userProfileSection').classList.add('hidden');
                     document.getElementById('governanceSection').classList.remove('hidden');
                     document.getElementById('badgesSection').classList.remove('hidden');
-                    document.getElementById('create2Section').classList.remove('hidden');
+                    document.getElementById('factorySection').classList.remove('hidden'); // Factory section'ı göster
                     loadUserBadges();
                     loadProposals();
                 } else {
@@ -737,6 +729,139 @@
             }
         }
 
+        // ✅ CREATE2 FACTORY FONKSİYONLARI - YENİ EKLENDİ
+        async function deployContract() {
+            if (!isConnected) {
+                const connected = await connectWallet();
+                if (!connected) return;
+            }
+
+            const bytecode = document.getElementById("contractBytecode").value.trim();
+            const salt = document.getElementById("contractSalt").value.trim();
+
+            if (!bytecode || !salt) {
+                alert("❌ Please enter both bytecode and salt");
+                return;
+            }
+
+            if (!bytecode.startsWith('0x')) {
+                alert("❌ Bytecode must start with 0x");
+                return;
+            }
+
+            try {
+                document.getElementById("deployContractBtn").disabled = true;
+                document.getElementById("deployContractBtn").textContent = "⏳ Deploying...";
+
+                const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, signer);
+                
+                const tx = await factory.deploy(bytecode, salt, {
+                    gasLimit: 500000
+                });
+
+                console.log("🔄 Deploy TX sent:", tx.hash);
+                alert(`⏳ Contract deployment submitted!\nTX Hash: ${tx.hash}`);
+
+                const receipt = await tx.wait();
+                console.log("✅ Deployment confirmed:", receipt);
+
+                // Event'i dinle
+                const event = receipt.events?.find(e => e.event === 'ContractDeployed');
+                if (event) {
+                    const deployedAddress = event.args.deployedAddress;
+                    alert(`✅ Contract deployed successfully!\nAddress: ${deployedAddress}`);
+                } else {
+                    alert("✅ Contract deployed successfully!");
+                }
+
+            } catch (error) {
+                console.error("❌ Deployment error:", error);
+                
+                if (error.code === 4001) {
+                    alert("❌ Transaction rejected by user");
+                } else if (error.code === 'INSUFFICIENT_FUNDS') {
+                    alert("❌ Insufficient funds for gas fee");
+                } else {
+                    alert("❌ Deployment failed: " + error.message);
+                }
+            } finally {
+                document.getElementById("deployContractBtn").disabled = false;
+                document.getElementById("deployContractBtn").textContent = "🏭 Deploy Contract";
+            }
+        }
+
+        async function computeContractAddress() {
+            const bytecode = document.getElementById("computeBytecode").value.trim();
+            const salt = document.getElementById("computeSalt").value.trim();
+
+            if (!bytecode || !salt) {
+                alert("❌ Please enter both bytecode and salt");
+                return;
+            }
+
+            if (!bytecode.startsWith('0x')) {
+                alert("❌ Bytecode must start with 0x");
+                return;
+            }
+
+            try {
+                document.getElementById("computeAddressBtn").disabled = true;
+                document.getElementById("computeAddressBtn").textContent = "⏳ Computing...";
+
+                const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
+                const computedAddress = await factory.computeAddress(bytecode, salt);
+
+                document.getElementById("computedAddress").innerHTML = `
+                    <strong>📬 Computed Address:</strong><br>
+                    ${computedAddress}
+                `;
+                document.getElementById("computedAddress").classList.remove('hidden');
+
+            } catch (error) {
+                console.error("❌ Compute error:", error);
+                alert("❌ Failed to compute address: " + error.message);
+            } finally {
+                document.getElementById("computeAddressBtn").disabled = false;
+                document.getElementById("computeAddressBtn").textContent = "🧮 Compute Address";
+            }
+        }
+
+        async function checkContractBalance() {
+            const contractAddress = document.getElementById("balanceContractAddress").value.trim();
+
+            if (!contractAddress) {
+                alert("❌ Please enter contract address");
+                return;
+            }
+
+            if (!ethers.utils.isAddress(contractAddress)) {
+                alert("❌ Invalid contract address");
+                return;
+            }
+
+            try {
+                document.getElementById("checkBalanceBtn").disabled = true;
+                document.getElementById("checkBalanceBtn").textContent = "⏳ Checking...";
+
+                const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
+                const balance = await factory.getContractBalance(contractAddress);
+                const balanceInCELO = ethers.utils.formatEther(balance);
+
+                document.getElementById("contractBalance").innerHTML = `
+                    <strong>💰 Contract Balance:</strong><br>
+                    ${balanceInCELO} CELO
+                `;
+                document.getElementById("contractBalance").classList.remove('hidden');
+
+            } catch (error) {
+                console.error("❌ Balance check error:", error);
+                alert("❌ Failed to check balance: " + error.message);
+            } finally {
+                document.getElementById("checkBalanceBtn").disabled = false;
+                document.getElementById("checkBalanceBtn").textContent = "📊 Check Balance";
+            }
+        }
+
         // Network functions
         async function switchToCeloNetwork() {
             try {
@@ -957,62 +1082,16 @@
             }
         }
 
-        // ✅ CREATE2 DEPLOY FONKSİYONU
-        async function deployWithCreate2(bytecode, salt) {
-            if (!isConnected) {
-                const connected = await connectWallet();
-                if (!connected) return;
-            }
-
-            try {
-                const factory = new ethers.Contract(CREATE2_FACTORY.address, CREATE2_FACTORY.abi, signer);
-                
-                // Önce adresi hesapla
-                const predictedAddress = await factory.computeAddress(bytecode, salt);
-                console.log("📝 Predicted address:", predictedAddress);
-                
-                // Deploy işlemi
-                const tx = await factory.deploy(bytecode, salt, {
-                    gasLimit: 500000
-                });
-                
-                console.log("🔄 CREATE2 deploy TX:", tx.hash);
-                alert(`⏳ CREATE2 deployment submitted!\n\nPredicted Address: ${predictedAddress}\nTX Hash: ${tx.hash}`);
-                
-                const receipt = await tx.wait();
-                console.log("✅ CREATE2 deployment confirmed:", receipt);
-                
-                alert(`✅ Contract successfully deployed!\n\nAddress: ${predictedAddress}`);
-                return predictedAddress;
-                
-            } catch (error) {
-                console.error("❌ CREATE2 deployment error:", error);
-                if (error.code === 4001) {
-                    alert("❌ Transaction rejected by user");
-                } else {
-                    alert("❌ CREATE2 deployment failed: " + error.message);
-                }
-            }
-        }
-
-        // Kullanıcı için basit deploy fonksiyonu
-        async function createSimpleStorage() {
-            const salt = Date.now();
-            await deployWithCreate2(SIMPLE_STORAGE_BYTECODE, salt);
-        }
-
-        // Custom salt ile deploy
-        async function deployWithCustomSalt() {
-            const saltInput = document.getElementById('customSalt');
-            const salt = saltInput.value ? parseInt(saltInput.value) : Date.now();
-            await deployWithCreate2(SIMPLE_STORAGE_BYTECODE, salt);
-        }
-
         // Event listeners
         document.getElementById("connectWalletBtn").addEventListener("click", connectWallet);
         document.getElementById("submitLinkBtn").addEventListener("click", submitLink);
         document.getElementById("setupProfileBtn").addEventListener("click", setupUserProfile);
         document.getElementById("createProposalBtn").addEventListener("click", createProposal);
+        
+        // ✅ YENİ FACTORY EVENT LISTENERS
+        document.getElementById("deployContractBtn").addEventListener("click", deployContract);
+        document.getElementById("computeAddressBtn").addEventListener("click", computeContractAddress);
+        document.getElementById("checkBalanceBtn").addEventListener("click", checkContractBalance);
 
         // Network değişikliklerini dinle
         if (window.ethereum) {
@@ -1058,8 +1137,9 @@
         window.connectWallet = connectWallet;
         window.handleLinkClick = handleLinkClick;
         window.voteProposal = voteProposal;
-        window.createSimpleStorage = createSimpleStorage;
-        window.deployWithCustomSalt = deployWithCustomSalt;
+        window.deployContract = deployContract;
+        window.computeContractAddress = computeContractAddress;
+        window.checkContractBalance = checkContractBalance;
     </script>
 </body>
 </html>
