@@ -1,62 +1,35 @@
-name: CI/CD
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout code
+    - name: Checkout
       uses: actions/checkout@v4
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-
-    - name: Install dependencies
-      run: npm install
-
-    - name: Run basic validation
-      run: |
-        echo "✅ Validating project structure..."
-        if [ -f "index.html" ]; then
-          echo "✅ index.html exists"
-        else
-          echo "❌ index.html missing"
-          exit 1
-        fi
-        
-        if [ -f "package.json" ]; then
-          echo "✅ package.json exists"
-        else
-          echo "❌ package.json missing"
-          exit 1
-        fi
-        
-        echo "✅ All validations passed!"
-
-  deploy:
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
     
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
+    # ⚠️ BUILD GEREKMEZ - direkt HTML dosyalarınız var
+    # - name: Build
+    #   run: |
+    #     echo "No build step needed for static HTML"
+    
+    - name: Setup Pages
+      uses: actions/configure-pages@v3
+      
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v2
       with:
-        node-version: '18'
-
+        path: '.'  # Tüm dosyaları deploy et
+        
     - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./
+      id: deployment
+      uses: actions/deploy-pages@v2
