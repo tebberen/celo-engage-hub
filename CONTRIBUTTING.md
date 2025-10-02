@@ -347,8 +347,3 @@ Thank you for considering contributing to Celo Engage Hub. Your efforts help bui
 Together, we're building the future of social engagement!
 
 ```
-
-**Şimdi bu metni kopyalayıp CONTRIBUTING.md dosyası olarak reponuza ekleyin ve "CONTRIBUTING tamam" deyin.**
-
-Sonra **ADIM 4: GitHub Repository Ayarları ve Topics**'e geçeceğiz! 🚀
-```
