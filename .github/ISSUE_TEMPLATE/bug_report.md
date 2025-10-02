@@ -1,151 +1,37 @@
 ---
-name: "🐛 Bug Report"
-description: "Report a bug or unexpected behavior in Celo Engage Hub"
-title: "🐛 [BUG] - "
-labels: ["bug", "triage", "needs-investigation"]
-assignees: []
-projects: ["tebberen/celo-engage-hub/1"]
-
+name: Bug Report
+about: Create a report to help us improve
+title: '[BUG] '
+labels: bug
+assignees: ''
 ---
 
-## 🐛 Bug Report
+**Describe the bug**
+A clear and concise description of what the bug is.
 
-### 📋 Description
-<!-- A clear and concise description of what the bug is. Include specific error messages if available. -->
-
-### 🔄 Reproduction Steps
-<!-- Detailed steps to reproduce the behavior -->
-1. Navigate to '...'
+**To Reproduce**
+Steps to reproduce the behavior:
+1. Go to '...'
 2. Click on '....'
-3. Connect wallet to '....' network
-4. Execute transaction '....'
-5. Observe error at step '....'
+3. Scroll down to '....'
+4. See error
 
-### ✅ Expected Behavior
-<!-- A clear and concise description of what you expected to happen -->
+**Expected behavior**
+A clear and concise description of what you expected to happen.
 
-### ❌ Actual Behavior
-<!-- A clear and concise description of what actually happened, including any error messages -->
+**Screenshots**
+If applicable, add screenshots to help explain your problem.
 
-### 🖼️ Visual Evidence
-<!-- If applicable, add screenshots or screen recordings to help explain your problem -->
-- [ ] I have attached screenshots
-- [ ] I have attached screen recording
-- [ ] No visual evidence available
+**Desktop (please complete the following information):**
+ - OS: [e.g. iOS]
+ - Browser [e.g. chrome, safari]
+ - Version [e.g. 22]
 
-### 🌐 Environment Details
-**Desktop Environment:**
-- Operating System: [e.g. Windows 11, macOS Sonoma 14.0, Ubuntu 22.04 LTS]
-- Browser: [e.g. Chrome 118.0.5993.88, Firefox 118.0.1, Safari 17.0]
-- Browser Version: [e.g. 118.0.5993.88]
-- Screen Resolution: [e.g. 1920x1080]
-- Application Version: [e.g. 1.2.0]
+**Smartphone (please complete the following information):**
+ - Device: [e.g. iPhone6]
+ - OS: [e.g. iOS8.1]
+ - Browser [e.g. stock browser, safari]
+ - Version [e.g. 22]
 
-**Mobile Environment:**
-- Device: [e.g. iPhone 15 Pro, Samsung Galaxy S23 Ultra, Google Pixel 7]
-- Operating System: [e.g. iOS 17.0.3, Android 14, HarmonyOS 4.0]
-- Browser: [e.g. Safari Mobile, Chrome Mobile, Samsung Internet]
-- Browser Version: [e.g. 117.0.5938.153]
-- Application Version: [e.g. 1.2.0]
-
-**Wallet Configuration:**
-- Wallet Provider: [e.g. MetaMask, Valora, Celo Wallet, Rabby]
-- Wallet Version: [e.g. MetaMask v10.28.3, Valora v1.42.0]
-- Connected Network: [e.g. Celo Mainnet (42220), Alfajores Testnet (44787)]
-- Account Type: [e.g. EOA, Smart Contract Wallet]
-
-### 🔧 Technical Details
-**Blockchain & Contract Information:**
-- Contract Address: `0x22eA49c074098931a478F381f971C77486d185b2`
-- Network: [e.g. Celo Mainnet (Chain ID: 42220), Alfajores (Chain ID: 44787)]
-- Transaction Hash (if applicable): [e.g. 0xf7d5...a1b2]
-- Block Number: [e.g. 21567890]
-- Gas Used: [e.g. 21000]
-- Gas Price: [e.g. 5 Gwei]
-
-**Console Errors & Logs:**
-<!-- Paste any console errors from browser developer tools -->
-<details>
-<summary>Browser Console Output</summary>
-
-```javascript
-// Paste complete console output here
-// Include errors, warnings, and relevant logs
-console.error("Error message here");
-console.warn("Warning message here");
-```
-
-</details>Network Request Details:
-
-<details>
-<summary>Network Activity</summary>```http
-// Paste failed network requests
-// Include request/response details
-POST https://forno.celo.org
-Status: 500
-Response: { "error": "execution reverted" }
-```
-
-</details>🔍 Debugging Information
-
-Application State:
-
-· Current Route/Page: [e.g. /governance, /profile]
-· User Authentication Status: [e.g. Connected, Disconnected]
-· Wallet Connection Status: [e.g. Connected, Disconnected, Wrong Network]
-· Contract Interaction State: [e.g. Pending, Confirmed, Failed]
-
-Local Storage & Session Data:
-
-<details>
-<summary>Storage Contents (if relevant)</summary>```json
-{
-  "celoEngageHubLinks": "[...]",
-  "userPreferences": "{...}",
-  "walletState": "{...}"
-}
-```
-
-</details>🚨 Severity Assessment
-
-Impact Level:
-
-· 🔴 Critical - System crash, data loss, security vulnerability, fund loss
-· 🟠 High - Major functionality broken, key features unusable
-· 🟡 Medium - Minor functionality issue, workaround exists
-· 🟢 Low - Cosmetic issue, typo, minor UI glitch
-
-Frequency:
-
-· Always reproducible
-· Intermittent (occurs randomly)
-· Specific conditions required
-· Only occurred once
-
-📚 Additional Context
-
-<!-- Add any other context about the problem here -->· Time of occurrence: [e.g. 2023-10-15 14:30 UTC]
-· Specific user actions before the issue
-· Recent changes to the system
-· Related transactions or contract interactions
-
-✅ Quality Assurance Checklist
-
-· I have searched existing issues and confirmed this is not a duplicate
-· I have provided detailed, step-by-step reproduction instructions
-· I have included all relevant environment details
-· I have attached necessary screenshots or screen recordings
-· I have included console errors and technical logs
-· I have specified wallet and network configuration
-· I have indicated the severity level appropriately
-· I have verified the issue occurs consistently
-
-🔄 Workflow Information
-
-Issue Priority: [To be set by maintainers]
-Estimated Effort: [To be set by maintainers]
-Target Resolution: [To be set by maintainers]
-
----
-
-<!-- 📝 Template Version: 2.0 --><!-- 🔗 Generated by Celo Engage Hub Quality Assurance System --><!-- 🏷️ Categories: bug-report, technical-issue, user-experience -->```
+**Additional context**
+Add any other context about the problem here.
