@@ -1,42 +1,36 @@
 ---
-name: 🐛 Bug Report
-description: Report a bug or unexpected behavior in Celo Engage Hub
+name: Bug Report
+about: Report a bug or unexpected behavior in Celo Engage Hub
 title: "[BUG] "
-labels: ["bug", "triage"]
-assignees: "tebberen"
+labels: bug
+assignees: tebberen
 ---
 
-## 🐛 Bug Description
-**What happened?**
+**Describe the bug**
+A clear and concise description of what the bug is.
 
-**What should have happened?**
+**To Reproduce**
+Steps to reproduce the behavior:
+1. Go to '...'
+2. Click on '....'
+3. Scroll down to '....'
+4. See error
 
-## 🔧 Steps to Reproduce
-1. 
-2. 
-3. 
+**Expected behavior**
+A clear and concise description of what you expected to happen.
 
-## 🌐 Environment
-**Desktop:**
-- OS: [e.g., Windows 11, macOS, Ubuntu]
-- Browser: [e.g., Chrome, Firefox, Safari]
-- Wallet: [e.g., MetaMask, Valora]
-- Network: [Celo Mainnet (42220)/Alfajores (44787)]
+**Environment**
+- OS: [e.g. Windows, macOS, Linux]
+- Browser: [e.g. Chrome, Firefox, Safari]
+- Wallet: [e.g. MetaMask, Valora]
+- Network: [Celo Mainnet, Alfajores]
 
-**Mobile:**
-- Device: [e.g., iPhone, Android]
-- OS: [e.g., iOS 17, Android 14]
-- Browser: [e.g., Safari Mobile, Chrome Mobile]
-- Wallet: [e.g., Valora, MetaMask Mobile]
+**Contract Details**
+- Address: 0x22eA49c074098931a478F381f971C77486d185b2
+- Transaction Hash (if applicable): 
 
-## 📋 Technical Details
-- Contract Address: `0x22eA49c074098931a478F381f971C77486d185b2`
-- Transaction Hash (if any): 
-- Console Errors: 
-- Network: [Celo Mainnet/Alfajores]
+**Screenshots**
+If applicable, add screenshots to help explain your problem.
 
-## 🖼️ Screenshots
-<!-- Drag and drop screenshots here -->
-
-## 📝 Additional Context
-<!-- Any other details -->
+**Additional context**
+Add any other context about the problem here.
