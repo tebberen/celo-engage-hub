@@ -1,4 +1,3 @@
-```markdown
 ---
 name: "🐛 Bug Report - Celo Engage Hub"
 about: Report a bug in the Celo Engage Hub dApp
@@ -69,3 +68,5 @@ _Add any other context about the problem here_
 - [ ] Medium (Minor feature issue)
 - [ ] Low (UI/UX cosmetic issue)
 ```
+
+---
