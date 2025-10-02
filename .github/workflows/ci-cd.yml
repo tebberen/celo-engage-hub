@@ -12,24 +12,18 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    
-    # ⚠️ BUILD GEREKMEZ - direkt HTML dosyalarınız var
-    # - name: Build
-    #   run: |
-    #     echo "No build step needed for static HTML"
-    
-    - name: Setup Pages
-      uses: actions/configure-pages@v3
+      - name: Checkout
+        uses: actions/checkout@v4
       
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v2
-      with:
-        path: '.'  # Tüm dosyaları deploy et
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
         
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v2
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: '.'
+          
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
