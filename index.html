@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Celo Engage Hub</title>
     <style>
-        /* TÜM ORİJİNAL CSS KODUNUZ AYNI KALDI */
         * { box-sizing: border-box; }
         body { background-color: #ffffff; font-family: Arial, sans-serif; color: #000000; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .container { display: flex; max-width: 1400px; width: 100%; gap: 30px; align-items: flex-start; }
@@ -50,15 +49,10 @@
         .support-section { order: 2; }
         .governance-section { order: 3; }
         .badge-section { order: 4; }
-        .factory-section { order: 5; }
         .proposal-card { border: 2px solid #35D07F; padding: 20px; border-radius: 12px; background-color: #F0FFF7; margin: 15px 0; }
         .badge-card { border: 2px solid #FBCC5C; padding: 15px; border-radius: 12px; background-color: #FFF9E6; margin: 10px 0; }
         .stats-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
         .stat-card { background: #FFFDF6; border: 2px solid #FBCC5C; padding: 15px; border-radius: 8px; text-align: center; }
-        
-        /* SADECE BU KISIM EKLENDİ - FACTORY İÇİN */
-        .factory-card { border: 2px solid #9B87F5; padding: 20px; border-radius: 12px; background-color: #F8F5FF; margin: 15px 0; }
-        .factory-result { background: #F0F4FF; padding: 15px; border-radius: 8px; margin: 15px 0; word-break: break-all; }
     </style>
 </head>
 <body>
@@ -113,7 +107,7 @@
 
         <div class="main-content">
             <div class="content-layout">
-                <!-- USER PROFILE SECTION - ORİJİNAL -->
+                <!-- USER PROFILE SECTION -->
                 <div id="userProfileSection" class="hidden">
                     <div class="step-indicator">
                         <span class="step-number">👤</span> Your Profile
@@ -127,7 +121,7 @@
                     </div>
                 </div>
 
-                <!-- SUBMIT YOUR LINK SECTION - ORİJİNAL -->
+                <!-- SUBMIT YOUR LINK SECTION -->
                 <div id="step2" class="submit-section hidden">
                     <div class="step-indicator">
                         <span class="step-number">2</span> Submit Your Link
@@ -144,7 +138,7 @@
                     </div>
                 </div>
 
-                <!-- SUPPORT COMMUNITY SECTION - ORİJİNAL -->
+                <!-- SUPPORT COMMUNITY SECTION -->
                 <div id="step1" class="support-section">
                     <div class="step-indicator">
                         <span class="step-number">1</span> Support Community Members
@@ -156,7 +150,7 @@
                     </div>
                 </div>
 
-                <!-- GOVERNANCE SECTION - ORİJİNAL -->
+                <!-- GOVERNANCE SECTION -->
                 <div id="governanceSection" class="governance-section hidden">
                     <div class="step-indicator">
                         <span class="step-number">🏛️</span> Community Governance
@@ -172,7 +166,7 @@
                     </div>
                 </div>
 
-                <!-- BADGES SECTION - ORİJİNAL -->
+                <!-- BADGES SECTION -->
                 <div id="badgesSection" class="badge-section hidden">
                     <div class="step-indicator">
                         <span class="step-number">🎖️</span> Your Badges
@@ -182,47 +176,13 @@
                         <div id="userBadgesContainer"></div>
                     </div>
                 </div>
-
-                <!-- CREATE2 FACTORY SECTION - SADECE BU BÖLÜM EKLENDİ -->
-                <div id="factorySection" class="factory-section hidden">
-                    <div class="step-indicator">
-                        <span class="step-number">🏭</span> Create2 Factory
-                    </div>
-                    <div class="step-container">
-                        <h3>🚀 Smart Contract Deployment</h3>
-                        <p>Deploy new contracts using CREATE2 for deterministic addresses</p>
-                        
-                        <div class="factory-card">
-                            <h4>📝 Deploy New Contract</h4>
-                            <textarea placeholder="Enter contract bytecode (0x...)" id="contractBytecode" rows="4"></textarea>
-                            <input type="number" placeholder="Salt value (number)" id="contractSalt" />
-                            <div class="gas-info">⛽ Gas estimate: ~200,000 - 500,000</div>
-                            <button id="deployContractBtn">🏭 Deploy Contract</button>
-                        </div>
-
-                        <div class="factory-card">
-                            <h4>🔍 Compute Contract Address</h4>
-                            <textarea placeholder="Enter bytecode to compute address" id="computeBytecode" rows="3"></textarea>
-                            <input type="number" placeholder="Salt value" id="computeSalt" />
-                            <button id="computeAddressBtn">🧮 Compute Address</button>
-                            <div id="computedAddress" class="factory-result hidden"></div>
-                        </div>
-
-                        <div class="factory-card">
-                            <h4>💰 Check Contract Balance</h4>
-                            <input type="text" placeholder="Contract address (0x...)" id="balanceContractAddress" />
-                            <button id="checkBalanceBtn">📊 Check Balance</button>
-                            <div id="contractBalance" class="factory-result hidden"></div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <script>
-        // ✅ ORİJİNAL STATE MANAGEMENT - DEĞİŞMEDİ
+        // State management
         let provider = null;
         let signer = null;
         let isConnected = false;
@@ -231,13 +191,10 @@
         let currentChainId = null;
         let userProfile = null;
 
-        // ✅ ORİJİNAL CELO CONTRACT ADDRESS - DEĞİŞMEDİ
+        // ✅ GÜNCEL CELO CONTRACT ADDRESS
         const CONTRACT_ADDRESS = "0x22eA49c074098931a478F381f971C77486d185b2";
 
-        // ✅ CREATE2 FACTORY CONTRACT ADDRESS - SADECE BU EKLENDİ
-        const FACTORY_ADDRESS = "0xe557Eb1ce745EB272Fd99941C9AD1E2867C7E01A";
-
-        // ✅ ORİJİNAL Contract ABI - DEĞİŞMEDİ
+        // ✅ GÜNCEL Contract ABI - BYTECODE ANALİZİNE GÖRE GÜNCELLENDİ
         const CONTRACT_ABI = [
             "function registerUser(string memory _username, string memory _link) public",
             "function updateProfile(string memory _username, string memory _link) public",
@@ -263,105 +220,9 @@
             "error AlreadyVoted()"
         ];
 
-        // ✅ CREATE2 FACTORY ABI - SADECE BU EKLENDİ
-        const FACTORY_ABI = [
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": false,
-                        "internalType": "address",
-                        "name": "deployedAddress",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "address",
-                        "name": "creator",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "uint256",
-                        "name": "salt",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "ContractDeployed",
-                "type": "event"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "bytes",
-                        "name": "bytecode",
-                        "type": "bytes"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "salt",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "deploy",
-                "outputs": [
-                    {
-                        "internalType": "address",
-                        "name": "",
-                        "type": "address"
-                    }
-                ],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "bytes",
-                        "name": "bytecode",
-                        "type": "bytes"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "salt",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "computeAddress",
-                "outputs": [
-                    {
-                        "internalType": "address",
-                        "name": "",
-                        "type": "address"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "contractAddress",
-                        "type": "address"
-                    }
-                ],
-                "name": "getContractBalance",
-                "outputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            }
-        ];
-
-        // ✅ ORİJİNAL CELO NETWORK CONFIG - DEĞİŞMEDİ
+        // Celo Network Configuration
         const CELO_MAINNET_PARAMS = {
-            chainId: "0xA4EC",
+            chainId: "0xA4EC", // 42220 in hex - Celo Mainnet
             chainName: "Celo Mainnet",
             nativeCurrency: { name: "CELO", symbol: "CELO", decimals: 18 },
             rpcUrls: ["https://forno.celo.org"],
@@ -369,14 +230,14 @@
         };
 
         const CELO_ALFAJORES_PARAMS = {
-            chainId: "0xAEF3",
+            chainId: "0xAEF3", // 44787 in hex - Celo Alfajores Testnet
             chainName: "Celo Alfajores Testnet",
             nativeCurrency: { name: "CELO", symbol: "CELO", decimals: 18 },
             rpcUrls: ["https://alfajores-forno.celo-testnet.org"],
             blockExplorerUrls: ["https://alfajores.celoscan.io/"]
         };
 
-        // ✅ ORİJİNAL SUPPORT LINKS - DEĞİŞMEDİ
+        // Initial support links
         const initialSupportLinks = [
             "https://farcaster.xyz/teberen/0x391c5713",
             "https://farcaster.xyz/ertu",
@@ -389,7 +250,7 @@
             "https://github.com/tebberen"
         ];
 
-        // ✅ ORİJİNAL LOAD/SAVE FUNCTIONS - DEĞİŞMEDİ
+        // Load links from localStorage
         function loadLinksFromStorage() {
             const storedLinks = localStorage.getItem('celoEngageHubLinks');
             if (storedLinks) {
@@ -399,13 +260,14 @@
             }
         }
 
+        // Save links to localStorage
         function saveLinksToStorage(links) {
             localStorage.setItem('celoEngageHubLinks', JSON.stringify(links));
         }
 
         let allCommunityLinks = loadLinksFromStorage();
 
-        // ✅ ORİJİNAL UTILITY FUNCTIONS - DEĞİŞMEDİ
+        // Utility functions
         function getPlatformName(url) {
             if (url.includes('x.com') || url.includes('twitter.com')) return '🐦 X';
             if (url.includes('farcaster.xyz') || url.includes('warpcast.com')) return '🔮 Farcaster';
@@ -454,7 +316,7 @@
             });
         }
 
-        // ✅ ORİJİNAL PLATFORM STATS - DEĞİŞMEDİ
+        // Platform Stats
         async function loadPlatformStats() {
             if (!provider || !isConnected) return;
 
@@ -475,7 +337,7 @@
             }
         }
 
-        // ✅ ORİJİNAL USER PROFILE - DEĞİŞMEDİ
+        // User Profile Yükleme
         async function loadUserProfile() {
             if (!provider || !isConnected) return;
 
@@ -497,7 +359,6 @@
                     document.getElementById('userProfileSection').classList.add('hidden');
                     document.getElementById('governanceSection').classList.remove('hidden');
                     document.getElementById('badgesSection').classList.remove('hidden');
-                    document.getElementById('factorySection').classList.remove('hidden'); // ✅ SADECE BU SATIR EKLENDİ
                     loadUserBadges();
                     loadProposals();
                 } else {
@@ -509,7 +370,7 @@
             }
         }
 
-        // ✅ ORİJİNAL PROFILE SETUP - DEĞİŞMEDİ
+        // ✅ OPTİMİZE EDİLMİŞ PROFILE SETUP - AKILLI KONTROL
         async function setupUserProfile() {
             if (!isConnected) {
                 const connected = await connectWallet();
@@ -530,12 +391,14 @@
 
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
                 
+                // ✅ ÖNCE KULLANICI KONTROLÜ YAP
                 const userProfile = await contract.getUserProfile(userAddress);
                 
                 let tx;
                 let actionType;
                 
                 if (userProfile.isActive) {
+                    // ✅ KAYITLIYSA UPDATE PROFILE KULLAN
                     actionType = "update";
                     document.getElementById("setupProfileBtn").textContent = "⏳ Updating...";
                     tx = await contract.connect(signer).updateProfile(username, link, {
@@ -543,6 +406,7 @@
                     });
                     console.log("🔄 Update profile TX:", tx.hash);
                 } else {
+                    // ✅ KAYITLI DEĞİLSE REGISTER USER KULLAN
                     actionType = "register";
                     document.getElementById("setupProfileBtn").textContent = "⏳ Registering...";
                     tx = await contract.connect(signer).registerUser(username, link, {
@@ -575,7 +439,7 @@
             }
         }
 
-        // ✅ ORİJİNAL PROPOSALS - DEĞİŞMEDİ
+        // Proposals Yükleme
         async function loadProposals() {
             try {
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
@@ -617,7 +481,7 @@
             }
         }
 
-        // ✅ ORİJİNAL CREATE PROPOSAL - DEĞİŞMEDİ
+        // ✅ OPTİMİZE EDİLMİŞ PROPOSAL CREATION
         async function createProposal() {
             const title = document.getElementById("proposalTitle").value.trim();
             const description = document.getElementById("proposalDescription").value.trim();
@@ -633,8 +497,9 @@
 
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
 
-                const duration = 3 * 24 * 60 * 60;
+                const duration = 3 * 24 * 60 * 60; // 3 gün
 
+                // ✅ BYTECODE ANALİZİNE GÖRE OPTİMİZE EDİLDİ
                 const tx = await contract.createProposal(title, description, duration, {
                     gasLimit: 600000
                 });
@@ -652,6 +517,7 @@
             } catch (error) {
                 console.error("❌ Proposal creation error:", error);
 
+                // ✅ CUSTOM ERROR HANDLING
                 if (error.code === 4001) {
                     alert("❌ Transaction rejected by user");
                 } else if (error.message.includes("UserNotActive()")) {
@@ -667,7 +533,7 @@
             }
         }
 
-        // ✅ ORİJİNAL VOTE - DEĞİŞMEDİ
+        // ✅ OPTİMİZE EDİLMİŞ VOTE
         async function voteProposal(proposalId, support) {
             try {
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
@@ -684,6 +550,7 @@
             } catch (error) {
                 console.error("❌ Voting error:", error);
 
+                // ✅ CUSTOM ERROR HANDLING
                 if (error.code === 4001) {
                     alert("❌ Transaction rejected by user");
                 } else if (error.message.includes("UserNotActive()")) {
@@ -698,7 +565,7 @@
             }
         }
 
-        // ✅ ORİJİNAL BADGES - DEĞİŞMEDİ
+        // Badge Yükleme
         async function loadUserBadges() {
             try {
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
@@ -725,139 +592,7 @@
             }
         }
 
-        // ✅ CREATE2 FACTORY FONKSİYONLARI - SADECE BUNLAR EKLENDİ
-        async function deployContract() {
-            if (!isConnected) {
-                const connected = await connectWallet();
-                if (!connected) return;
-            }
-
-            const bytecode = document.getElementById("contractBytecode").value.trim();
-            const salt = document.getElementById("contractSalt").value.trim();
-
-            if (!bytecode || !salt) {
-                alert("❌ Please enter both bytecode and salt");
-                return;
-            }
-
-            if (!bytecode.startsWith('0x')) {
-                alert("❌ Bytecode must start with 0x");
-                return;
-            }
-
-            try {
-                document.getElementById("deployContractBtn").disabled = true;
-                document.getElementById("deployContractBtn").textContent = "⏳ Deploying...";
-
-                const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, signer);
-                
-                const tx = await factory.deploy(bytecode, salt, {
-                    gasLimit: 500000
-                });
-
-                console.log("🔄 Deploy TX sent:", tx.hash);
-                alert(`⏳ Contract deployment submitted!\nTX Hash: ${tx.hash}`);
-
-                const receipt = await tx.wait();
-                console.log("✅ Deployment confirmed:", receipt);
-
-                const event = receipt.events?.find(e => e.event === 'ContractDeployed');
-                if (event) {
-                    const deployedAddress = event.args.deployedAddress;
-                    alert(`✅ Contract deployed successfully!\nAddress: ${deployedAddress}`);
-                } else {
-                    alert("✅ Contract deployed successfully!");
-                }
-
-            } catch (error) {
-                console.error("❌ Deployment error:", error);
-                
-                if (error.code === 4001) {
-                    alert("❌ Transaction rejected by user");
-                } else if (error.code === 'INSUFFICIENT_FUNDS') {
-                    alert("❌ Insufficient funds for gas fee");
-                } else {
-                    alert("❌ Deployment failed: " + error.message);
-                }
-            } finally {
-                document.getElementById("deployContractBtn").disabled = false;
-                document.getElementById("deployContractBtn").textContent = "🏭 Deploy Contract";
-            }
-        }
-
-        async function computeContractAddress() {
-            const bytecode = document.getElementById("computeBytecode").value.trim();
-            const salt = document.getElementById("computeSalt").value.trim();
-
-            if (!bytecode || !salt) {
-                alert("❌ Please enter both bytecode and salt");
-                return;
-            }
-
-            if (!bytecode.startsWith('0x')) {
-                alert("❌ Bytecode must start with 0x");
-                return;
-            }
-
-            try {
-                document.getElementById("computeAddressBtn").disabled = true;
-                document.getElementById("computeAddressBtn").textContent = "⏳ Computing...";
-
-                const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
-                const computedAddress = await factory.computeAddress(bytecode, salt);
-
-                document.getElementById("computedAddress").innerHTML = `
-                    <strong>📬 Computed Address:</strong><br>
-                    ${computedAddress}
-                `;
-                document.getElementById("computedAddress").classList.remove('hidden');
-
-            } catch (error) {
-                console.error("❌ Compute error:", error);
-                alert("❌ Failed to compute address: " + error.message);
-            } finally {
-                document.getElementById("computeAddressBtn").disabled = false;
-                document.getElementById("computeAddressBtn").textContent = "🧮 Compute Address";
-            }
-        }
-
-        async function checkContractBalance() {
-            const contractAddress = document.getElementById("balanceContractAddress").value.trim();
-
-            if (!contractAddress) {
-                alert("❌ Please enter contract address");
-                return;
-            }
-
-            if (!ethers.utils.isAddress(contractAddress)) {
-                alert("❌ Invalid contract address");
-                return;
-            }
-
-            try {
-                document.getElementById("checkBalanceBtn").disabled = true;
-                document.getElementById("checkBalanceBtn").textContent = "⏳ Checking...";
-
-                const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
-                const balance = await factory.getContractBalance(contractAddress);
-                const balanceInCELO = ethers.utils.formatEther(balance);
-
-                document.getElementById("contractBalance").innerHTML = `
-                    <strong>💰 Contract Balance:</strong><br>
-                    ${balanceInCELO} CELO
-                `;
-                document.getElementById("contractBalance").classList.remove('hidden');
-
-            } catch (error) {
-                console.error("❌ Balance check error:", error);
-                alert("❌ Failed to check balance: " + error.message);
-            } finally {
-                document.getElementById("checkBalanceBtn").disabled = false;
-                document.getElementById("checkBalanceBtn").textContent = "📊 Check Balance";
-            }
-        }
-
-        // ✅ ORİJİNAL NETWORK FUNCTIONS - DEĞİŞMEDİ
+        // Network functions
         async function switchToCeloNetwork() {
             try {
                 try {
@@ -921,7 +656,6 @@
             }
         }
 
-        // ✅ ORİJİNAL LINK FUNCTIONS - DEĞİŞMEDİ
         function handleLinkClick(linkUrl) {
             const linkData = allCommunityLinks.find(item => item.link === linkUrl);
             if (linkData && linkData.clickCount < 5) {
@@ -949,7 +683,6 @@
             return true;
         }
 
-        // ✅ ORİJİNAL WALLET CONNECTION - DEĞİŞMEDİ
         async function connectWallet() {
             if (!checkMetaMask()) return false;
             try {
@@ -979,7 +712,7 @@
             }
         }
 
-        // ✅ ORİJİNAL SUBMIT LINK - DEĞİŞMEDİ
+        // ✅ OPTİMİZE EDİLMİŞ SUBMIT LINK - AKILLI KONTROL
         async function submitLink() {
             if (!isConnected) {
                 const connected = await connectWallet();
@@ -1008,13 +741,16 @@
                 document.getElementById("submitLinkBtn").disabled = true;
                 document.getElementById("submitLinkBtn").textContent = "⏳ Checking...";
 
+                // ✅ ÖNCE KULLANICI KONTROLÜ YAP
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
                 const userProfile = await contract.getUserProfile(userAddress);
                 
                 let tx;
                 let actionType;
                 
+                // Kullanıcı zaten kayıtlı mı?
                 if (userProfile.isActive) {
+                    // ✅ KAYITLIYSA UPDATE PROFILE KULLAN
                     actionType = "update";
                     document.getElementById("submitLinkBtn").textContent = "⏳ Updating...";
                     tx = await contract.connect(signer).updateProfile("User", userLink, {
@@ -1023,6 +759,7 @@
                     
                     console.log("🔄 Update transaction sent:", tx.hash);
                 } else {
+                    // ✅ KAYITLI DEĞİLSE REGISTER USER KULLAN
                     actionType = "register";
                     document.getElementById("submitLinkBtn").textContent = "⏳ Registering...";
                     tx = await contract.connect(signer).registerUser("User", userLink, {
@@ -1039,6 +776,7 @@
 
                 alert(`✅ ${actionType === 'register' ? 'Registration' : 'Profile update'} successful!`);
 
+                // ✅ UI GÜNCELLEME
                 const newLinkData = {
                     link: userLink,
                     clickCount: 0,
@@ -1056,6 +794,7 @@
             } catch (error) {
                 console.error("❌ Submit error:", error);
                 
+                // ✅ GELİŞMİŞ HATA YÖNETİMİ
                 if (error.code === 4001) {
                     alert("❌ Transaction rejected by user");
                 } else if (error.code === 'INSUFFICIENT_FUNDS') {
@@ -1073,18 +812,13 @@
             }
         }
 
-        // ✅ ORİJİNAL EVENT LISTENERS - DEĞİŞMEDİ
+        // Event listeners
         document.getElementById("connectWalletBtn").addEventListener("click", connectWallet);
         document.getElementById("submitLinkBtn").addEventListener("click", submitLink);
         document.getElementById("setupProfileBtn").addEventListener("click", setupUserProfile);
         document.getElementById("createProposalBtn").addEventListener("click", createProposal);
-        
-        // ✅ SADECE BU EVENT LISTENERS EKLENDİ
-        document.getElementById("deployContractBtn").addEventListener("click", deployContract);
-        document.getElementById("computeAddressBtn").addEventListener("click", computeContractAddress);
-        document.getElementById("checkBalanceBtn").addEventListener("click", checkContractBalance);
 
-        // ✅ ORİJİNAL NETWORK LISTENER - DEĞİŞMEDİ
+        // Network değişikliklerini dinle
         if (window.ethereum) {
             window.ethereum.on('chainChanged', (chainId) => {
                 console.log("Chain changed to:", chainId);
@@ -1097,7 +831,7 @@
             });
         }
 
-        // ✅ ORİJİNAL INITIALIZE - DEĞİŞMEDİ
+        // Initialize application
         window.addEventListener('load', function() {
             displaySupportLinks();
             if (checkMetaMask()) {
@@ -1123,16 +857,11 @@
             }
         });
 
-        // ✅ ORİJİNAL GLOBAL FUNCTIONS - DEĞİŞMEDİ
+        // Make functions globally available
         window.markAsSupported = markAsSupported;
         window.connectWallet = connectWallet;
         window.handleLinkClick = handleLinkClick;
         window.voteProposal = voteProposal;
-        
-        // ✅ SADECE BU GLOBAL FUNCTIONS EKLENDİ
-        window.deployContract = deployContract;
-        window.computeContractAddress = computeContractAddress;
-        window.checkContractBalance = checkContractBalance;
     </script>
 </body>
 </html>
