@@ -1,84 +1,94 @@
-# 🌐 Celo Engage Hub - Social Engagement Platform
+🌐 Celo Engage Hub - Social Engagement Platform
 
-[![Celo](https://img.shields.io/badge/Celo-Mainnet-gold)](https://celo.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![GitHub Stars](https://img.shields.io/github/stars/tebberen/celo-engage-hub)](https://github.com/tebberen/celo-engage-hub/stargazers)
-[![GitHub Forks](https://img.shields.io/github/forks/tebberen/celo-engage-hub)](https://github.com/tebberen/celo-engage-hub/network/members)
-[![GitHub Issues](https://img.shields.io/github/issues/tebberen/celo-engage-hub)](https://github.com/tebberen/celo-engage-hub/issues)
-[![Twitter](https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Fgithub.com%2Ftebberen%2Fcelo-engage-hub)](https://twitter.com/intent/tweet?text=Check%20out%20this%20awesome%20Celo%20project%3A&url=https%3A%2F%2Fgithub.com%2Ftebberen%2Fcelo-engage-hub)
+https://img.shields.io/badge/Celo-Mainnet-gold
+https://img.shields.io/badge/License-MIT-yellow.svg
+https://img.shields.io/github/stars/tebberen/celo-engage-hub
+https://img.shields.io/github/forks/tebberen/celo-engage-hub
+https://img.shields.io/github/issues/tebberen/celo-engage-hub
+https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Fgithub.com%2Ftebberen%2Fcelo-engage-hub
 
-> **Social TX - Where Every Interaction Builds Real Value**  
-> A decentralized social engagement platform built on Celo blockchain that rewards meaningful community interactions through governance, badges, and social verification.
+Social TX - Where Every Interaction Builds Real Value
+A decentralized social engagement platform built on Celo blockchain that rewards meaningful community interactions through governance, badges, and social verification.
 
-## 📑 Table of Contents
-- [🌟 Introduction](#-introduction)
-- [🚀 Features](#-features)
-- [🏗️ Architecture](#️-architecture)
-- [📦 Installation](#-installation)
-- [🎮 Quick Start](#-quick-start)
-- [🔧 Smart Contracts](#-smart-contracts)
-- [🛠️ Development](#️-development)
-- [🧪 Testing](#-testing)
-- [📚 API Documentation](#-api-documentation)
-- [🌍 Deployment](#-deployment)
-- [🤝 Contributing](#-contributing)
-- [📝 License](#-license)
-- [🙏 Acknowledgments](#-acknowledgments)
+📑 Table of Contents
 
-## 🌟 Introduction
+· 🌟 Introduction
+· 🚀 Features
+· 🏗️ Architecture
+· 📦 Installation
+· 🎮 Quick Start
+· 🔧 Smart Contracts
+· 🛠️ Development
+· 🧪 Testing
+· 📚 API Documentation
+· 🌍 Deployment
+· 🤝 Contributing
+· 📝 License
+· 🙏 Acknowledgments
+
+🌟 Introduction
 
 Celo Engage Hub is a groundbreaking social platform that leverages blockchain technology to create a trustless, community-driven ecosystem. Built on the Celo network, it combines social interactions with on-chain governance and reputation systems.
 
-### 🎯 Problem Statement
+🎯 Problem Statement
+
 Traditional social platforms suffer from:
-- Centralized control and censorship
-- Lack of transparency in content moderation
-- No real ownership or rewards for users
-- Limited community governance
 
-### 💡 Our Solution
-- **Decentralized Governance**: Community-driven proposal and voting system
-- **Social Verification**: Support-based content curation
-- **Monetization & Rewards**: Badge-based achievement system
-- **Transparent Operations**: Fully on-chain interactions
+· Centralized control and censorship
+· Lack of transparency in content moderation
+· No real ownership or rewards for users
+· Limited community governance
 
-## 🚀 Features
+💡 Our Solution
 
-### 🛡️ Social Verification System
-- **Support-Based Submission**: Users must support existing content before submitting their own
-- **Community Curation**: Content visibility determined by community engagement
-- **Anti-Spam Mechanism**: Limits and verification prevent platform abuse
+· Decentralized Governance: Community-driven proposal and voting system
+· Social Verification: Support-based content curation
+· Monetization & Rewards: Badge-based achievement system
+· Transparent Operations: Fully on-chain interactions
 
-### 🏛️ On-Chain Governance
-- **Proposal Creation**: Any user can create governance proposals
-- **Transparent Voting**: Verifiable on-chain voting with Celo transactions
-- **Community Decisions**: Platform evolution driven by user votes
+🚀 Features
 
-### 🎖️ Badge & Reputation System
-- **Achievement Tracking**: Earn badges for platform participation
-- **Reputation Scoring**: Build reputation through quality contributions
-- **Soulbound Tokens**: Non-transferable achievement badges (future)
+🛡️ Social Verification System
 
-### 💰 Gas Optimization
-- **Efficient Transactions**: Optimized for Celo's low-gas environment
-- **Batch Operations**: Multiple actions in single transactions
-- **Gas Estimation**: Accurate gas prediction for better UX
+· Support-Based Submission: Users must support existing content before submitting their own
+· Community Curation: Content visibility determined by community engagement
+· Anti-Spam Mechanism: Limits and verification prevent platform abuse
 
-### 🌐 Multi-Platform Integration
-- **Social Media Links**: Support for X, Farcaster, GitHub, and more
-- **Cross-Platform Verification**: Unified identity across platforms
-- **Content Syndication**: Share across multiple platforms seamlessly
+🏛️ On-Chain Governance
 
-### 🔐 Advanced Wallet Integration
-- **MetaMask Support**: Full MetaMask compatibility
-- **Celo Native Wallets**: Support for Valora, Celo Wallet
-- **Network Switching**: Automatic Celo network detection and switching
+· Proposal Creation: Any user can create governance proposals
+· Transparent Voting: Verifiable on-chain voting with Celo transactions
+· Community Decisions: Platform evolution driven by user votes
 
-## 🏗️ Architecture
+🎖️ Badge & Reputation System
 
-### System Overview
+· Achievement Tracking: Earn badges for platform participation
+· Reputation Scoring: Build reputation through quality contributions
+· Soulbound Tokens: Non-transferable achievement badges (future)
+
+💰 Gas Optimization
+
+· Efficient Transactions: Optimized for Celo's low-gas environment
+· Batch Operations: Multiple actions in single transactions
+· Gas Estimation: Accurate gas prediction for better UX
+
+🌐 Multi-Platform Integration
+
+· Social Media Links: Support for X, Farcaster, GitHub, and more
+· Cross-Platform Verification: Unified identity across platforms
+· Content Syndication: Share across multiple platforms seamlessly
+
+🔐 Advanced Wallet Integration
+
+· MetaMask Support: Full MetaMask compatibility
+· Celo Native Wallets: Support for Valora, Celo Wallet
+· Network Switching: Automatic Celo network detection and switching
+
+🏗️ Architecture
+
+System Overview
+
 ```
-
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
 │   Frontend      │    │   Smart Contract │    │   Celo Network  │
 │   (Client)      │    │   (Middleware)   │    │   (Blockchain)  │
@@ -87,18 +97,19 @@ Traditional social platforms suffer from:
 │ • Ethers.js     │    │ • Governance     │    │ • Smart Contracts│
 │ • LocalStorage  │    │ • Badge System   │    │ • CELO/cUSD     │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
-
 ```
 
-### Technology Stack
-- **Frontend**: HTML5, CSS3, Vanilla JavaScript (ES6+)
-- **Blockchain**: Celo Network (Mainnet & Alfajores Testnet)
-- **Web3 Library**: Ethers.js v5.7.2
-- **Wallet Integration**: MetaMask, Celo-Compatible Wallets
-- **Storage**: Browser LocalStorage + On-chain Storage
-- **Styling**: Custom CSS with Celo Brand Colors
+Technology Stack
 
-### Smart Contract Architecture
+· Frontend: HTML5, CSS3, Vanilla JavaScript (ES6+)
+· Blockchain: Celo Network (Mainnet & Alfajores Testnet)
+· Web3 Library: Ethers.js v5.7.2
+· Wallet Integration: MetaMask, Celo-Compatible Wallets
+· Storage: Browser LocalStorage + On-chain Storage
+· Styling: Custom CSS with Celo Brand Colors
+
+Smart Contract Architecture
+
 ```solidity
 // Core Contract Structure
 CeloEngageHub.sol
@@ -523,10 +534,4 @@ https://img.shields.io/github/forks/tebberen/celo-engage-hub?style=social
 
 Built with ❤️ for the Celo Ecosystem
 
-</div>
-```
-## Milestones
-1. Prototype Development (28 Sep – 12 Oct 2025)
-2. Alpha Testing (13 Oct – 26 Oct 2025)
-3. Beta Launch (27 Oct – 9 Nov 2025)
-4. Community Engagement & Partnerships (10 Nov – 24 Nov 2025)
+</div>---
