@@ -54,7 +54,6 @@
         .stats-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
         .stat-card { background: #FFFDF6; border: 2px solid #FBCC5C; padding: 15px; border-radius: 8px; text-align: center; }
         
-        /* Feature Buttons Stilleri */
         .feature-buttons-container {
             display: flex;
             justify-content: center;
@@ -105,7 +104,6 @@
         <div class="subheader">If you want support, support first</div> 
         <button id="connectWalletBtn" class="connect-btn">🔗 Connect MetaMask</button> 
         
-        <!-- Feature Buttons -->
         <div class="feature-buttons-container">
             <button class="feature-btn active" onclick="showSection('support')">🤝 Support Community</button>
             <button class="feature-btn" onclick="showSection('submit')">✍️ Submit Link</button>
@@ -135,7 +133,6 @@
                 <a href="https://github.com/celo-org" target="_blank" class="celo-link"> <span class="celo-link-icon">💻</span>Celo GitHub </a> 
             </div> 
 
-            <!-- Platform Stats -->
             <div id="platformStats" class="stats-container">
                 <div class="stat-card">
                     <div>👥 Total Users</div>
@@ -158,7 +155,6 @@
 
         <div class="main-content"> 
             <div class="content-layout"> 
-                <!-- SUPPORT COMMUNITY SECTION -->
                 <div id="supportSection" class="feature-section"> 
                     <div class="step-indicator"> 
                         <span class="step-number">1</span> Support Community Members 
@@ -170,7 +166,6 @@
                     </div> 
                 </div>
 
-                <!-- SUBMIT YOUR LINK SECTION -->
                 <div id="submitSection" class="feature-section hidden"> 
                     <div class="step-indicator"> 
                         <span class="step-number">2</span> Submit Your Link 
@@ -187,7 +182,6 @@
                     </div> 
                 </div> 
 
-                <!-- USER PROFILE SECTION -->
                 <div id="profileSection" class="feature-section hidden">
                     <div class="step-indicator"> 
                         <span class="step-number">👤</span> Your Profile 
@@ -202,7 +196,6 @@
                     </div> 
                 </div>
 
-                <!-- GOVERNANCE SECTION -->
                 <div id="governanceSection" class="feature-section hidden">
                     <div class="step-indicator"> 
                         <span class="step-number">🏛️</span> Community Governance 
@@ -218,7 +211,6 @@
                     </div> 
                 </div>
 
-                <!-- BADGES SECTION -->
                 <div id="badgesSection" class="feature-section hidden">
                     <div class="step-indicator"> 
                         <span class="step-number">🎖️</span> Your Badges 
@@ -229,7 +221,6 @@
                     </div> 
                 </div>
 
-                <!-- STATS SECTION -->
                 <div id="statsSection" class="feature-section hidden">
                     <div class="step-indicator"> 
                         <span class="step-number">📊</span> Platform Statistics 
@@ -262,7 +253,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script> 
     <script> 
-        // State management 
         let provider = null; 
         let signer = null; 
         let isConnected = false; 
@@ -272,10 +262,8 @@
         let userProfile = null;
         let currentSection = 'support';
 
-        // ✅ SİZİN CONTRACT ADRESİNİZ
         const CONTRACT_ADDRESS = "0x22eA49c074098931a478F381f971C77486d185b2"; 
 
-        // ✅ SADECE SİZİN CONTRACT'INIZDAKİ FONKSİYONLAR
         const CONTRACT_ABI = [
             "function registerUser(string _username, string _link) public",
             "function updateProfile(string _username, string _link) public", 
@@ -288,9 +276,8 @@
             "function voteProposal(uint256 _proposalId, bool _support) public"
         ];
 
-        // Celo Network Configuration 
         const CELO_MAINNET_PARAMS = { 
-            chainId: "0xA4EC", // 42220
+            chainId: "0xA4EC",
             chainName: "Celo Mainnet", 
             nativeCurrency: { name: "CELO", symbol: "CELO", decimals: 18 }, 
             rpcUrls: ["https://forno.celo.org"], 
@@ -298,14 +285,13 @@
         }; 
 
         const CELO_ALFAJORES_PARAMS = { 
-            chainId: "0xAEF3", // 44787
+            chainId: "0xAEF3",
             chainName: "Celo Alfajores Testnet", 
             nativeCurrency: { name: "CELO", symbol: "CELO", decimals: 18 }, 
             rpcUrls: ["https://alfajores-forno.celo-testnet.org"], 
             blockExplorerUrls: ["https://alfajores.celoscan.io/"] 
         }; 
 
-        // Initial support links 
         const initialSupportLinks = [ 
             "https://farcaster.xyz/teberen/0x391c5713", 
             "https://farcaster.xyz/ertu", 
@@ -318,7 +304,6 @@
             "https://github.com/tebberen" 
         ]; 
 
-        // Load links from localStorage 
         function loadLinksFromStorage() { 
             const storedLinks = localStorage.getItem('celoEngageHubLinks'); 
             if (storedLinks) { 
@@ -328,14 +313,12 @@
             } 
         } 
 
-        // Save links to localStorage 
         function saveLinksToStorage(links) { 
             localStorage.setItem('celoEngageHubLinks', JSON.stringify(links)); 
         } 
 
         let allCommunityLinks = loadLinksFromStorage(); 
 
-        // Section gösterim fonksiyonu
         function showSection(sectionName) {
             document.querySelectorAll('.feature-section').forEach(section => {
                 section.classList.add('hidden');
@@ -366,7 +349,6 @@
             }
         }
 
-        // Utility functions 
         function getPlatformName(url) { 
             if (url.includes('x.com') || url.includes('twitter.com')) return '🐦 X'; 
             if (url.includes('farcaster.xyz') || url.includes('warpcast.com')) return '🔮 Farcaster'; 
@@ -413,7 +395,6 @@
             }); 
         } 
 
-        // ✅ DOĞRU: registerUser fonksiyonunu kullan
         async function setupUserProfile() {
             if (!isConnected) {
                 const connected = await connectWallet();
@@ -434,7 +415,6 @@
                 
                 document.getElementById('profileStatus').innerHTML = '<div style="color: #F59E0B;">⏳ Processing transaction...</div>';
 
-                // ✅ DOĞRU FONKSİYON: registerUser
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
                 const tx = await contract.registerUser(username, link, { 
                     gasLimit: 300000 
@@ -469,7 +449,6 @@
             }
         }
 
-        // ✅ DOĞRU: registerUser fonksiyonunu kullan
         async function submitLink() { 
             if (!isConnected) { 
                 const connected = await connectWallet(); 
@@ -493,7 +472,6 @@
                 document.getElementById("submitLinkBtn").disabled = true; 
                 document.getElementById("submitLinkBtn").textContent = "⏳ Submitting..."; 
                 
-                // ✅ DOĞRU FONKSİYON: registerUser
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer); 
                 const tx = await contract.registerUser(username, userLink, { gasLimit: 300000 }); 
                 await tx.wait(); 
@@ -516,7 +494,6 @@
             } 
         } 
 
-        // Diğer fonksiyonlar aynı...
         async function loadUserProfile() {
             if (!provider || !isConnected) return;
             
@@ -573,7 +550,6 @@
             }
         }
 
-        // Network functions 
         async function switchToCeloNetwork() { 
             try { 
                 await window.ethereum.request({ 
@@ -670,13 +646,11 @@
             } 
         } 
 
-        // Event listeners 
         document.getElementById("connectWalletBtn").addEventListener("click", connectWallet); 
         document.getElementById("submitLinkBtn").addEventListener("click", submitLink); 
         document.getElementById("setupProfileBtn").addEventListener("click", setupUserProfile); 
         document.getElementById("createProposalBtn").addEventListener("click", createProposal); 
 
-        // Network değişikliklerini dinle 
         if (window.ethereum) { 
             window.ethereum.on('chainChanged', (chainId) => { 
                 currentChainId = parseInt(chainId, 16).toString(); 
@@ -684,7 +658,6 @@
             }); 
         } 
 
-        // Initialize application 
         window.addEventListener('load', function() { 
             displaySupportLinks(); 
             loadDetailedStats();
@@ -711,7 +684,6 @@
             } 
         }); 
 
-        // Make functions globally available 
         window.markAsSupported = markAsSupported; 
         window.connectWallet = connectWallet; 
         window.handleLinkClick = handleLinkClick; 
