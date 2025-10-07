@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Celo Engage Hub</title>
     <style>
-        /* ... [TASARIM DEĞİŞMEDİ, KODUN TAMAMINI KORUDUM] ... */
         * { box-sizing: border-box; }
         body { background-color: #ffffff; font-family: Arial, sans-serif; color: #000000; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .container { display: flex; max-width: 1400px; width: 100%; gap: 30px; align-items: flex-start; }
@@ -60,6 +59,11 @@
         .wallet-option { background: #35D07F; color: black; border: none; padding: 15px 30px; border-radius: 10px; cursor: pointer; font-size: 17px; font-weight: bold; margin: 10px 0; display: block; width: 100%; transition: all 0.3s ease; }
         .wallet-option:hover { background: #FBCC5C; color: #000; }
         .close-modal { background: #EF4444; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+        .status-message { position: fixed; top: 20px; right: 20px; padding: 15px 20px; border-radius: 8px; font-weight: bold; z-index: 10000; animation: slideIn 0.3s ease; }
+        .status-message.success { background: #E8FBF1; border: 2px solid #35D07F; color: #065f46; }
+        .status-message.error { background: #FEE2E2; border: 2px solid #EF4444; color: #991B1B; }
+        .status-message.info { background: #DBEAFE; border: 2px solid #3B82F6; color: #1E40AF; }
+        @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     </style>
 </head>
 <body>
@@ -71,6 +75,7 @@
         <div class="subheader">If you want support, support first</div>
         <button id="connectWalletBtn" class="connect-btn">🔗 Connect Wallet</button>
     </div>
+
     <div id="walletModal" class="wallet-modal hidden">
         <div class="wallet-modal-content">
             <h3 style="margin-bottom: 25px;">Choose Wallet</h3>
@@ -79,6 +84,7 @@
             <button class="close-modal" id="closeWalletModalBtn">Cancel</button>
         </div>
     </div>
+
     <div class="container">
         <div class="sidebar">
             <div id="walletInfo" class="wallet-address hidden">
@@ -98,7 +104,6 @@
                 <a href="https://blog.celo.org" target="_blank" class="celo-link"> <span class="celo-link-icon">📰</span>Celo Blog </a>
                 <a href="https://github.com/celo-org" target="_blank" class="celo-link"> <span class="celo-link-icon">💻</span>Celo GitHub </a>
             </div>
-            <!-- Platform Stats -->
             <div id="platformStats" class="stats-container hidden">
                 <div class="stat-card">
                     <div>👥 Total Users</div>
@@ -120,7 +125,6 @@
         </div>
         <div class="main-content">
             <div class="content-layout">
-                <!-- USER PROFILE SECTION -->
                 <div id="userProfileSection" class="hidden">
                     <div class="step-indicator">
                         <span class="step-number">👤</span> Your Profile
@@ -132,7 +136,6 @@
                         <button id="setupProfileBtn">🚀 Setup Profile</button>
                     </div>
                 </div>
-                <!-- SUBMIT YOUR LINK SECTION -->
                 <div id="step2" class="submit-section hidden">
                     <div class="step-indicator">
                         <span class="step-number">2</span> Submit Your Link
@@ -148,7 +151,6 @@
                         <p><small>🔒 Secure transaction on Celo network</small></p>
                     </div>
                 </div>
-                <!-- SUPPORT COMMUNITY SECTION -->
                 <div id="step1" class="support-section">
                     <div class="step-indicator">
                         <span class="step-number">1</span> Support Community Members
@@ -159,7 +161,6 @@
                         <div class="links-grid" id="linksContainer"> </div>
                     </div>
                 </div>
-                <!-- GOVERNANCE SECTION -->
                 <div id="governanceSection" class="governance-section hidden">
                     <div class="step-indicator">
                         <span class="step-number">🏛️</span> Community Governance
@@ -173,7 +174,6 @@
                         <div id="proposalsContainer"></div>
                     </div>
                 </div>
-                <!-- BADGES SECTION -->
                 <div id="badgesSection" class="badge-section hidden">
                     <div class="step-indicator">
                         <span class="step-number">🎖️</span> Your Badges
@@ -186,9 +186,10 @@
             </div>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
     <script>
-        // State management
         let provider = null;
         let signer = null;
         let isConnected = false;
@@ -196,9 +197,9 @@
         let hasSupported = false;
         let currentChainId = null;
         let userProfile = null;
-        // ✅ GÜNCEL CELO CONTRACT ADDRESS
+        let walletConnectProvider = null;
+
         const CONTRACT_ADDRESS = "0x22eA49c074098931a478F381f971C77486d185b2";
-        // ✅ GÜNCEL Contract ABI - BYTECODE ANALİZİNE GÖRE GÜNCELLENDİ
         const CONTRACT_ABI = [
             "function registerUser(string memory _username) public",
             "function updateProfile(string memory _username) public",
@@ -223,22 +224,23 @@
             "error VotingEnded()",
             "error AlreadyVoted()"
         ];
-        // Celo Network Configuration
+
         const CELO_MAINNET_PARAMS = {
-            chainId: "0xA4EC", // 42220 in hex - Celo Mainnet
+            chainId: "0xA4EC",
             chainName: "Celo Mainnet",
             nativeCurrency: { name: "CELO", symbol: "CELO", decimals: 18 },
             rpcUrls: ["https://forno.celo.org"],
             blockExplorerUrls: ["https://celoscan.io/"]
         };
+
         const CELO_ALFAJORES_PARAMS = {
-            chainId: "0xAEF3", // 44787 in hex - Celo Alfajores Testnet
+            chainId: "0xAEF3",
             chainName: "Celo Alfajores Testnet",
             nativeCurrency: { name: "CELO", symbol: "CELO", decimals: 18 },
             rpcUrls: ["https://alfajores-forno.celo-testnet.org"],
             blockExplorerUrls: ["https://alfajores.celoscan.io/"]
         };
-        // Initial support links
+
         const initialSupportLinks = [
             "https://farcaster.xyz/teberen/0x391c5713",
             "https://farcaster.xyz/ertu",
@@ -250,7 +252,15 @@
             "https://x.com/luckyfromnecef/status/1972371920290259437?s=46&t=l2lmnRZcmeoUCu9IdzeRpA",
             "https://github.com/tebberen"
         ];
-        // Load links from localStorage
+
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `status-message ${type}`;
+            statusDiv.textContent = message;
+            document.body.appendChild(statusDiv);
+            setTimeout(() => statusDiv.remove(), 4000);
+        }
+
         function loadLinksFromStorage() {
             const storedLinks = localStorage.getItem('celoEngageHubLinks');
             if (storedLinks) {
@@ -259,11 +269,13 @@
                 return initialSupportLinks.map(link => ({ link: link, clickCount: 0, timestamp: Date.now(), submitter: "community" }));
             }
         }
-        // Save links to localStorage
+
         function saveLinksToStorage(links) {
             localStorage.setItem('celoEngageHubLinks', JSON.stringify(links));
         }
+
         let allCommunityLinks = loadLinksFromStorage();
+
         function getPlatformName(url) {
             if (url.includes('x.com') || url.includes('twitter.com')) return '🐦 X';
             if (url.includes('farcaster.xyz') || url.includes('warpcast.com')) return '🔮 Farcaster';
@@ -272,34 +284,26 @@
             if (url.includes('discord.com')) return '💬 Discord';
             return '🌐 Website';
         }
+
         function displaySupportLinks() {
             const container = document.getElementById('linksContainer');
             container.innerHTML = '';
             const activeLinks = allCommunityLinks.filter(linkData => linkData.clickCount < 5);
             if (activeLinks.length === 0) {
-                container.innerHTML = `
-                <div style="grid-column: 1 / -1;">
-                    <div class="link-card">
-                        <p>🌟 All links have reached maximum support! Submit new links to continue.</p>
-                    </div>
-                </div>
-                `;
+                container.innerHTML = `<div style="grid-column: 1 / -1;"><div class="link-card"><p>🌟 All links have reached maximum support! Submit new links to continue.</p></div></div>`;
                 return;
             }
             activeLinks.sort((a, b) => a.clickCount - b.clickCount);
             activeLinks.forEach((linkData, index) => {
                 const platform = getPlatformName(linkData.link);
                 const linkCard = document.createElement('div');
-                // Tebberen linkinde ekstra yönlendirme olmayacak, diğerlerinde step2 açılacak
                 let openStep2 = 'true';
                 if (linkData.link === "https://tebberen.github.io/celo-engage-hub/") openStep2 = 'false';
                 linkCard.innerHTML = `
                 <div class="link-card">
                     <div>
                         <div class="link-platform">${platform}</div>
-                        <a href="${linkData.link}" target="_blank" class="support-link" onclick="handleCommunityLink('${linkData.link}', ${openStep2})">
-                        ${linkData.link}
-                        </a>
+                        <a href="${linkData.link}" target="_blank" class="support-link" onclick="handleCommunityLink('${linkData.link}', ${openStep2})">${linkData.link}</a>
                     </div>
                     <div class="link-stats">
                         <div class="stat-item">
@@ -307,12 +311,11 @@
                             <div class="stat-value">${linkData.clickCount}/5</div>
                         </div>
                     </div>
-                </div>
-                `;
+                </div>`;
                 container.appendChild(linkCard);
             });
         }
-        // Platform Stats
+
         async function loadPlatformStats() {
             if (!provider || !isConnected) return;
             try {
@@ -328,7 +331,7 @@
                 console.error("Error loading stats:", error);
             }
         }
-        // User Profile Yükleme
+
         async function loadUserProfile() {
             if (!provider || !isConnected) return;
             try {
@@ -356,7 +359,7 @@
                 document.getElementById('userProfileSection').classList.remove('hidden');
             }
         }
-        // ✅ OPTİMİZE EDİLMİŞ PROFILE SETUP - AKILLI KONTROL
+
         async function setupUserProfile() {
             if (!isConnected) {
                 const connected = await connectWallet();
@@ -364,51 +367,37 @@
             }
             const username = document.getElementById("userUsername").value.trim();
             if (!username) {
-                alert("❌ Please enter your username");
+                showStatus("❌ Please enter your username", "error");
                 return;
             }
             try {
                 document.getElementById("setupProfileBtn").disabled = true;
-                document.getElementById("setupProfileBtn").textContent = "⏳ Checking...";
+                document.getElementById("setupProfileBtn").textContent = "⏳ Processing...";
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
                 const userProfile = await contract.getUserProfile(userAddress);
                 let tx;
-                let actionType;
                 if (userProfile.isActive) {
-                    actionType = "update";
-                    document.getElementById("setupProfileBtn").textContent = "⏳ Updating...";
-                    tx = await contract.connect(signer).updateProfile(username, {
-                        gasLimit: 300000
-                    });
+                    tx = await contract.connect(signer).updateProfile(username, { gasLimit: 300000 });
                     console.log("🔄 Update profile TX:", tx.hash);
                 } else {
-                    actionType = "register";
-                    document.getElementById("setupProfileBtn").textContent = "⏳ Registering...";
-                    tx = await contract.connect(signer).registerUser(username, {
-                        gasLimit: 500000
-                    });
+                    tx = await contract.connect(signer).registerUser(username, { gasLimit: 500000 });
                     console.log("🔄 Register TX:", tx.hash);
                 }
-                alert(`⏳ ${actionType === 'register' ? 'Registration' : 'Update'} submitted!\nTX Hash: ${tx.hash}`);
-                const receipt = await tx.wait();
-                console.log("✅ Transaction confirmed:", receipt);
-                alert(`✅ Profile ${actionType === 'register' ? 'registered' : 'updated'} successfully!`);
+                await tx.wait();
                 loadUserProfile();
             } catch (error) {
                 console.error("❌ Profile setup error:", error);
                 if (error.code === 4001) {
-                    alert("❌ Transaction rejected by user");
-                } else if (error.message.includes("AlreadyRegistered()") || error.message.includes("execution reverted")) {
-                    alert("❌ You are already registered! Profile has been updated.");
+                    showStatus("❌ Transaction rejected", "error");
                 } else {
-                    alert("❌ Setup failed: " + error.message);
+                    showStatus("❌ Setup failed", "error");
                 }
             } finally {
                 document.getElementById("setupProfileBtn").disabled = false;
                 document.getElementById("setupProfileBtn").textContent = "🚀 Setup Profile";
             }
         }
-        // Proposals Yükleme
+
         async function loadProposals() {
             try {
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
@@ -430,355 +419,4 @@
                         <div class="link-stats">
                             <div class="stat-item">
                                 <div>👍 For</div>
-                                <div class="stat-value">${details.votesFor.toString()}</div>
-                            </div>
-                            <div class="stat-item">
-                                <div>👎 Against</div>
-                                <div class="stat-value">${details.votesAgainst.toString()}</div>
-                            </div>
-                        </div>
-                        <button onclick="voteProposal(${proposalId}, true)">👍 Support</button>
-                        <button onclick="voteProposal(${proposalId}, false)">👎 Oppose</button>
-                    `;
-                    container.appendChild(proposalCard);
-                }
-            } catch (error) {
-                console.error("Error loading proposals:", error);
-            }
-        }
-        // ✅ OPTİMİZE EDİLMİŞ PROPOSAL CREATION
-        async function createProposal() {
-            const title = document.getElementById("proposalTitle").value.trim();
-            const description = document.getElementById("proposalDescription").value.trim();
-            if (!title || !description) {
-                alert("❌ Please enter both title and description");
-                return;
-            }
-            try {
-                document.getElementById("createProposalBtn").disabled = true;
-                document.getElementById("createProposalBtn").textContent = "⏳ Creating...";
-                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-                const duration = 3 * 24 * 60 * 60; // 3 gün
-                const tx = await contract.createProposal(title, description, duration, {
-                    gasLimit: 600000
-                });
-                console.log("🔄 Proposal TX sent:", tx.hash);
-                alert(`⏳ Proposal submitted!\nTX Hash: ${tx.hash}`);
-                await tx.wait();
-                alert("✅ Proposal created successfully!");
-                document.getElementById("proposalTitle").value = "";
-                document.getElementById("proposalDescription").value = "";
-                loadProposals();
-            } catch (error) {
-                console.error("❌ Proposal creation error:", error);
-                if (error.code === 4001) {
-                    alert("❌ Transaction rejected by user");
-                } else if (error.message.includes("UserNotActive()")) {
-                    alert("❌ You need to be an active user to create proposals");
-                } else if (error.message.includes("InvalidProposal()")) {
-                    alert("❌ Invalid proposal parameters");
-                } else {
-                    alert("❌ Proposal creation failed: " + error.message);
-                }
-            } finally {
-                document.getElementById("createProposalBtn").disabled = false;
-                document.getElementById("createProposalBtn").textContent = "📝 Create Proposal";
-            }
-        }
-        // ✅ OPTİMİZE EDİLMİŞ VOTE
-        async function voteProposal(proposalId, support) {
-            try {
-                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-                const tx = await contract.voteProposal(proposalId, support, {
-                    gasLimit: 400000
-                });
-                console.log("🔄 Vote TX sent:", tx.hash);
-                alert(`⏳ Vote submitted!\nTX Hash: ${tx.hash}`);
-                await tx.wait();
-                alert("✅ Vote submitted successfully!");
-                loadProposals();
-            } catch (error) {
-                console.error("❌ Voting error:", error);
-                if (error.code === 4001) {
-                    alert("❌ Transaction rejected by user");
-                } else if (error.message.includes("UserNotActive()")) {
-                    alert("❌ You need to be an active user to vote");
-                } else if (error.message.includes("VotingEnded()")) {
-                    alert("❌ Voting period has ended");
-                } else if (error.message.includes("AlreadyVoted()")) {
-                    alert("❌ You have already voted on this proposal");
-                } else {
-                    alert("❌ Voting failed: " + error.message);
-                }
-            }
-        }
-        // Badge Yükleme
-        async function loadUserBadges() {
-            try {
-                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
-                const badges = await contract.getUserBadges(userAddress);
-                const container = document.getElementById('userBadgesContainer');
-                container.innerHTML = '';
-                if (badges.length === 0) {
-                    container.innerHTML = '<p>No badges yet. Be active in the community to earn badges!</p>';
-                    return;
-                }
-                badges.forEach(badge => {
-                    const badgeCard = document.createElement('div');
-                    badgeCard.className = 'badge-card';
-                    badgeCard.innerHTML = `
-                        <strong>${badge}</strong>
-                        <p>Earned through community participation</p>
-                    `;
-                    container.appendChild(badgeCard);
-                });
-            } catch (error) {
-                console.error("Error loading badges:", error);
-            }
-        }
-        // Network functions
-        async function switchToCeloNetwork() {
-            try {
-                try {
-                    await window.ethereum.request({
-                        method: 'wallet_switchEthereumChain',
-                        params: [{ chainId: CELO_MAINNET_PARAMS.chainId }],
-                    });
-                    return true;
-                } catch (switchError) {
-                    if (switchError.code === 4902) {
-                        await window.ethereum.request({
-                            method: 'wallet_addEthereumChain',
-                            params: [CELO_MAINNET_PARAMS],
-                        });
-                        return true;
-                    }
-                    throw switchError;
-                }
-            } catch (error) {
-                console.error("Error switching to Celo:", error);
-                try {
-                    await window.ethereum.request({
-                        method: 'wallet_switchEthereumChain',
-                        params: [{ chainId: CELO_ALFAJORES_PARAMS.chainId }],
-                    });
-                    return true;
-                } catch (testnetError) {
-                    if (testnetError.code === 4902) {
-                        await window.ethereum.request({
-                            method: 'wallet_addEthereumChain',
-                            params: [CELO_ALFAJORES_PARAMS],
-                        });
-                        return true;
-                    }
-                    throw testnetError;
-                }
-            }
-        }
-        async function checkCurrentNetwork() {
-            if (!provider) return false;
-            try {
-                const network = await provider.getNetwork();
-                currentChainId = network.chainId.toString();
-                const networkInfo = document.getElementById('networkInfo');
-                const networkWarning = document.getElementById('networkWarning');
-                if (currentChainId === "42220" || currentChainId === "44787") {
-                    networkInfo.innerHTML = `🌐 Celo ${currentChainId === "42220" ? "Mainnet" : "Alfajores"}`;
-                    networkInfo.style.color = "#35D07F";
-                    networkWarning.classList.add('hidden');
-                    return true;
-                } else {
-                    networkInfo.innerHTML = `⚠️ Wrong Network - Please switch to Celo`;
-                    networkInfo.style.color = "#EF4444";
-                    networkWarning.classList.remove('hidden');
-                    return false;
-                }
-            } catch (error) {
-                console.error("Error checking network:", error);
-                return false;
-            }
-        }
-        function handleCommunityLink(linkUrl, openStep2) {
-            window.open(linkUrl, '_blank');
-            if (openStep2) {
-                document.getElementById('step1').classList.add('hidden');
-                document.getElementById('step2').classList.remove('hidden');
-            }
-        }
-        function checkMetaMask() {
-            if (typeof window.ethereum === 'undefined') {
-                alert("❌ MetaMask not detected. Please install MetaMask first.");
-                return false;
-            }
-            return true;
-        }
-        async function connectWalletMetaMask() {
-            if (!checkMetaMask()) return false;
-            try {
-                provider = new ethers.providers.Web3Provider(window.ethereum);
-                await switchToCeloNetwork();
-                await window.ethereum.request({ method: 'eth_requestAccounts' });
-                signer = provider.getSigner();
-                userAddress = await signer.getAddress();
-                document.getElementById('walletAddress').textContent = `${userAddress.substring(0, 6)}...${userAddress.substring(userAddress.length - 4)}`;
-                document.getElementById('walletInfo').classList.remove('hidden');
-                document.getElementById('connectWalletBtn').style.display = 'none';
-                isConnected = true;
-                await checkCurrentNetwork();
-                loadPlatformStats();
-                loadUserProfile();
-                closeWalletModal();
-                return true;
-            } catch (error) {
-                console.error("Connection error:", error);
-                if (error.code === 4001) {
-                    alert("❌ Connection rejected. Please connect to continue.");
-                } else {
-                    alert("❌ Connection failed: " + error.message);
-                }
-                return false;
-            }
-        }
-        // WalletConnect ile bağlantı örnek kodu (placeholder)
-        async function connectWalletWalletConnect() {
-            alert("WalletConnect entegrasyonu yakında eklenecek.");
-            // WalletConnect entegrasyonu için ek kütüphane ve kod gerekecek.
-            closeWalletModal();
-        }
-        async function connectWallet() {
-            openWalletModal();
-        }
-        // Disconnect wallet
-        function disconnectWallet() {
-            isConnected = false;
-            provider = null;
-            signer = null;
-            userAddress = '';
-            document.getElementById('walletInfo').classList.add('hidden');
-            document.getElementById('connectWalletBtn').style.display = 'inline-block';
-            document.getElementById('governanceSection').classList.add('hidden');
-            document.getElementById('badgesSection').classList.add('hidden');
-            document.getElementById('userProfileSection').classList.add('hidden');
-            displaySupportLinks();
-            document.getElementById('step2').classList.add('hidden');
-            document.getElementById('step1').classList.remove('hidden');
-        }
-        // Modal functions
-        function openWalletModal() {
-            document.getElementById('walletModal').classList.remove('hidden');
-        }
-        function closeWalletModal() {
-            document.getElementById('walletModal').classList.add('hidden');
-        }
-        // ✅ OPTİMİZE EDİLMİŞ SUBMIT LINK - AKILLI KONTROL
-        async function submitLink() {
-            if (!isConnected) {
-                const connected = await connectWalletMetaMask();
-                if (!connected) return;
-            }
-            if (!hasSupported) {
-                alert("❌ Please support at least one community member first!");
-                return;
-            }
-            const isCorrectNetwork = await checkCurrentNetwork();
-            if (!isCorrectNetwork) {
-                alert("❌ Please switch to Celo network to submit your link");
-                return;
-            }
-            const userLink = document.getElementById("userLinkInput").value.trim();
-            if (!userLink) {
-                alert("❌ Please enter your link first.");
-                return;
-            }
-            if (!userLink.startsWith('http://') && !userLink.startsWith('https://')) {
-                alert("❌ Please enter a valid URL starting with http:// or https://");
-                return;
-            }
-            try {
-                document.getElementById("submitLinkBtn").disabled = true;
-                document.getElementById("submitLinkBtn").textContent = "⏳ Checking...";
-                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
-                const userProfile = await contract.getUserProfile(userAddress);
-                let tx;
-                let actionType;
-                if (userProfile.isActive) {
-                    actionType = "update";
-                    document.getElementById("submitLinkBtn").textContent = "⏳ Updating...";
-                    tx = await contract.connect(signer).updateProfile("User", {
-                        gasLimit: 300000
-                    });
-                    console.log("🔄 Update transaction sent:", tx.hash);
-                } else {
-                    actionType = "register";
-                    document.getElementById("submitLinkBtn").textContent = "⏳ Registering...";
-                    tx = await contract.connect(signer).registerUser("User", {
-                        gasLimit: 500000
-                    });
-                    console.log("🔄 Register transaction sent:", tx.hash);
-                }
-                alert(`⏳ ${actionType === 'register' ? 'Registration' : 'Profile update'} submitted!\nTX Hash: ${tx.hash}`);
-                const receipt = await tx.wait();
-                console.log("✅ Transaction confirmed:", receipt);
-                alert(`✅ ${actionType === 'register' ? 'Registration' : 'Profile update'} successful!`);
-                const newLinkData = {
-                    link: userLink,
-                    clickCount: 0,
-                    timestamp: Date.now(),
-                    submitter: userAddress
-                };
-                allCommunityLinks.unshift(newLinkData);
-                saveLinksToStorage(allCommunityLinks);
-                displaySupportLinks();
-                document.getElementById("userLinkInput").value = "";
-                hasSupported = false;
-                document.getElementById('step2').classList.add('hidden');
-                document.getElementById('step1').classList.remove('hidden');
-            } catch (error) {
-                console.error("❌ Submit error:", error);
-                if (error.code === 4001) {
-                    alert("❌ Transaction rejected by user");
-                } else if (error.code === 'INSUFFICIENT_FUNDS') {
-                    alert("❌ Insufficient funds for gas fee. Please add CELO to your wallet.");
-                } else if (error.message.includes("AlreadyRegistered()") || error.message.includes("execution reverted")) {
-                    alert("❌ You are already registered! Your profile has been updated instead.");
-                } else if (error.message.includes("UserNotActive()")) {
-                    alert("❌ User not active. Please complete registration first.");
-                } else {
-                    alert("❌ Submission failed: " + error.message);
-                }
-            } finally {
-                document.getElementById("submitLinkBtn").disabled = false;
-                document.getElementById("submitLinkBtn").textContent = "✍️ Submit Link";
-            }
-        }
-        // Event listeners
-        document.getElementById("connectWalletBtn").addEventListener("click", connectWallet);
-        document.getElementById("modalMetaMaskBtn").addEventListener("click", connectWalletMetaMask);
-        document.getElementById("modalWalletConnectBtn").addEventListener("click", connectWalletWalletConnect);
-        document.getElementById("closeWalletModalBtn").addEventListener("click", closeWalletModal);
-        document.getElementById("submitLinkBtn").addEventListener("click", submitLink);
-        document.getElementById("setupProfileBtn").addEventListener("click", setupUserProfile);
-        document.getElementById("createProposalBtn").addEventListener("click", createProposal);
-        document.getElementById("disconnectWalletBtn").addEventListener("click", disconnectWallet);
-        // Network değişikliklerini dinle
-        if (window.ethereum) {
-            window.ethereum.on('chainChanged', (chainId) => {
-                console.log("Chain changed to:", chainId);
-                currentChainId = parseInt(chainId, 16).toString();
-                checkCurrentNetwork();
-                if (isConnected) {
-                    loadPlatformStats();
-                    loadUserProfile();
-                }
-            });
-        }
-        // Initialize application
-        window.addEventListener('load', function() {
-            displaySupportLinks();
-        });
-        // Make functions globally available
-        window.handleCommunityLink = handleCommunityLink;
-        window.voteProposal = voteProposal;
-    </script>
-</body>
-</html>
+                                <div class="stat-value">${details.votesFor
