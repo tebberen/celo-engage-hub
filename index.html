@@ -59,10 +59,10 @@
         .wallet-option { background: #35D07F; color: black; border: none; padding: 15px 30px; border-radius: 10px; cursor: pointer; font-size: 17px; font-weight: bold; margin: 10px 0; display: block; width: 100%; transition: all 0.3s ease; }
         .wallet-option:hover { background: #FBCC5C; color: #000; }
         .close-modal { background: #EF4444; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 15px; }
-        .status-message { position: fixed; top: 20px; right: 20px; padding: 15px 20px; border-radius: 8px; font-weight: bold; z-index: 10000; animation: slideIn 0.3s ease; }
-        .status-message.success { background: #E8FBF1; border: 2px solid #35D07F; color: #065f46; }
-        .status-message.error { background: #FEE2E2; border: 2px solid #EF4444; color: #991B1B; }
-        .status-message.info { background: #DBEAFE; border: 2px solid #3B82F6; color: #1E40AF; }
+        .status-toast { position: fixed; top: 20px; right: 20px; padding: 15px 20px; border-radius: 8px; font-weight: bold; z-index: 10000; animation: slideIn 0.3s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .status-toast.success { background: #E8FBF1; border: 2px solid #35D07F; color: #065f46; }
+        .status-toast.error { background: #FEE2E2; border: 2px solid #EF4444; color: #991B1B; }
+        .status-toast.info { background: #DBEAFE; border: 2px solid #3B82F6; color: #1E40AF; }
         @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     </style>
 </head>
@@ -75,7 +75,6 @@
         <div class="subheader">If you want support, support first</div>
         <button id="connectWalletBtn" class="connect-btn">🔗 Connect Wallet</button>
     </div>
-
     <div id="walletModal" class="wallet-modal hidden">
         <div class="wallet-modal-content">
             <h3 style="margin-bottom: 25px;">Choose Wallet</h3>
@@ -84,7 +83,6 @@
             <button class="close-modal" id="closeWalletModalBtn">Cancel</button>
         </div>
     </div>
-
     <div class="container">
         <div class="sidebar">
             <div id="walletInfo" class="wallet-address hidden">
@@ -186,7 +184,6 @@
             </div>
         </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
     <script>
@@ -216,13 +213,7 @@
             "event UserRegistered(address indexed user, string username)",
             "event ProposalCreated(uint256 indexed proposalId, string title, address creator)",
             "event Voted(uint256 indexed proposalId, address indexed voter, bool support)",
-            "event BadgeAwarded(address indexed user, string badge)",
-            "error AlreadyRegistered()",
-            "error UserNotActive()",
-            "error InvalidProposal()",
-            "error NotOwner()",
-            "error VotingEnded()",
-            "error AlreadyVoted()"
+            "event BadgeAwarded(address indexed user, string badge)"
         ];
 
         const CELO_MAINNET_PARAMS = {
@@ -253,12 +244,12 @@
             "https://github.com/tebberen"
         ];
 
-        function showStatus(message, type = 'info') {
-            const statusDiv = document.createElement('div');
-            statusDiv.className = `status-message ${type}`;
-            statusDiv.textContent = message;
-            document.body.appendChild(statusDiv);
-            setTimeout(() => statusDiv.remove(), 4000);
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `status-toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
         }
 
         function loadLinksFromStorage() {
@@ -290,7 +281,13 @@
             container.innerHTML = '';
             const activeLinks = allCommunityLinks.filter(linkData => linkData.clickCount < 5);
             if (activeLinks.length === 0) {
-                container.innerHTML = `<div style="grid-column: 1 / -1;"><div class="link-card"><p>🌟 All links have reached maximum support! Submit new links to continue.</p></div></div>`;
+                container.innerHTML = `
+                <div style="grid-column: 1 / -1;">
+                    <div class="link-card">
+                        <p>🌟 All links have reached maximum support! Submit new links to continue.</p>
+                    </div>
+                </div>
+                `;
                 return;
             }
             activeLinks.sort((a, b) => a.clickCount - b.clickCount);
@@ -303,7 +300,9 @@
                 <div class="link-card">
                     <div>
                         <div class="link-platform">${platform}</div>
-                        <a href="${linkData.link}" target="_blank" class="support-link" onclick="handleCommunityLink('${linkData.link}', ${openStep2})">${linkData.link}</a>
+                        <a href="${linkData.link}" target="_blank" class="support-link" onclick="handleCommunityLink('${linkData.link}', ${openStep2})">
+                        ${linkData.link}
+                        </a>
                     </div>
                     <div class="link-stats">
                         <div class="stat-item">
@@ -311,7 +310,8 @@
                             <div class="stat-value">${linkData.clickCount}/5</div>
                         </div>
                     </div>
-                </div>`;
+                </div>
+                `;
                 container.appendChild(linkCard);
             });
         }
@@ -362,21 +362,21 @@
 
         async function setupUserProfile() {
             if (!isConnected) {
-                const connected = await connectWallet();
-                if (!connected) return;
+                showToast("❌ Please connect your wallet first", "error");
+                return;
             }
             const username = document.getElementById("userUsername").value.trim();
             if (!username) {
-                showStatus("❌ Please enter your username", "error");
+                showToast("❌ Please enter your username", "error");
                 return;
             }
             try {
                 document.getElementById("setupProfileBtn").disabled = true;
                 document.getElementById("setupProfileBtn").textContent = "⏳ Processing...";
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
-                const userProfile = await contract.getUserProfile(userAddress);
+                const userProfileData = await contract.getUserProfile(userAddress);
                 let tx;
-                if (userProfile.isActive) {
+                if (userProfileData.isActive) {
                     tx = await contract.connect(signer).updateProfile(username, { gasLimit: 300000 });
                     console.log("🔄 Update profile TX:", tx.hash);
                 } else {
@@ -384,13 +384,14 @@
                     console.log("🔄 Register TX:", tx.hash);
                 }
                 await tx.wait();
+                showToast("✅ Profile updated successfully!", "success");
                 loadUserProfile();
             } catch (error) {
                 console.error("❌ Profile setup error:", error);
                 if (error.code === 4001) {
-                    showStatus("❌ Transaction rejected", "error");
+                    showToast("❌ Transaction rejected", "error");
                 } else {
-                    showStatus("❌ Setup failed", "error");
+                    showToast("❌ Setup failed", "error");
                 }
             } finally {
                 document.getElementById("setupProfileBtn").disabled = false;
@@ -419,4 +420,393 @@
                         <div class="link-stats">
                             <div class="stat-item">
                                 <div>👍 For</div>
-                                <div class="stat-value">${details.votesFor
+                                <div class="stat-value">${details.votesAgainst.toString()}</div>
+                            </div>
+                        </div>
+                        <button onclick="voteProposal(${proposalId}, true)">👍 Support</button>
+                        <button onclick="voteProposal(${proposalId}, false)">👎 Oppose</button>
+                    `;
+                    container.appendChild(proposalCard);
+                }
+            } catch (error) {
+                console.error("Error loading proposals:", error);
+            }
+        }
+
+        async function createProposal() {
+            const title = document.getElementById("proposalTitle").value.trim();
+            const description = document.getElementById("proposalDescription").value.trim();
+            if (!title || !description) {
+                showToast("❌ Please enter both title and description", "error");
+                return;
+            }
+            try {
+                document.getElementById("createProposalBtn").disabled = true;
+                document.getElementById("createProposalBtn").textContent = "⏳ Creating...";
+                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+                const duration = 3 * 24 * 60 * 60;
+                const tx = await contract.createProposal(title, description, duration, { gasLimit: 600000 });
+                console.log("🔄 Proposal TX sent:", tx.hash);
+                await tx.wait();
+                showToast("✅ Proposal created successfully!", "success");
+                document.getElementById("proposalTitle").value = "";
+                document.getElementById("proposalDescription").value = "";
+                loadProposals();
+            } catch (error) {
+                console.error("❌ Proposal creation error:", error);
+                if (error.code === 4001) {
+                    showToast("❌ Transaction rejected", "error");
+                } else {
+                    showToast("❌ Proposal creation failed", "error");
+                }
+            } finally {
+                document.getElementById("createProposalBtn").disabled = false;
+                document.getElementById("createProposalBtn").textContent = "📝 Create Proposal";
+            }
+        }
+
+        async function voteProposal(proposalId, support) {
+            try {
+                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+                const tx = await contract.voteProposal(proposalId, support, { gasLimit: 400000 });
+                console.log("🔄 Vote TX sent:", tx.hash);
+                await tx.wait();
+                showToast("✅ Vote submitted successfully!", "success");
+                loadProposals();
+            } catch (error) {
+                console.error("❌ Voting error:", error);
+                if (error.code === 4001) {
+                    showToast("❌ Transaction rejected", "error");
+                } else {
+                    showToast("❌ Voting failed", "error");
+                }
+            }
+        }
+
+        async function loadUserBadges() {
+            try {
+                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+                const badges = await contract.getUserBadges(userAddress);
+                const container = document.getElementById('userBadgesContainer');
+                container.innerHTML = '';
+                if (badges.length === 0) {
+                    container.innerHTML = '<p>No badges yet. Be active in the community to earn badges!</p>';
+                    return;
+                }
+                badges.forEach(badge => {
+                    const badgeCard = document.createElement('div');
+                    badgeCard.className = 'badge-card';
+                    badgeCard.innerHTML = `
+                        <strong>${badge}</strong>
+                        <p>Earned through community participation</p>
+                    `;
+                    container.appendChild(badgeCard);
+                });
+            } catch (error) {
+                console.error("Error loading badges:", error);
+            }
+        }
+
+        async function switchToCeloNetwork() {
+            try {
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: CELO_MAINNET_PARAMS.chainId }],
+                    });
+                    return true;
+                } catch (switchError) {
+                    if (switchError.code === 4902) {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [CELO_MAINNET_PARAMS],
+                        });
+                        return true;
+                    }
+                    throw switchError;
+                }
+            } catch (error) {
+                console.error("Error switching to Celo:", error);
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: CELO_ALFAJORES_PARAMS.chainId }],
+                    });
+                    return true;
+                } catch (testnetError) {
+                    if (testnetError.code === 4902) {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [CELO_ALFAJORES_PARAMS],
+                        });
+                        return true;
+                    }
+                    throw testnetError;
+                }
+            }
+        }
+
+        async function checkCurrentNetwork() {
+            if (!provider) return false;
+            try {
+                const network = await provider.getNetwork();
+                currentChainId = network.chainId.toString();
+                const networkInfo = document.getElementById('networkInfo');
+                const networkWarning = document.getElementById('networkWarning');
+                if (currentChainId === "42220" || currentChainId === "44787") {
+                    networkInfo.innerHTML = `🌐 Celo ${currentChainId === "42220" ? "Mainnet" : "Alfajores"}`;
+                    networkInfo.style.color = "#35D07F";
+                    networkWarning.classList.add('hidden');
+                    return true;
+                } else {
+                    networkInfo.innerHTML = `⚠️ Wrong Network - Please switch to Celo`;
+                    networkInfo.style.color = "#EF4444";
+                    networkWarning.classList.remove('hidden');
+                    return false;
+                }
+            } catch (error) {
+                console.error("Error checking network:", error);
+                return false;
+            }
+        }
+
+        function handleCommunityLink(linkUrl, openStep2) {
+            window.open(linkUrl, '_blank');
+            if (openStep2) {
+                document.getElementById('step1').classList.add('hidden');
+                document.getElementById('step2').classList.remove('hidden');
+            }
+        }
+
+        function checkMetaMask() {
+            if (typeof window.ethereum === 'undefined') {
+                showToast("❌ MetaMask not detected. Please install MetaMask first.", "error");
+                return false;
+            }
+            return true;
+        }
+
+        async function connectWalletMetaMask() {
+            if (!checkMetaMask()) return false;
+            try {
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                await switchToCeloNetwork();
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                signer = provider.getSigner();
+                userAddress = await signer.getAddress();
+                document.getElementById('walletAddress').textContent = `${userAddress.substring(0, 6)}...${userAddress.substring(userAddress.length - 4)}`;
+                document.getElementById('walletInfo').classList.remove('hidden');
+                document.getElementById('connectWalletBtn').style.display = 'none';
+                isConnected = true;
+                await checkCurrentNetwork();
+                loadPlatformStats();
+                loadUserProfile();
+                closeWalletModal();
+                showToast("✅ Wallet connected successfully!", "success");
+                return true;
+            } catch (error) {
+                console.error("Connection error:", error);
+                if (error.code === 4001) {
+                    showToast("❌ Connection rejected", "error");
+                } else {
+                    showToast("❌ Connection failed", "error");
+                }
+                return false;
+            }
+        }
+
+        async function connectWalletWalletConnect() {
+            try {
+                walletConnectProvider = new WalletConnectProvider.default({
+                    rpc: {
+                        42220: "https://forno.celo.org",
+                        44787: "https://alfajores-forno.celo-testnet.org"
+                    },
+                    chainId: 42220
+                });
+                
+                await walletConnectProvider.enable();
+                
+                provider = new ethers.providers.Web3Provider(walletConnectProvider);
+                signer = provider.getSigner();
+                userAddress = await signer.getAddress();
+                
+                document.getElementById('walletAddress').textContent = `${userAddress.substring(0, 6)}...${userAddress.substring(userAddress.length - 4)}`;
+                document.getElementById('walletInfo').classList.remove('hidden');
+                document.getElementById('connectWalletBtn').style.display = 'none';
+                isConnected = true;
+                
+                await checkCurrentNetwork();
+                loadPlatformStats();
+                loadUserProfile();
+                closeWalletModal();
+                showToast("✅ WalletConnect connected successfully!", "success");
+                
+                walletConnectProvider.on("accountsChanged", (accounts) => {
+                    if (accounts.length === 0) {
+                        disconnectWallet();
+                    }
+                });
+                
+                walletConnectProvider.on("chainChanged", (chainId) => {
+                    checkCurrentNetwork();
+                });
+                
+                walletConnectProvider.on("disconnect", () => {
+                    disconnectWallet();
+                });
+                
+                return true;
+            } catch (error) {
+                console.error("WalletConnect error:", error);
+                if (error.message && error.message.includes("User closed modal")) {
+                    showToast("❌ Connection cancelled", "error");
+                } else {
+                    showToast("❌ WalletConnect connection failed", "error");
+                }
+                closeWalletModal();
+                return false;
+            }
+        }
+
+        async function connectWallet() {
+            openWalletModal();
+        }
+
+        async function disconnectWallet() {
+            if (walletConnectProvider) {
+                await walletConnectProvider.disconnect();
+                walletConnectProvider = null;
+            }
+            isConnected = false;
+            provider = null;
+            signer = null;
+            userAddress = '';
+            document.getElementById('walletInfo').classList.add('hidden');
+            document.getElementById('connectWalletBtn').style.display = 'inline-block';
+            document.getElementById('governanceSection').classList.add('hidden');
+            document.getElementById('badgesSection').classList.add('hidden');
+            document.getElementById('userProfileSection').classList.add('hidden');
+            displaySupportLinks();
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step1').classList.remove('hidden');
+            showToast("👋 Wallet disconnected", "info");
+        }
+
+        function openWalletModal() {
+            document.getElementById('walletModal').classList.remove('hidden');
+        }
+
+        function closeWalletModal() {
+            document.getElementById('walletModal').classList.add('hidden');
+        }
+
+        async function submitLink() {
+            if (!isConnected) {
+                showToast("❌ Please connect your wallet first", "error");
+                openWalletModal();
+                return;
+            }
+            if (!hasSupported) {
+                showToast("❌ Please support at least one community member first!", "error");
+                return;
+            }
+            const isCorrectNetwork = await checkCurrentNetwork();
+            if (!isCorrectNetwork) {
+                showToast("❌ Please switch to Celo network", "error");
+                return;
+            }
+            const userLink = document.getElementById("userLinkInput").value.trim();
+            if (!userLink) {
+                showToast("❌ Please enter your link first", "error");
+                return;
+            }
+            if (!userLink.startsWith('http://') && !userLink.startsWith('https://')) {
+                showToast("❌ Please enter a valid URL", "error");
+                return;
+            }
+            try {
+                document.getElementById("submitLinkBtn").disabled = true;
+                document.getElementById("submitLinkBtn").textContent = "⏳ Processing...";
+                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+                const userProfileData = await contract.getUserProfile(userAddress);
+                let tx;
+                if (userProfileData.isActive) {
+                    tx = await contract.connect(signer).updateProfile("User", { gasLimit: 300000 });
+                    console.log("🔄 Update transaction sent:", tx.hash);
+                } else {
+                    tx = await contract.connect(signer).registerUser("User", { gasLimit: 500000 });
+                    console.log("🔄 Register transaction sent:", tx.hash);
+                }
+                await tx.wait();
+                showToast("✅ Link submitted successfully!", "success");
+                const newLinkData = {
+                    link: userLink,
+                    clickCount: 0,
+                    timestamp: Date.now(),
+                    submitter: userAddress
+                };
+                allCommunityLinks.unshift(newLinkData);
+                saveLinksToStorage(allCommunityLinks);
+                displaySupportLinks();
+                document.getElementById("userLinkInput").value = "";
+                hasSupported = false;
+                document.getElementById('step2').classList.add('hidden');
+                document.getElementById('step1').classList.remove('hidden');
+            } catch (error) {
+                console.error("❌ Submit error:", error);
+                if (error.code === 4001) {
+                    showToast("❌ Transaction rejected", "error");
+                } else if (error.code === 'INSUFFICIENT_FUNDS') {
+                    showToast("❌ Insufficient funds for gas fee", "error");
+                } else {
+                    showToast("❌ Submission failed", "error");
+                }
+            } finally {
+                document.getElementById("submitLinkBtn").disabled = false;
+                document.getElementById("submitLinkBtn").textContent = "✍️ Submit Link";
+            }
+        }
+
+        document.getElementById("connectWalletBtn").addEventListener("click", connectWallet);
+        document.getElementById("modalMetaMaskBtn").addEventListener("click", connectWalletMetaMask);
+        document.getElementById("modalWalletConnectBtn").addEventListener("click", connectWalletWalletConnect);
+        document.getElementById("closeWalletModalBtn").addEventListener("click", closeWalletModal);
+        document.getElementById("submitLinkBtn").addEventListener("click", submitLink);
+        document.getElementById("setupProfileBtn").addEventListener("click", setupUserProfile);
+        document.getElementById("createProposalBtn").addEventListener("click", createProposal);
+        document.getElementById("disconnectWalletBtn").addEventListener("click", disconnectWallet);
+
+        if (window.ethereum) {
+            window.ethereum.on('chainChanged', (chainId) => {
+                console.log("Chain changed to:", chainId);
+                currentChainId = parseInt(chainId, 16).toString();
+                checkCurrentNetwork();
+                if (isConnected) {
+                    loadPlatformStats();
+                    loadUserProfile();
+                }
+            });
+            
+            window.ethereum.on('accountsChanged', (accounts) => {
+                if (accounts.length === 0) {
+                    disconnectWallet();
+                } else if (isConnected) {
+                    location.reload();
+                }
+            });
+        }
+
+        window.addEventListener('load', function() {
+            displaySupportLinks();
+        });
+
+        window.handleCommunityLink = handleCommunityLink;
+        window.voteProposal = voteProposal;
+    </script>
+</body>
+</html>votesFor.toString()}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div>👎 Against</div>
+                                <div class="stat-value">${details.
