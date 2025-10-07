@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Celo Engage Hub</title>
     <style>
-        * { box-sizing: border-box; }
-        body { background-color: #ffffff; font-family: Arial, sans-serif; color: #000000; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: #ffffff; font-family: Arial, sans-serif; color: #000000; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .container { display: flex; max-width: 1400px; width: 100%; gap: 30px; align-items: flex-start; }
         .sidebar { width: 300px; flex-shrink: 0; }
         .main-content { flex: 1; display: flex; flex-direction: column; align-items: center; }
@@ -53,11 +53,6 @@
         .badge-card { border: 2px solid #FBCC5C; padding: 15px; border-radius: 12px; background-color: #FFF9E6; margin: 10px 0; }
         .stats-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
         .stat-card { background: #FFFDF6; border: 2px solid #FBCC5C; padding: 15px; border-radius: 8px; text-align: center; }
-        .wallet-connect-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; }
-        .wallet-connect-content { background: white; padding: 30px; border-radius: 12px; max-width: 500px; width: 90%; text-align: center; }
-        .wallet-options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
-        .wallet-option { border: 2px solid #FBCC5C; padding: 15px; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; background: #FFFDF6; }
-        .wallet-option:hover { background: #FBCC5C; transform: translateY(-2px); }
         .disconnect-btn { background: #EF4444; color: white; margin-top: 10px; }
         .disconnect-btn:hover { background: #DC2626; }
     </style>
@@ -70,25 +65,6 @@
         <div class="slogan"> Social TX - Where Every Interaction Builds Real Value </div>
         <div class="subheader">If you want support, support first</div>
         <button id="connectWalletBtn" class="connect-btn">🔗 Connect Wallet</button>
-    </div>
-
-    <!-- Wallet Connect Modal -->
-    <div id="walletConnectModal" class="wallet-connect-modal">
-        <div class="wallet-connect-content">
-            <h2>Connect Your Wallet</h2>
-            <p>Choose your wallet to connect to Celo Engage Hub</p>
-            <div class="wallet-options">
-                <div class="wallet-option" onclick="connectWallet('injected')">
-                    <strong>Browser Wallet</strong>
-                    <p>MetaMask, Trust Wallet, etc.</p>
-                </div>
-                <div class="wallet-option" onclick="connectWallet('walletconnect')">
-                    <strong>WalletConnect</strong>
-                    <p>Mobile Wallets</p>
-                </div>
-            </div>
-            <button onclick="closeWalletModal()">Cancel</button>
-        </div>
     </div>
 
     <div class="container">
@@ -142,6 +118,7 @@
                     <div class="submit-form">
                         <h3>🆔 Setup Your Profile</h3>
                         <input type="text" placeholder="Enter your username..." id="userUsername" />
+                        <input type="text" placeholder="Paste your X, Farcaster, GitHub link... (Optional)" id="userLink" />
                         <div class="gas-info"> ⛽ Setup your profile to unlock all features </div>
                         <button id="setupProfileBtn">🚀 Setup Profile</button>
                     </div>
@@ -207,8 +184,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-    <!-- WalletConnect Library -->
-    <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
     <script>
         // State management
         let provider = null;
@@ -218,7 +193,6 @@
         let hasSupported = false;
         let currentChainId = null;
         let userProfile = null;
-        let walletConnectProvider = null;
 
         // Contract Configuration
         const CONTRACT_ADDRESS = "0x22eA49c074098931a478F381f971C77486d185b2";
@@ -345,34 +319,16 @@
         }
 
         // Wallet Connection Functions
-        function openWalletModal() {
-            document.getElementById('walletConnectModal').style.display = 'flex';
-        }
-
-        function closeWalletModal() {
-            document.getElementById('walletConnectModal').style.display = 'none';
-        }
-
-        async function connectWallet(walletType) {
-            closeWalletModal();
+        async function connectWallet() {
+            if (typeof window.ethereum === 'undefined') {
+                alert('No Ethereum wallet found. Please install MetaMask or another Ethereum-compatible wallet.');
+                return false;
+            }
             
             try {
-                if (walletType === 'injected') {
-                    // Browser wallets (MetaMask, Trust Wallet, etc.)
-                    if (typeof window.ethereum === 'undefined') {
-                        alert('No Ethereum wallet found. Please install MetaMask or another Ethereum-compatible wallet.');
-                        return false;
-                    }
-                    
-                    provider = new ethers.providers.Web3Provider(window.ethereum);
-                    await switchToCeloNetwork();
-                    await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    
-                } else if (walletType === 'walletconnect') {
-                    // WalletConnect for mobile wallets[citation:6]
-                    alert('WalletConnect integration would be implemented here. For now, please use a browser wallet.');
-                    return false;
-                }
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                await switchToCeloNetwork();
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
                 
                 signer = provider.getSigner();
                 userAddress = await signer.getAddress();
@@ -413,12 +369,6 @@
             document.getElementById('governanceSection').classList.add('hidden');
             document.getElementById('badgesSection').classList.add('hidden');
             document.getElementById('platformStats').classList.add('hidden');
-            
-            // Reset any WalletConnect sessions if used
-            if (walletConnectProvider) {
-                walletConnectProvider.disconnect();
-                walletConnectProvider = null;
-            }
         }
 
         // Platform Stats
@@ -478,11 +428,12 @@
         // Profile Setup - Link is now optional
         async function setupUserProfile() {
             if (!isConnected) {
-                openWalletModal();
+                await connectWallet();
                 return;
             }
 
             const username = document.getElementById("userUsername").value.trim();
+            const link = document.getElementById("userLink").value.trim();
 
             if (!username) {
                 alert("❌ Please enter a username");
@@ -493,26 +444,23 @@
                 document.getElementById("setupProfileBtn").disabled = true;
                 document.getElementById("setupProfileBtn").textContent = "⏳ Checking...";
 
-                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
                 
                 const userProfile = await contract.getUserProfile(userAddress);
                 
                 let tx;
                 let actionType;
                 
-                // Use empty string for link since it's now optional
-                const emptyLink = "";
-                
                 if (userProfile.isActive) {
                     actionType = "update";
                     document.getElementById("setupProfileBtn").textContent = "⏳ Updating...";
-                    tx = await contract.connect(signer).updateProfile(username, emptyLink, {
+                    tx = await contract.updateProfile(username, link, {
                         gasLimit: 300000
                     });
                 } else {
                     actionType = "register";
                     document.getElementById("setupProfileBtn").textContent = "⏳ Registering...";
-                    tx = await contract.connect(signer).registerUser(username, emptyLink, {
+                    tx = await contract.registerUser(username, link, {
                         gasLimit: 500000
                     });
                 }
@@ -770,21 +718,12 @@
                         checkCurrentNetwork();
                     }
                 }
-                
-                // Special handling for your project page
-                if (linkUrl.includes('tebberen.github.io/celo-engage-hub')) {
-                    setTimeout(() => {
-                        if (isConnected) {
-                            document.getElementById('userLinkInput').value = "https://tebberen.github.io/celo-engage-hub";
-                        }
-                    }, 1000);
-                }
             }
         }
 
         async function submitLink() {
             if (!isConnected) {
-                openWalletModal();
+                await connectWallet();
                 return;
             }
             if (!hasSupported) {
@@ -810,7 +749,7 @@
                 document.getElementById("submitLinkBtn").disabled = true;
                 document.getElementById("submitLinkBtn").textContent = "⏳ Checking...";
 
-                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
                 const userProfile = await contract.getUserProfile(userAddress);
                 
                 let tx;
@@ -819,13 +758,13 @@
                 if (userProfile.isActive) {
                     actionType = "update";
                     document.getElementById("submitLinkBtn").textContent = "⏳ Updating...";
-                    tx = await contract.connect(signer).updateProfile("User", userLink, {
+                    tx = await contract.updateProfile("User", userLink, {
                         gasLimit: 300000
                     });
                 } else {
                     actionType = "register";
                     document.getElementById("submitLinkBtn").textContent = "⏳ Registering...";
-                    tx = await contract.connect(signer).registerUser("User", userLink, {
+                    tx = await contract.registerUser("User", userLink, {
                         gasLimit: 500000
                     });
                 }
@@ -872,7 +811,7 @@
         }
 
         // Event listeners
-        document.getElementById("connectWalletBtn").addEventListener("click", openWalletModal);
+        document.getElementById("connectWalletBtn").addEventListener("click", connectWallet);
         document.getElementById("disconnectWalletBtn").addEventListener("click", disconnectWallet);
         document.getElementById("submitLinkBtn").addEventListener("click", submitLink);
         document.getElementById("setupProfileBtn").addEventListener("click", setupUserProfile);
@@ -894,17 +833,11 @@
         // Initialize application
         window.addEventListener('load', function() {
             displaySupportLinks();
-            
-            // Remove auto-connection on page load
-            // Users must now manually click connect wallet
         });
 
         // Make functions globally available
         window.handleLinkClick = handleLinkClick;
         window.voteProposal = voteProposal;
-        window.connectWallet = connectWallet;
-        window.openWalletModal = openWalletModal;
-        window.closeWalletModal = closeWalletModal;
     </script>
 </body>
 </html>
