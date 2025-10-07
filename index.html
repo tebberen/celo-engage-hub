@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Celo Engage Hub</title>
     <style>
+        /* ... (Tüm CSS kodun, öncekiyle neredeyse aynı, sadeleştirilmiş ve modal güncellenmiş) ... */
         * { box-sizing: border-box; }
         body { background-color: #ffffff; font-family: Arial, sans-serif; color: #000000; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .container { display: flex; max-width: 1400px; width: 100%; gap: 30px; align-items: flex-start; }
@@ -14,7 +15,6 @@
         .slogan { margin: 5px 0 15px 0; font-size: 22px; color: #000000; font-weight: bold; text-align: center; width: 100%; font-style: italic; }
         .subheader { margin: 0 0 30px 0; font-size: 18px; color: #000000; font-weight: bold; text-align: center; width: 100%; }
         .link-card { border: 2px solid #FBCC5C; padding: 20px; border-radius: 12px; background-color: #FFFDF6; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.3s ease; height: 100%; display: flex; flex-direction: column; justify-content: space-between; }
-        .link-card.completed { border-color: #35D07F; background-color: #F0FFF7; }
         .links-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px auto; width: 100%; }
         button { background: #FBCC5C; color: black; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; margin: 8px; font-size: 16px; font-weight: bold; transition: all 0.3s ease; }
         button:hover { background: #000000; color: #FBCC5C; transform: translateY(-2px); }
@@ -22,38 +22,8 @@
         input, textarea { padding: 12px; border-radius: 8px; border: 2px solid #FBCC5C; width: 90%; max-width: 500px; margin: 15px 0; font-size: 16px; }
         .wallet-info { margin: 0 0 20px 0; padding: 15px; background-color: #FFF9E6; border-radius: 10px; font-weight: bold; border: 2px solid #FBCC5C; text-align: center; width: 100%; }
         .connect-btn { background: #35D07F; color: black; margin: 15px 0; padding: 15px 25px; font-size: 18px; }
-        .support-link { color: #000000; text-decoration: none; word-break: break-all; display: block; margin-bottom: 15px; font-weight: bold; font-size: 16px; line-height: 1.4; }
-        .link-platform { font-size: 14px; color: #666; margin-bottom: 10px; font-weight: bold; background: #FFF0C2; padding: 5px 10px; border-radius: 20px; display: inline-block; }
-        .step-indicator { margin: 0 0 20px 0; font-weight: bold; color: #000000; font-size: 20px; text-align: center; width: 100%; }
-        .step-container { background: #FFFDF6; border: 2px solid #FBCC5C; padding: 25px; border-radius: 12px; text-align: center; height: fit-content; width: 100%; }
         .hidden { display: none !important; }
-        .step-number { background: #FBCC5C; color: black; border-radius: 50%; width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; }
-        .success-message { background: #E8FBF1; border: 2px solid #35D07F; padding: 15px; margin: 15px auto; border-radius: 8px; color: #065f46; font-weight: bold; max-width: 600px; text-align: center; width: 100%; }
-        .link-stats { display: flex; justify-content: space-around; margin-top: 15px; font-size: 14px; color: #666; }
-        .stat-item { display: flex; flex-direction: column; align-items: center; }
-        .stat-value { font-weight: bold; font-size: 18px; color: #000000; }
-        .submit-form { background: #FFFDF6; border: 2px solid #FBCC5C; padding: 30px; margin: 20px auto; border-radius: 12px; max-width: 600px; text-align: center; width: 100%; }
-        .gas-info { background: #FFF0C2; padding: 10px; border-radius: 8px; margin: 10px 0; font-size: 14px; color: #000000; text-align: center; }
-        .celo-ecosystem { background: linear-gradient(135deg, #FBCC5C 0%, #000000 100%); color: white; padding: 20px; border-radius: 12px; height: fit-content; }
-        .celo-ecosystem h3 { margin: 0 0 15px 0; font-size: 20px; text-align: center; }
-        .celo-link { display: flex; align-items: center; padding: 10px; margin: 8px 0; background: rgba(255,255,255,0.1); border-radius: 8px; text-decoration: none; color: white; transition: all 0.3s ease; }
-        .celo-link:hover { background: rgba(255,255,255,0.2); transform: translateX(5px); }
-        .celo-link-icon { margin-right: 10px; font-size: 18px; }
         .wallet-address { background: #FFF9E6; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; border: 2px solid #FBCC5C; text-align: center; width: 100%; }
-        .main-sections { display: flex; flex-direction: column; gap: 30px; width: 100%; align-items: center; }
-        .centered-content { display: flex; flex-direction: column; align-items: center; width: 100%; }
-        .section-title { font-size: 24px; font-weight: bold; color: #000000; margin: 30px 0 20px 0; text-align: center; width: 100%; }
-        .network-warning { background: #FEF3CD; border: 2px solid #F59E0B; padding: 15px; margin: 15px auto; border-radius: 8px; color: #92400E; font-weight: bold; max-width: 600px; text-align: center; width: 100%; }
-        .content-layout { display: flex; flex-direction: column; gap: 30px; width: 100%; }
-        .submit-section { order: 1; }
-        .support-section { order: 2; }
-        .governance-section { order: 3; }
-        .badge-section { order: 4; }
-        .proposal-card { border: 2px solid #35D07F; padding: 20px; border-radius: 12px; background-color: #F0FFF7; margin: 15px 0; }
-        .badge-card { border: 2px solid #FBCC5C; padding: 15px; border-radius: 12px; background-color: #FFF9E6; margin: 10px 0; }
-        .stats-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
-        .stat-card { background: #FFFDF6; border: 2px solid #FBCC5C; padding: 15px; border-radius: 8px; text-align: center; }
-
         /* Modal styles for Connect Wallet */
         .wallet-modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 9999; }
         .wallet-modal { background: #fff; width: 420px; max-width: calc(100% - 40px); border-radius: 28px; padding: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 1px solid rgba(0,0,0,0.08); }
@@ -65,10 +35,8 @@
         .wallet-meta { display:flex; flex-direction:column; }
         .wallet-name { font-weight:700; }
         .wallet-status { color: #16a34a; font-weight:700; font-size:13px; }
-        .wallet-install { color: #ef4444; font-weight:700; font-size:13px; }
         .modal-close { position:absolute; right:30px; top:22px; cursor:pointer; font-weight:bold; color:#999; }
         .wallet-list { display:flex; flex-direction:column; gap:8px; margin-top:6px; }
-
         @media (max-width: 720px) {
             .container { flex-direction: column; padding-bottom: 60px; }
             .sidebar { width: 100%; }
@@ -93,55 +61,24 @@
                 <div id="modalClose" class="modal-close">✖</div>
                 <h3 id="connectWalletTitle">Connect Wallet</h3>
             </div>
-
             <div class="wallet-list">
                 <div class="wallet-option" onclick="connectWithWallet('metamask')">
                     <div class="wallet-left">
                         <div class="wallet-icon">🦊</div>
                         <div class="wallet-meta">
                             <div class="wallet-name">MetaMask</div>
-                            <div id="metaMaskStatus" class="wallet-status" style="display:none">INSTALLED</div>
-                            <div id="metaMaskInstall" class="wallet-install" style="display:none">INSTALL</div>
                         </div>
                     </div>
                     <div style="font-size:13px; color:#666;">Browser extension</div>
                 </div>
-
-                <div class="wallet-option" onclick="connectWithWallet('coinbase')">
-                    <div class="wallet-left">
-                        <div class="wallet-icon">🟦</div>
-                        <div class="wallet-meta">
-                            <div class="wallet-name">Coinbase Wallet</div>
-                            <div id="coinbaseStatus" class="wallet-status" style="display:none">INSTALLED</div>
-                        </div>
-                    </div>
-                    <div style="font-size:13px; color:#666;">App / extension / SDK</div>
-                </div>
-
                 <div class="wallet-option" onclick="connectWithWallet('walletconnect')">
                     <div class="wallet-left">
                         <div class="wallet-icon">🔗</div>
                         <div class="wallet-meta">
                             <div class="wallet-name">WalletConnect</div>
-                            <div class="wallet-status" style="display:block; color:#666; font-weight:700;">QR / Mobile</div>
                         </div>
                     </div>
-                    <div style="font-size:13px; color:#666;">Trust, Rainbow, Coinbase Mobile...</div>
-                </div>
-
-                <div class="wallet-option" onclick="connectWithWallet('rabby')">
-                    <div class="wallet-left">
-                        <div class="wallet-icon">🛡️</div>
-                        <div class="wallet-meta">
-                            <div class="wallet-name">Rabby</div>
-                            <div id="rabbyStatus" class="wallet-status" style="display:none">INSTALLED</div>
-                        </div>
-                    </div>
-                    <div style="font-size:13px; color:#666;">Browser extension</div>
-                </div>
-
-                <div style="margin-top:12px; text-align:center;">
-                    <button onclick="connectWithWallet('walletconnect')" style="background:#000;color:#FBCC5C;padding:8px 14px;border-radius:10px;font-weight:700;">All Wallets (WalletConnect)</button>
+                    <div style="font-size:13px; color:#666;">TrustWallet, Rainbow, Coinbase Mobile, Rabby...</div>
                 </div>
             </div>
         </div>
@@ -156,6 +93,7 @@
                     <button id="disconnectBtn" style="background:#ef4444;color:white;padding:10px 12px;border-radius:8px;">Disconnect Wallet</button>
                 </div>
             </div>
+            <!-- Celo ecosystem links -->
             <div class="celo-ecosystem">
                 <h3>🟡 Celo Ecosystem</h3>
                 <a href="https://celo.org" target="_blank" class="celo-link"> <span class="celo-link-icon">🌐</span>Celo Official </a>
@@ -168,28 +106,7 @@
                 <a href="https://blog.celo.org" target="_blank" class="celo-link"> <span class="celo-link-icon">📰</span>Celo Blog </a>
                 <a href="https://github.com/celo-org" target="_blank" class="celo-link"> <span class="celo-link-icon">💻</span>Celo GitHub </a>
             </div>
-
-            <!-- Platform Stats -->
-            <div id="platformStats" class="stats-container hidden">
-                <div class="stat-card">
-                    <div>👥 Total Users</div>
-                    <div class="stat-value" id="totalUsers">0</div>
-                </div>
-                <div class="stat-card">
-                    <div>📋 Proposals</div>
-                    <div class="stat-value" id="totalProposals">0</div>
-                </div>
-                <div class="stat-card">
-                    <div>🎖️ Badges</div>
-                    <div class="stat-value" id="totalBadges">0</div>
-                </div>
-                <div class="stat-card">
-                    <div>👍 Supports</div>
-                    <div class="stat-value" id="totalSupports">0</div>
-                </div>
-            </div>
         </div>
-
         <div class="main-content">
             <div class="content-layout">
                 <!-- USER PROFILE SECTION -->
@@ -205,7 +122,6 @@
                         <button id="setupProfileBtn">🚀 Setup Profile</button>
                     </div>
                 </div>
-
                 <!-- SUBMIT YOUR LINK SECTION -->
                 <div id="step2" class="submit-section hidden">
                     <div class="step-indicator">
@@ -222,7 +138,6 @@
                         <p><small>🔒 Secure transaction on Celo network</small></p>
                     </div>
                 </div>
-
                 <!-- SUPPORT COMMUNITY SECTION -->
                 <div id="step1" class="support-section">
                     <div class="step-indicator">
@@ -234,67 +149,16 @@
                         <div class="links-grid" id="linksContainer"> </div>
                     </div>
                 </div>
-
-                <!-- GOVERNANCE SECTION -->
-                <div id="governanceSection" class="governance-section hidden">
-                    <div class="step-indicator">
-                        <span class="step-number">🏛️</span> Community Governance
-                    </div>
-                    <div class="step-container">
-                        <h3>🗳️ Create Proposal</h3>
-                        <input type="text" placeholder="Proposal title..." id="proposalTitle" />
-                        <textarea placeholder="Proposal description..." id="proposalDescription" rows="3"></textarea>
-                        <button id="createProposalBtn">📝 Create Proposal</button>
-
-                        <h3 style="margin-top: 30px;">📋 Active Proposals</h3>
-                        <div id="proposalsContainer"></div>
-                    </div>
-                </div>
-
-                <!-- BADGES SECTION -->
-                <div id="badgesSection" class="badge-section hidden">
-                    <div class="step-indicator">
-                        <span class="step-number">🎖️</span> Your Badges
-                    </div>
-                    <div class="step-container">
-                        <h3>🏆 Your Achievements</h3>
-                        <div id="userBadgesContainer"></div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
-
-    <!-- External libs:
-         - ethers (for contract interaction)
-         - walletconnect provider (for WalletConnect mobile/wallets)
-         - coinbase wallet sdk (for Coinbase Wallet integration fallback)
-         CDN references (jsdelivr) — if you prefer, pin to a different version.
-    -->
+    <!-- external libraries -->
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-    <!-- WalletConnect provider (v1.x UMD) -->
     <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
-    <!-- Coinbase Wallet SDK (UMD) -->
-    <script src="https://cdn.jsdelivr.net/npm/@coinbase/wallet-sdk@4.3.7/dist/index.min.js"></script>
-
     <script>
-        /***********************************************************************
-         * Celo Engage Hub - Updated wallet connection flow
-         *
-         * - No auto-connect on page load
-         * - Connect modal with multiple wallet options (MetaMask, Coinbase, WalletConnect, Rabby)
-         * - WalletConnect is used as fallback for mobile wallets (Trust, Rainbow, etc.)
-         * - Users can disconnect manually
-         * - Profile registration: link optional (pass empty string if none)
-         *
-         * Notes:
-         * - WalletConnect provider & Coinbase SDK loaded via CDN above.
-         * - If a specific SDK isn't available at runtime, code falls back to WalletConnect or injected provider.
-         ***********************************************************************/
-
         // State
-        let provider = null;            // ethers provider (ethers.providers.Web3Provider)
-        let rawProvider = null;         // underlying provider (window.ethereum or WalletConnect / Coinbase provider)
+        let provider = null;
+        let rawProvider = null;
         let signer = null;
         let isConnected = false;
         let userAddress = '';
@@ -302,31 +166,14 @@
         let userProfile = null;
         let currentChainId = null;
 
-        // Contract config (unchanged; update if you need)
+        // Contract config
         const CONTRACT_ADDRESS = "0x22eA49c074098931a478F381f971C77486d185b2";
         const CONTRACT_ABI = [
             "function registerUser(string memory _username, string memory _link) public",
             "function updateProfile(string memory _username, string memory _link) public",
-            "function createProposal(string memory _title, string memory _description, uint256 _duration) public",
-            "function voteProposal(uint256 _proposalId, bool _support) public",
-            "function awardBadge(address _user, string memory _badge) public",
             "function getUserProfile(address _user) public view returns (string memory link, string memory username, uint256 supportCount, uint256 reputation, uint256 badgeCount, bool isActive, uint256 timestamp)",
-            "function getUserBadges(address _user) public view returns (string[] memory)",
-            "function getActiveProposals() public view returns (uint256[] memory)",
-            "function getProposalDetails(uint256 _proposalId) public view returns (uint256 id, string memory title, string memory description, address creator, uint256 votesFor, uint256 votesAgainst, uint256 deadline, bool executed)",
             "function totalUsers() public view returns (uint256)",
-            "function proposalCount() public view returns (uint256)",
-            "function getAllUsers() public view returns (address[] memory)",
-            "event UserRegistered(address indexed user, string username)",
-            "event ProposalCreated(uint256 indexed proposalId, string title, address creator)",
-            "event Voted(uint256 indexed proposalId, address indexed voter, bool support)",
-            "event BadgeAwarded(address indexed user, string badge)",
-            "error AlreadyRegistered()",
-            "error UserNotActive()",
-            "error InvalidProposal()",
-            "error NotOwner()",
-            "error VotingEnded()",
-            "error AlreadyVoted()"
+            "event UserRegistered(address indexed user, string username)"
         ];
 
         // Network params
@@ -357,7 +204,6 @@
             "https://x.com/luckyfromnecef/status/1972371920290259437?s=46&t=l2lmnRZcmeoUCu9IdzeRpA",
             "https://github.com/tebberen"
         ];
-
         function loadLinksFromStorage() {
             const stored = localStorage.getItem('celoEngageHubLinks');
             if (stored) return JSON.parse(stored);
@@ -367,8 +213,6 @@
             localStorage.setItem('celoEngageHubLinks', JSON.stringify(links));
         }
         let allCommunityLinks = loadLinksFromStorage();
-
-        // Utilities
         function getPlatformName(url) {
             if (url.includes('x.com') || url.includes('twitter.com')) return '🐦 X';
             if (url.includes('farcaster.xyz') || url.includes('warpcast.com')) return '🔮 Farcaster';
@@ -377,8 +221,7 @@
             if (url.includes('discord.com')) return '💬 Discord';
             return '🌐 Website';
         }
-
-        // Display support links (NO "support this content" buttons anymore)
+        // Support links: no support button, just links
         function displaySupportLinks() {
             const container = document.getElementById('linksContainer');
             container.innerHTML = '';
@@ -392,12 +235,10 @@
                     </div>`;
                 return;
             }
-            activeLinks.sort((a,b) => a.clickCount - b.clickCount);
             activeLinks.forEach(linkData => {
                 const platform = getPlatformName(linkData.link);
                 const div = document.createElement('div');
                 div.className = 'link-card';
-                // anchor now simply opens new tab; onclick increments counter and handles "tebberen" special case
                 div.innerHTML = `
                     <div>
                         <div class="link-platform">${platform}</div>
@@ -415,25 +256,7 @@
                 container.appendChild(div);
             });
         }
-
-        // Platform stats loader (calls contract)
-        async function loadPlatformStats() {
-            if (!provider || !isConnected) return;
-            try {
-                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
-                const totalUsers = await contract.totalUsers();
-                const proposalCount = await contract.proposalCount();
-                document.getElementById('totalUsers').textContent = totalUsers.toString();
-                document.getElementById('totalProposals').textContent = proposalCount.toString();
-                document.getElementById('totalBadges').textContent = "0";
-                document.getElementById('totalSupports').textContent = "0";
-                document.getElementById('platformStats').classList.remove('hidden');
-            } catch (err) {
-                console.error("Error loading stats:", err);
-            }
-        }
-
-        // Load user profile (calls contract)
+        // User profile loader
         async function loadUserProfile() {
             if (!provider || !isConnected) return;
             try {
@@ -450,10 +273,6 @@
                 };
                 if (userProfile.isActive) {
                     document.getElementById('userProfileSection').classList.add('hidden');
-                    document.getElementById('governanceSection').classList.remove('hidden');
-                    document.getElementById('badgesSection').classList.remove('hidden');
-                    loadUserBadges();
-                    loadProposals();
                 } else {
                     document.getElementById('userProfileSection').classList.remove('hidden');
                 }
@@ -462,8 +281,7 @@
                 document.getElementById('userProfileSection').classList.remove('hidden');
             }
         }
-
-        // Setup user profile - link optional now
+        // Setup profile: link optional
         async function setupUserProfile() {
             if (!isConnected) {
                 const ok = await showConnectModalAndWait();
@@ -478,19 +296,15 @@
             try {
                 document.getElementById("setupProfileBtn").disabled = true;
                 document.getElementById("setupProfileBtn").textContent = "⏳ Processing...";
-
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
                 // check current on-chain profile
                 const existing = await contract.getUserProfile(userAddress);
-
                 let tx;
                 if (existing.isActive) {
-                    // update
                     tx = await contract.connect(signer).updateProfile(username, link, { gasLimit: 300000 });
                 } else {
                     tx = await contract.connect(signer).registerUser(username, link, { gasLimit: 500000 });
                 }
-
                 alert(`⏳ Transaction submitted\nTX: ${tx.hash}`);
                 await tx.wait();
                 alert("✅ Profile setup success!");
@@ -507,114 +321,7 @@
                 document.getElementById("setupProfileBtn").textContent = "🚀 Setup Profile";
             }
         }
-
-        // Proposals / voting / badges - unchanged (kept for completeness)
-        async function loadProposals() {
-            try {
-                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
-                const activeProposals = await contract.getActiveProposals();
-                const container = document.getElementById('proposalsContainer');
-                container.innerHTML = '';
-                if (!activeProposals || activeProposals.length === 0) {
-                    container.innerHTML = '<p>No active proposals yet.</p>';
-                    return;
-                }
-                for (let i = 0; i < activeProposals.length; i++) {
-                    const proposalId = activeProposals[i];
-                    const details = await contract.getProposalDetails(proposalId);
-                    const proposalCard = document.createElement('div');
-                    proposalCard.className = 'proposal-card';
-                    proposalCard.innerHTML = `
-                        <h4>${details.title}</h4>
-                        <p>${details.description}</p>
-                        <div class="link-stats">
-                            <div class="stat-item">
-                                <div>👍 For</div>
-                                <div class="stat-value">${details.votesFor.toString()}</div>
-                            </div>
-                            <div class="stat-item">
-                                <div>👎 Against</div>
-                                <div class="stat-value">${details.votesAgainst.toString()}</div>
-                            </div>
-                        </div>
-                        <button onclick="voteProposal(${proposalId}, true)">👍 Support</button>
-                        <button onclick="voteProposal(${proposalId}, false)">👎 Oppose</button>
-                    `;
-                    container.appendChild(proposalCard);
-                }
-            } catch (err) {
-                console.error("Error loading proposals:", err);
-            }
-        }
-
-        async function createProposal() {
-            const title = document.getElementById("proposalTitle").value.trim();
-            const description = document.getElementById("proposalDescription").value.trim();
-            if (!title || !description) {
-                alert("❌ Please enter both title and description");
-                return;
-            }
-            try {
-                document.getElementById("createProposalBtn").disabled = true;
-                document.getElementById("createProposalBtn").textContent = "⏳ Creating...";
-                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-                const duration = 3 * 24 * 60 * 60;
-                const tx = await contract.createProposal(title, description, duration, { gasLimit: 600000 });
-                alert(`⏳ Proposal submitted\nTX: ${tx.hash}`);
-                await tx.wait();
-                alert("✅ Proposal created");
-                document.getElementById("proposalTitle").value = "";
-                document.getElementById("proposalDescription").value = "";
-                loadProposals();
-            } catch (err) {
-                console.error("Proposal creation error:", err);
-                if (err.code === 4001) alert("❌ Transaction rejected");
-                else alert("❌ Error: " + (err.message || err));
-            } finally {
-                document.getElementById("createProposalBtn").disabled = false;
-                document.getElementById("createProposalBtn").textContent = "📝 Create Proposal";
-            }
-        }
-
-        async function voteProposal(proposalId, support) {
-            try {
-                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-                const tx = await contract.voteProposal(proposalId, support, { gasLimit: 400000 });
-                alert(`⏳ Vote submitted\nTX: ${tx.hash}`);
-                await tx.wait();
-                alert("✅ Vote recorded");
-                loadProposals();
-            } catch (err) {
-                console.error("Vote error:", err);
-                if (err.code === 4001) alert("❌ Transaction rejected");
-                else alert("❌ Error: " + (err.message || err));
-            }
-        }
-
-        async function loadUserBadges() {
-            try {
-                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
-                const badges = await contract.getUserBadges(userAddress);
-                const container = document.getElementById('userBadgesContainer');
-                container.innerHTML = '';
-                if (!badges || badges.length === 0) {
-                    container.innerHTML = '<p>No badges yet. Be active in the community to earn badges!</p>';
-                    return;
-                }
-                badges.forEach(b => {
-                    const card = document.createElement('div');
-                    card.className = 'badge-card';
-                    card.innerHTML = `<strong>${b}</strong><p>Earned through community participation</p>`;
-                    container.appendChild(card);
-                });
-            } catch (err) {
-                console.error("Error loading badges:", err);
-            }
-        }
-
-        /***********************
-         * NETWORK & HELPERS
-         ***********************/
+        // Network helpers
         async function switchToCeloNetwork() {
             if (!rawProvider || !rawProvider.request) return false;
             try {
@@ -643,7 +350,6 @@
                 }
             }
         }
-
         async function checkCurrentNetwork() {
             if (!provider) return false;
             try {
@@ -667,12 +373,7 @@
                 return false;
             }
         }
-
-        /***********************
-         * LINK CLICK HANDLING
-         ***********************/
-        // When a community link is clicked: increment support count, open link.
-        // Special-case: if tebberen.github.io link clicked, also prefill submit form and show it.
+        // Link click handling
         function handleLinkClick(event, linkUrl) {
             try {
                 // increment support count
@@ -683,32 +384,23 @@
                     displaySupportLinks();
                     hasSupported = true;
                 }
-
                 // special behavior for teberen page
                 if (linkUrl.includes('tebberen.github.io/celo-engage-hub')) {
-                    // open the site in a new tab so the user can see it
                     window.open(linkUrl, '_blank');
-                    // pre-fill submit form in our DApp and show step 2
                     document.getElementById('userLinkInput').value = linkUrl;
                     document.getElementById('step1').classList.add('hidden');
                     document.getElementById('step2').classList.remove('hidden');
-                    // prevent default anchor navigation (we already opened window)
                     event.preventDefault();
                     return;
                 }
-                // otherwise, default anchor behavior will open new tab.
-                // no need to prevent default
+                // default anchor opens new tab.
             } catch (err) {
                 console.error("handleLinkClick error:", err);
             }
         }
-
-        /***********************
-         * DISCONNECT
-         ***********************/
+        // Disconnect
         async function disconnectWallet() {
             try {
-                // if walletconnect, try to disconnect session
                 if (rawProvider && rawProvider.disconnect && typeof rawProvider.disconnect === 'function') {
                     try { await rawProvider.disconnect(); } catch (e) { console.warn("Provider disconnect error:", e); }
                 }
@@ -722,80 +414,37 @@
                 userAddress = '';
                 document.getElementById('walletInfo').classList.add('hidden');
                 document.getElementById('connectWalletBtn').style.display = 'inline-block';
-                // clear UI that should not be visible
-                document.getElementById('governanceSection').classList.add('hidden');
-                document.getElementById('badgesSection').classList.add('hidden');
                 document.getElementById('userProfileSection').classList.add('hidden');
-                // show step1
                 document.getElementById('step1').classList.remove('hidden');
                 document.getElementById('step2').classList.add('hidden');
             }
         }
-
-        /***********************
-         * CONNECT MODAL & CORE CONNECT LOGIC
-         ***********************/
+        // Connect modal & logic
         const walletModalBackdrop = document.getElementById('walletModalBackdrop');
         const connectBtn = document.getElementById('connectWalletBtn');
         const modalClose = document.getElementById('modalClose');
         const disconnectBtn = document.getElementById('disconnectBtn');
-
-        connectBtn.addEventListener('click', () => {
-            openWalletModal();
-        });
+        connectBtn.addEventListener('click', () => { openWalletModal(); });
         modalClose.addEventListener('click', closeWalletModal);
         walletModalBackdrop.addEventListener('click', (e) => { if (e.target === walletModalBackdrop) closeWalletModal(); });
         disconnectBtn.addEventListener('click', () => { disconnectWallet(); });
-
-        function openWalletModal() {
-            // update installed status badges
-            const hasEthereum = !!window.ethereum;
-            const isMetaMask = hasEthereum && !!window.ethereum.isMetaMask;
-            const isCoinbaseInjected = hasEthereum && !!window.ethereum.isCoinbaseWallet;
-            const isRabby = !!window.rabby || (hasEthereum && !!window.ethereum.isRabby);
-
-            document.getElementById('metaMaskStatus').style.display = isMetaMask ? 'block' : 'none';
-            document.getElementById('metaMaskInstall').style.display = isMetaMask ? 'none' : 'block';
-            document.getElementById('coinbaseStatus').style.display = isCoinbaseInjected ? 'block' : 'none';
-            document.getElementById('rabbyStatus').style.display = isRabby ? 'block' : 'none';
-
-            walletModalBackdrop.style.display = 'flex';
-            walletModalBackdrop.setAttribute('aria-hidden', 'false');
-        }
-        function closeWalletModal() {
-            walletModalBackdrop.style.display = 'none';
-            walletModalBackdrop.setAttribute('aria-hidden', 'true');
-        }
-
-        // Helper to show modal and wait for user to pick a wallet (promise resolves after connection)
+        function openWalletModal() { walletModalBackdrop.style.display = 'flex'; walletModalBackdrop.setAttribute('aria-hidden', 'false'); }
+        function closeWalletModal() { walletModalBackdrop.style.display = 'none'; walletModalBackdrop.setAttribute('aria-hidden', 'true'); }
         function showConnectModalAndWait() {
             return new Promise((resolve) => {
                 openWalletModal();
-                // create a one-time listener: when connected, resolve true; if modal closed without connect, resolve false
-                const cleanup = () => {
-                    document.removeEventListener('walletConnectedTemp', onConnected);
-                    // we don't remove other listeners, just the temp one
-                };
+                const cleanup = () => { document.removeEventListener('walletConnectedTemp', onConnected); };
                 function onConnected() { cleanup(); resolve(true); }
                 document.addEventListener('walletConnectedTemp', onConnected);
-
-                // If the modal closes without connecting, resolve false after a short delay
                 const observer = new MutationObserver(() => {
                     if (walletModalBackdrop.style.display === 'none') {
-                        setTimeout(() => {
-                            if (!isConnected) {
-                                cleanup();
-                                resolve(false);
-                            }
-                        }, 200);
+                        setTimeout(() => { if (!isConnected) { cleanup(); resolve(false); } }, 200);
                         observer.disconnect();
                     }
                 });
                 observer.observe(walletModalBackdrop, { attributes: true, attributeFilter: ['style'] });
             });
         }
-
-        // main connect function called by modal options
         async function connectWithWallet(method) {
             closeWalletModal();
             try {
@@ -810,13 +459,7 @@
                     await rawProvider.request({ method: 'eth_requestAccounts' });
                     signer = provider.getSigner();
                 } else if (method === 'walletconnect') {
-                    // use WalletConnect provider (many mobile wallets will connect via this)
-                    if (!window.WalletConnectProvider && !window.WalletConnectProvider.default) {
-                        alert("WalletConnect provider not loaded. Please check your internet connection.");
-                        return;
-                    }
                     const WalletConnectProvider = window.WalletConnectProvider.default || window.WalletConnectProvider;
-                    // instantiate WC provider with Celo RPCs
                     const wcProvider = new WalletConnectProvider({
                         rpc: {
                             42220: 'https://forno.celo.org',
@@ -828,77 +471,25 @@
                     rawProvider = wcProvider;
                     provider = new ethers.providers.Web3Provider(wcProvider);
                     signer = provider.getSigner();
-                    // handle wc disconnect
-                    wcProvider.on("disconnect", (code, reason) => {
-                        console.log("WC disconnected", code, reason);
-                        disconnectWallet();
-                    });
-                } else if (method === 'coinbase') {
-                    // attempt Coinbase Wallet SDK first (if CDN provided)
-                    try {
-                        const CoinbaseWalletSDK = window.CoinbaseWalletSDK || window.CoinbaseWalletSdk || window.CoinbaseWallet;
-                        if (CoinbaseWalletSDK) {
-                            const coinbase = new CoinbaseWalletSDK({
-                                appName: "Celo Engage Hub",
-                                appLogoUrl: "",
-                                darkMode: false
-                            });
-                            const cbProvider = coinbase.makeWeb3Provider("https://forno.celo.org", 42220);
-                            // request accounts
-                            await cbProvider.request({ method: 'eth_requestAccounts' });
-                            rawProvider = cbProvider;
-                            provider = new ethers.providers.Web3Provider(cbProvider);
-                            signer = provider.getSigner();
-                        } else {
-                            // fallback to WalletConnect (Coinbase Wallet mobile supports WC)
-                            await connectWithWallet('walletconnect');
-                            return;
-                        }
-                    } catch (err) {
-                        console.warn("Coinbase SDK failed, fallback to WalletConnect", err);
-                        await connectWithWallet('walletconnect');
-                        return;
-                    }
-                } else if (method === 'rabby') {
-                    // Rabby is an injected wallet (if present)
-                    if ((window.rabby) || (window.ethereum && window.ethereum.isRabby)) {
-                        rawProvider = window.ethereum;
-                        provider = new ethers.providers.Web3Provider(rawProvider);
-                        await rawProvider.request({ method: 'eth_requestAccounts' });
-                        signer = provider.getSigner();
-                    } else {
-                        if (confirm("Rabby not detected. Open Rabby site?")) window.open('https://rabby.io/', '_blank');
-                        return;
-                    }
+                    wcProvider.on("disconnect", (code, reason) => { disconnectWallet(); });
                 } else {
-                    // fallback to walletconnect for any other
                     await connectWithWallet('walletconnect');
                     return;
                 }
-
-                // set user address and UI
                 userAddress = await signer.getAddress();
                 isConnected = true;
                 document.getElementById('walletAddress').textContent = `${userAddress.substring(0,6)}...${userAddress.substring(userAddress.length - 4)}`;
                 document.getElementById('walletInfo').classList.remove('hidden');
                 document.getElementById('connectWalletBtn').style.display = 'none';
-
-                // network check & load data
                 await checkCurrentNetwork();
-                loadPlatformStats();
                 loadUserProfile();
-
-                // fire a temporary global event used by showConnectModalAndWait
                 document.dispatchEvent(new Event('walletConnectedTemp'));
-
             } catch (err) {
                 console.error("connectWithWallet error:", err);
                 if (err && err.code === 4001) alert("❌ Connection request rejected");
                 else alert("❌ Connection failed: " + (err.message || err));
             }
         }
-
-        // Submit link (unchanged flow but checks hasSupported & network)
         async function submitLink() {
             if (!isConnected) {
                 const connected = await showConnectModalAndWait();
@@ -922,11 +513,9 @@
                 alert("❌ Please enter a valid URL (http:// or https://)");
                 return;
             }
-
             try {
                 document.getElementById("submitLinkBtn").disabled = true;
                 document.getElementById("submitLinkBtn").textContent = "⏳ Processing...";
-
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
                 const existing = await contract.getUserProfile(userAddress);
                 let tx;
@@ -938,8 +527,6 @@
                 alert(`⏳ TX submitted: ${tx.hash}`);
                 await tx.wait();
                 alert("✅ Submitted successfully");
-
-                // update UI + local storage
                 const newLinkData = { link: userLinkVal, clickCount: 0, timestamp: Date.now(), submitter: userAddress };
                 allCommunityLinks.unshift(newLinkData);
                 saveLinksToStorage(allCommunityLinks);
@@ -948,7 +535,6 @@
                 hasSupported = false;
                 document.getElementById('step2').classList.add('hidden');
                 document.getElementById('step1').classList.remove('hidden');
-
             } catch (err) {
                 console.error("submitLink error:", err);
                 if (err.code === 4001) alert("❌ Transaction rejected");
@@ -959,26 +545,15 @@
                 document.getElementById("submitLinkBtn").textContent = "✍️ Submit Link";
             }
         }
-
-        // init on page load: do not auto-connect. Show available links, prepare UI.
-        window.addEventListener('load', () => {
-            displaySupportLinks();
-            // Do not auto connect or read accounts. Only show connect button.
-        });
-
-        // listen to chain change for injected providers
+        window.addEventListener('load', () => { displaySupportLinks(); });
         if (window.ethereum) {
             window.ethereum.on('chainChanged', (chainIdHex) => {
                 try {
                     currentChainId = parseInt(chainIdHex, 16).toString();
                     checkCurrentNetwork();
-                    if (isConnected) {
-                        loadPlatformStats();
-                        loadUserProfile();
-                    }
-                } catch (err) { console.log('chainChanged handler error', err); }
+                    if (isConnected) loadUserProfile();
+                } catch (err) { }
             });
-            // account change: clear state if no accounts
             window.ethereum.on('accountsChanged', (accounts) => {
                 if (!accounts || accounts.length === 0) {
                     disconnectWallet();
@@ -989,18 +564,13 @@
                 }
             });
         }
-
-        // Expose some functions globally (used by inline handlers)
         window.handleLinkClick = handleLinkClick;
         window.connectWithWallet = connectWithWallet;
-        window.voteProposal = voteProposal;
         window.connectWallet = () => openWalletModal();
         window.submitLink = submitLink;
         window.setupUserProfile = setupUserProfile;
-        // Hook up buttons
         document.getElementById('submitLinkBtn').addEventListener('click', submitLink);
         document.getElementById('setupProfileBtn').addEventListener('click', setupUserProfile);
-        document.getElementById('createProposalBtn').addEventListener('click', createProposal);
     </script>
 </body>
 </html>
