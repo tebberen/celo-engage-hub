@@ -36,7 +36,6 @@
         .submit-form { background: #FFFDF6; border: 2px solid #FBCC5C; padding: 30px; margin: 20px auto; border-radius: 12px; max-width: 600px; text-align: center; width: 100%; }
         .gas-info { background: #FFF0C2; padding: 10px; border-radius: 8px; margin: 10px 0; font-size: 14px; color: #000000; text-align: center; }
         .celo-ecosystem { background: linear-gradient(135deg, #FBCC5C 0%, #000000 100%); color: white; padding: 20px; border-radius: 12px; height: fit-content; }
-        .celo-ecosystem h3 { margin: 0 0 15px 0; font-size: 20px; text-align: center; }
         .celo-link { display: flex; align-items: center; padding: 10px; margin: 8px 0; background: rgba(255,255,255,0.1); border-radius: 8px; text-decoration: none; color: white; transition: all 0.3s ease; }
         .celo-link:hover { background: rgba(255,255,255,0.2); transform: translateX(5px); }
         .celo-link-icon { margin-right: 10px; font-size: 18px; }
@@ -45,7 +44,7 @@
         .centered-content { display: flex; flex-direction: column; align-items: center; width: 100%; }
         .section-title { font-size: 24px; font-weight: bold; color: #000000; margin: 30px 0 20px 0; text-align: center; width: 100%; }
         .network-warning { background: #FEF3CD; border: 2px solid #F59E0B; padding: 15px; margin: 15px auto; border-radius: 8px; color: #92400E; font-weight: bold; max-width: 600px; text-align: center; width: 100%; }
-        .content-layout { display: flex; flex-direction: column; gap: 30px; width: 100%; }
+        .content-layout { display: flex; flex-direction: column; gap: 30px; width: 100%; align-items: center; }
         .submit-section { order: 1; }
         .support-section { order: 2; }
         .governance-section { order: 3; }
@@ -186,7 +185,6 @@
         let signer = null;
         let isConnected = false;
         let userAddress = '';
-        let hasSupported = false;
         let currentChainId = null;
         let userProfile = null;
         let walletConnectProvider = null;
@@ -356,7 +354,7 @@
 
         async function setupUserProfile() {
             if (!isConnected) {
-                const connected = await connectWallet();
+                const connected = await connectWalletMetaMask();
                 if (!connected) return;
             }
             const username = document.getElementById("userUsername").value.trim();
@@ -623,6 +621,8 @@
                 walletConnectProvider.on("accountsChanged", (accounts) => {
                     if (accounts.length === 0) {
                         disconnectWallet();
+                    } else {
+                        location.reload();
                     }
                 });
                 
@@ -640,10 +640,6 @@
                 closeWalletModal();
                 return false;
             }
-        }
-
-        function connectWallet() {
-            openWalletModal();
         }
 
         function disconnectWallet() {
@@ -734,7 +730,7 @@
             }
         }
 
-        document.getElementById("connectWalletBtn").addEventListener("click", connectWallet);
+        document.getElementById("connectWalletBtn").addEventListener("click", openWalletModal);
         document.getElementById("modalMetaMaskBtn").addEventListener("click", connectWalletMetaMask);
         document.getElementById("modalWalletConnectBtn").addEventListener("click", connectWalletWalletConnect);
         document.getElementById("closeWalletModalBtn").addEventListener("click", closeWalletModal);
