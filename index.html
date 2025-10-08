@@ -59,11 +59,6 @@
         .wallet-option { background: #35D07F; color: black; border: none; padding: 15px 30px; border-radius: 10px; cursor: pointer; font-size: 17px; font-weight: bold; margin: 10px 0; display: block; width: 100%; transition: all 0.3s ease; }
         .wallet-option:hover { background: #FBCC5C; color: #000; }
         .close-modal { background: #EF4444; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 15px; }
-        .status-toast { position: fixed; top: 20px; right: 20px; padding: 15px 20px; border-radius: 8px; font-weight: bold; z-index: 10000; animation: slideIn 0.3s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .status-toast.success { background: #E8FBF1; border: 2px solid #35D07F; color: #065f46; }
-        .status-toast.error { background: #FEE2E2; border: 2px solid #EF4444; color: #991B1B; }
-        .status-toast.info { background: #DBEAFE; border: 2px solid #3B82F6; color: #1E40AF; }
-        @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     </style>
 </head>
 <body>
@@ -197,6 +192,7 @@
         let walletConnectProvider = null;
 
         const CONTRACT_ADDRESS = "0x22eA49c074098931a478F381f971C77486d185b2";
+        
         const CONTRACT_ABI = [
             "function registerUser(string memory _username) public",
             "function updateProfile(string memory _username) public",
@@ -213,7 +209,13 @@
             "event UserRegistered(address indexed user, string username)",
             "event ProposalCreated(uint256 indexed proposalId, string title, address creator)",
             "event Voted(uint256 indexed proposalId, address indexed voter, bool support)",
-            "event BadgeAwarded(address indexed user, string badge)"
+            "event BadgeAwarded(address indexed user, string badge)",
+            "error AlreadyRegistered()",
+            "error UserNotActive()",
+            "error InvalidProposal()",
+            "error NotOwner()",
+            "error VotingEnded()",
+            "error AlreadyVoted()"
         ];
 
         const CELO_MAINNET_PARAMS = {
@@ -243,14 +245,6 @@
             "https://x.com/luckyfromnecef/status/1972371920290259437?s=46&t=l2lmnRZcmeoUCu9IdzeRpA",
             "https://github.com/tebberen"
         ];
-
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = `status-toast ${type}`;
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 4000);
-        }
 
         function loadLinksFromStorage() {
             const storedLinks = localStorage.getItem('celoEngageHubLinks');
@@ -362,37 +356,34 @@
 
         async function setupUserProfile() {
             if (!isConnected) {
-                showToast("❌ Please connect your wallet first", "error");
-                return;
+                const connected = await connectWallet();
+                if (!connected) return;
             }
             const username = document.getElementById("userUsername").value.trim();
             if (!username) {
-                showToast("❌ Please enter your username", "error");
+                console.log("Please enter your username");
                 return;
             }
             try {
                 document.getElementById("setupProfileBtn").disabled = true;
-                document.getElementById("setupProfileBtn").textContent = "⏳ Processing...";
+                document.getElementById("setupProfileBtn").textContent = "⏳ Checking...";
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
                 const userProfileData = await contract.getUserProfile(userAddress);
                 let tx;
                 if (userProfileData.isActive) {
+                    document.getElementById("setupProfileBtn").textContent = "⏳ Updating...";
                     tx = await contract.connect(signer).updateProfile(username, { gasLimit: 300000 });
                     console.log("🔄 Update profile TX:", tx.hash);
                 } else {
+                    document.getElementById("setupProfileBtn").textContent = "⏳ Registering...";
                     tx = await contract.connect(signer).registerUser(username, { gasLimit: 500000 });
                     console.log("🔄 Register TX:", tx.hash);
                 }
-                await tx.wait();
-                showToast("✅ Profile updated successfully!", "success");
+                const receipt = await tx.wait();
+                console.log("✅ Transaction confirmed:", receipt);
                 loadUserProfile();
             } catch (error) {
                 console.error("❌ Profile setup error:", error);
-                if (error.code === 4001) {
-                    showToast("❌ Transaction rejected", "error");
-                } else {
-                    showToast("❌ Setup failed", "error");
-                }
             } finally {
                 document.getElementById("setupProfileBtn").disabled = false;
                 document.getElementById("setupProfileBtn").textContent = "🚀 Setup Profile";
@@ -420,6 +411,10 @@
                         <div class="link-stats">
                             <div class="stat-item">
                                 <div>👍 For</div>
+                                <div class="stat-value">${details.votesFor.toString()}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div>👎 Against</div>
                                 <div class="stat-value">${details.votesAgainst.toString()}</div>
                             </div>
                         </div>
@@ -437,7 +432,7 @@
             const title = document.getElementById("proposalTitle").value.trim();
             const description = document.getElementById("proposalDescription").value.trim();
             if (!title || !description) {
-                showToast("❌ Please enter both title and description", "error");
+                console.log("Please enter both title and description");
                 return;
             }
             try {
@@ -448,17 +443,12 @@
                 const tx = await contract.createProposal(title, description, duration, { gasLimit: 600000 });
                 console.log("🔄 Proposal TX sent:", tx.hash);
                 await tx.wait();
-                showToast("✅ Proposal created successfully!", "success");
+                console.log("✅ Proposal created successfully!");
                 document.getElementById("proposalTitle").value = "";
                 document.getElementById("proposalDescription").value = "";
                 loadProposals();
             } catch (error) {
                 console.error("❌ Proposal creation error:", error);
-                if (error.code === 4001) {
-                    showToast("❌ Transaction rejected", "error");
-                } else {
-                    showToast("❌ Proposal creation failed", "error");
-                }
             } finally {
                 document.getElementById("createProposalBtn").disabled = false;
                 document.getElementById("createProposalBtn").textContent = "📝 Create Proposal";
@@ -471,15 +461,10 @@
                 const tx = await contract.voteProposal(proposalId, support, { gasLimit: 400000 });
                 console.log("🔄 Vote TX sent:", tx.hash);
                 await tx.wait();
-                showToast("✅ Vote submitted successfully!", "success");
+                console.log("✅ Vote submitted successfully!");
                 loadProposals();
             } catch (error) {
                 console.error("❌ Voting error:", error);
-                if (error.code === 4001) {
-                    showToast("❌ Transaction rejected", "error");
-                } else {
-                    showToast("❌ Voting failed", "error");
-                }
             }
         }
 
@@ -580,7 +565,7 @@
 
         function checkMetaMask() {
             if (typeof window.ethereum === 'undefined') {
-                showToast("❌ MetaMask not detected. Please install MetaMask first.", "error");
+                console.log("MetaMask not detected. Please install MetaMask first.");
                 return false;
             }
             return true;
@@ -602,15 +587,9 @@
                 loadPlatformStats();
                 loadUserProfile();
                 closeWalletModal();
-                showToast("✅ Wallet connected successfully!", "success");
                 return true;
             } catch (error) {
                 console.error("Connection error:", error);
-                if (error.code === 4001) {
-                    showToast("❌ Connection rejected", "error");
-                } else {
-                    showToast("❌ Connection failed", "error");
-                }
                 return false;
             }
         }
@@ -640,7 +619,6 @@
                 loadPlatformStats();
                 loadUserProfile();
                 closeWalletModal();
-                showToast("✅ WalletConnect connected successfully!", "success");
                 
                 walletConnectProvider.on("accountsChanged", (accounts) => {
                     if (accounts.length === 0) {
@@ -659,11 +637,6 @@
                 return true;
             } catch (error) {
                 console.error("WalletConnect error:", error);
-                if (error.message && error.message.includes("User closed modal")) {
-                    showToast("❌ Connection cancelled", "error");
-                } else {
-                    showToast("❌ WalletConnect connection failed", "error");
-                }
                 closeWalletModal();
                 return false;
             }
@@ -673,9 +646,9 @@
             openWalletModal();
         }
 
-        async function disconnectWallet() {
+        function disconnectWallet() {
             if (walletConnectProvider) {
-                await walletConnectProvider.disconnect();
+                walletConnectProvider.disconnect();
                 walletConnectProvider = null;
             }
             isConnected = false;
@@ -690,7 +663,6 @@
             displaySupportLinks();
             document.getElementById('step2').classList.add('hidden');
             document.getElementById('step1').classList.remove('hidden');
-            showToast("👋 Wallet disconnected", "info");
         }
 
         function openWalletModal() {
@@ -703,43 +675,44 @@
 
         async function submitLink() {
             if (!isConnected) {
-                showToast("❌ Please connect your wallet first", "error");
-                openWalletModal();
-                return;
+                const connected = await connectWalletMetaMask();
+                if (!connected) return;
             }
             if (!hasSupported) {
-                showToast("❌ Please support at least one community member first!", "error");
+                console.log("Please support at least one community member first!");
                 return;
             }
             const isCorrectNetwork = await checkCurrentNetwork();
             if (!isCorrectNetwork) {
-                showToast("❌ Please switch to Celo network", "error");
+                console.log("Please switch to Celo network to submit your link");
                 return;
             }
             const userLink = document.getElementById("userLinkInput").value.trim();
             if (!userLink) {
-                showToast("❌ Please enter your link first", "error");
+                console.log("Please enter your link first.");
                 return;
             }
             if (!userLink.startsWith('http://') && !userLink.startsWith('https://')) {
-                showToast("❌ Please enter a valid URL", "error");
+                console.log("Please enter a valid URL starting with http:// or https://");
                 return;
             }
             try {
                 document.getElementById("submitLinkBtn").disabled = true;
-                document.getElementById("submitLinkBtn").textContent = "⏳ Processing...";
+                document.getElementById("submitLinkBtn").textContent = "⏳ Checking...";
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
                 const userProfileData = await contract.getUserProfile(userAddress);
                 let tx;
                 if (userProfileData.isActive) {
+                    document.getElementById("submitLinkBtn").textContent = "⏳ Updating...";
                     tx = await contract.connect(signer).updateProfile("User", { gasLimit: 300000 });
                     console.log("🔄 Update transaction sent:", tx.hash);
                 } else {
+                    document.getElementById("submitLinkBtn").textContent = "⏳ Registering...";
                     tx = await contract.connect(signer).registerUser("User", { gasLimit: 500000 });
                     console.log("🔄 Register transaction sent:", tx.hash);
                 }
-                await tx.wait();
-                showToast("✅ Link submitted successfully!", "success");
+                const receipt = await tx.wait();
+                console.log("✅ Transaction confirmed:", receipt);
                 const newLinkData = {
                     link: userLink,
                     clickCount: 0,
@@ -755,13 +728,6 @@
                 document.getElementById('step1').classList.remove('hidden');
             } catch (error) {
                 console.error("❌ Submit error:", error);
-                if (error.code === 4001) {
-                    showToast("❌ Transaction rejected", "error");
-                } else if (error.code === 'INSUFFICIENT_FUNDS') {
-                    showToast("❌ Insufficient funds for gas fee", "error");
-                } else {
-                    showToast("❌ Submission failed", "error");
-                }
             } finally {
                 document.getElementById("submitLinkBtn").disabled = false;
                 document.getElementById("submitLinkBtn").textContent = "✍️ Submit Link";
@@ -805,8 +771,4 @@
         window.voteProposal = voteProposal;
     </script>
 </body>
-</html>votesFor.toString()}</div>
-                            </div>
-                            <div class="stat-item">
-                                <div>👎 Against</div>
-                                <div class="stat-value">${details.
+</html>
