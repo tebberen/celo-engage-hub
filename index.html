@@ -70,6 +70,7 @@
         <div class="subheader">If you want support, support first</div>
         <button id="connectWalletBtn" class="connect-btn">🔗 Connect Wallet</button>
     </div>
+
     <div id="walletModal" class="wallet-modal hidden">
         <div class="wallet-modal-content">
             <h3 style="margin-bottom: 25px;">Choose Wallet</h3>
@@ -78,6 +79,7 @@
             <button class="close-modal" id="closeWalletModalBtn">Cancel</button>
         </div>
     </div>
+
     <div class="container">
         <div class="sidebar">
             <div id="walletInfo" class="wallet-address hidden">
@@ -116,6 +118,7 @@
                 </div>
             </div>
         </div>
+
         <div class="main-content">
             <div class="content-layout">
                 <div id="userProfileSection" class="hidden">
@@ -129,6 +132,7 @@
                         <button id="setupProfileBtn">🚀 Setup Profile</button>
                     </div>
                 </div>
+
                 <div id="step2" class="submit-section hidden">
                     <div class="step-indicator">
                         <span class="step-number">2</span> Submit Your Link
@@ -144,6 +148,7 @@
                         <p><small>🔒 Secure transaction on Celo network</small></p>
                     </div>
                 </div>
+
                 <div id="step1" class="support-section">
                     <div class="step-indicator">
                         <span class="step-number">1</span> Support Community Members
@@ -154,6 +159,7 @@
                         <div class="links-grid" id="linksContainer"> </div>
                     </div>
                 </div>
+
                 <div id="governanceSection" class="governance-section hidden">
                     <div class="step-indicator">
                         <span class="step-number">🏛️</span> Community Governance
@@ -167,6 +173,7 @@
                         <div id="proposalsContainer"></div>
                     </div>
                 </div>
+
                 <div id="badgesSection" class="badge-section hidden">
                     <div class="step-indicator">
                         <span class="step-number">🎖️</span> Your Badges
@@ -176,18 +183,15 @@
                         <div id="userBadgesContainer"></div>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
 
     <!-- Ethers v5 -->
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-    <!-- WalletConnect v1 (KALDIRILDI) -->
-    <!-- <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script> -->
-
-    <!-- WalletConnect v2 UMD (EKLENDİ) -->
-    <script src="https://unpkg.com/@walletconnect/modal@2.6.2/dist/index.umd.js"></script>
-    <script src="https://unpkg.com/@walletconnect/ethereum-provider@2.11.2/dist/umd/index.min.js"></script>
+    <!-- WalletConnect v2 Ethereum Provider (UMD) -->
+    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.11.0/dist/index.umd.min.js"></script>
 
     <script>
         let provider = null;
@@ -602,88 +606,97 @@
             }
         }
 
-        // **** WALLETCONNECT V2: SADECE BU KISIM GÜNCELLENDİ ****
+        // ---- WalletConnect v2 entegrasyonu (QR ile bağlanır) ----
         async function connectWalletWalletConnect() {
             try {
-                const WCProviderCtor = window.WalletConnectEthereumProvider || window.EthereumProvider; // why: UMD adı değişebiliyor
-                if (!WCProviderCtor) {
-                    console.error("WalletConnect v2 UMD not found");
-                    alert("WalletConnect kütüphanesi yüklenemedi. Sayfayı yenileyin.");
+                // UMD: window.WalletConnectEthereumProvider
+                const EthereumProviderWC = window.WalletConnectEthereumProvider;
+                if (!EthereumProviderWC || !EthereumProviderWC.init) {
+                    console.error("WalletConnect v2 script not loaded");
                     return false;
                 }
 
-                walletConnectProvider = await WCProviderCtor.init({
+                walletConnectProvider = await EthereumProviderWC.init({
                     projectId: "8b020ffbb31e5aba14160c27ca26540b",
                     showQrModal: true,
-                    chains: [42220],              // CELO Mainnet
-                    optionalChains: [44787],      // Alfajores
+                    chains: [42220],                 // Celo Mainnet
+                    optionalChains: [44787],         // Alfajores
                     rpcMap: {
                         42220: "https://forno.celo.org",
                         44787: "https://alfajores-forno.celo-testnet.org"
                     },
                     methods: [
-                        "eth_sendTransaction","personal_sign","eth_sign","eth_signTypedData","eth_signTypedData_v4",
-                        "wallet_switchEthereumChain","wallet_addEthereumChain"
+                        "eth_sendTransaction",
+                        "eth_signTransaction",
+                        "eth_sign",
+                        "personal_sign",
+                        "eth_signTypedData",
+                        "eth_signTypedData_v4",
+                        "eth_requestAccounts"
                     ],
-                    events: ["connect","disconnect","accountsChanged","chainChanged"],
+                    events: ["chainChanged", "accountsChanged", "disconnect"],
                     metadata: {
                         name: "Celo Engage Hub",
-                        description: "Community engagement on Celo",
-                        url: window.location.origin,
-                        icons: ["https://celo.org/static/brand/celo-logo.png"]
-                    }
+                        description: "Community engagement dApp on Celo",
+                        url: "https://tebberen.github.io/celo-engage-hub/",
+                        icons: ["https://raw.githubusercontent.com/celo-org/celo-brand/master/icon/128x128.png"]
+                    },
+                    themeMode: "light"
                 });
 
-                await walletConnectProvider.connect();   // QR v2 modal açılır
+                await walletConnectProvider.connect(); // QR modal açılır
 
                 provider = new ethers.providers.Web3Provider(walletConnectProvider);
                 signer = provider.getSigner();
                 userAddress = await signer.getAddress();
-                
-                document.getElementById('walletAddress').textContent = `${userAddress.substring(0, 6)}...${userAddress.substring(userAddress.length - 4)}`;
+
+                document.getElementById('walletAddress').textContent =
+                    `${userAddress.substring(0, 6)}...${userAddress.substring(userAddress.length - 4)}`;
                 document.getElementById('walletInfo').classList.remove('hidden');
                 document.getElementById('connectWalletBtn').style.display = 'none';
                 isConnected = true;
-                
+
                 await checkCurrentNetwork();
                 loadPlatformStats();
                 loadUserProfile();
                 closeWalletModal();
-                
+
+                // Dinleyiciler
                 walletConnectProvider.on("accountsChanged", (accounts) => {
-                    if (accounts.length === 0) {
+                    if (!accounts || accounts.length === 0) {
                         disconnectWallet();
                     }
                 });
-                
-                walletConnectProvider.on("chainChanged", (_chainId) => {
+
+                walletConnectProvider.on("chainChanged", (chainId) => {
                     checkCurrentNetwork();
                 });
-                
+
                 walletConnectProvider.on("disconnect", () => {
                     disconnectWallet();
                 });
-                
+
                 return true;
             } catch (error) {
                 console.error("WalletConnect v2 error:", error);
-                alert("WalletConnect bağlantısı kurulamadı. Konsolu kontrol edin.");
                 closeWalletModal();
                 return false;
             }
         }
-        // **** WALLETCONNECT V2 GÜNCELLEMESİ BİTTİ ****
 
         function connectWallet() {
             openWalletModal();
-            return true;
         }
 
         function disconnectWallet() {
-            if (walletConnectProvider) {
-                try { walletConnectProvider.disconnect(); } catch (_) {}
-                walletConnectProvider = null;
+            try {
+                if (walletConnectProvider && walletConnectProvider.disconnect) {
+                    walletConnectProvider.disconnect();
+                }
+            } catch (e) {
+                // ignore
             }
+            walletConnectProvider = null;
             isConnected = false;
             provider = null;
             signer = null;
@@ -767,6 +780,7 @@
             }
         }
 
+        // UI bindings
         document.getElementById("connectWalletBtn").addEventListener("click", connectWallet);
         document.getElementById("modalMetaMaskBtn").addEventListener("click", connectWalletMetaMask);
         document.getElementById("modalWalletConnectBtn").addEventListener("click", connectWalletWalletConnect);
