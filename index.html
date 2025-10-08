@@ -70,7 +70,6 @@
         <div class="subheader">If you want support, support first</div>
         <button id="connectWalletBtn" class="connect-btn">🔗 Connect Wallet</button>
     </div>
-
     <div id="walletModal" class="wallet-modal hidden">
         <div class="wallet-modal-content">
             <h3 style="margin-bottom: 25px;">Choose Wallet</h3>
@@ -79,7 +78,6 @@
             <button class="close-modal" id="closeWalletModalBtn">Cancel</button>
         </div>
     </div>
-
     <div class="container">
         <div class="sidebar">
             <div id="walletInfo" class="wallet-address hidden">
@@ -118,7 +116,6 @@
                 </div>
             </div>
         </div>
-
         <div class="main-content">
             <div class="content-layout">
                 <div id="userProfileSection" class="hidden">
@@ -132,7 +129,6 @@
                         <button id="setupProfileBtn">🚀 Setup Profile</button>
                     </div>
                 </div>
-
                 <div id="step2" class="submit-section hidden">
                     <div class="step-indicator">
                         <span class="step-number">2</span> Submit Your Link
@@ -148,7 +144,6 @@
                         <p><small>🔒 Secure transaction on Celo network</small></p>
                     </div>
                 </div>
-
                 <div id="step1" class="support-section">
                     <div class="step-indicator">
                         <span class="step-number">1</span> Support Community Members
@@ -159,7 +154,6 @@
                         <div class="links-grid" id="linksContainer"> </div>
                     </div>
                 </div>
-
                 <div id="governanceSection" class="governance-section hidden">
                     <div class="step-indicator">
                         <span class="step-number">🏛️</span> Community Governance
@@ -173,7 +167,6 @@
                         <div id="proposalsContainer"></div>
                     </div>
                 </div>
-
                 <div id="badgesSection" class="badge-section hidden">
                     <div class="step-indicator">
                         <span class="step-number">🎖️</span> Your Badges
@@ -183,15 +176,14 @@
                         <div id="userBadgesContainer"></div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
 
     <!-- Ethers v5 -->
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-    <!-- WalletConnect v2 Ethereum Provider (UMD) -->
-    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.11.0/dist/index.umd.min.js"></script>
+    <!-- WalletConnect v2 Ethereum Provider (UMD) – v1 kaldırıldı -->
+    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider/dist/index.umd.min.js"></script>
 
     <script>
         let provider = null;
@@ -385,14 +377,11 @@
                 if (userProfileData.isActive) {
                     document.getElementById("setupProfileBtn").textContent = "⏳ Updating...";
                     tx = await contract.connect(signer).updateProfile(username, { gasLimit: 300000 });
-                    console.log("🔄 Update profile TX:", tx.hash);
                 } else {
                     document.getElementById("setupProfileBtn").textContent = "⏳ Registering...";
                     tx = await contract.connect(signer).registerUser(username, { gasLimit: 500000 });
-                    console.log("🔄 Register TX:", tx.hash);
                 }
-                const receipt = await tx.wait();
-                console.log("✅ Transaction confirmed:", receipt);
+                await tx.wait();
                 loadUserProfile();
             } catch (error) {
                 console.error("❌ Profile setup error:", error);
@@ -453,9 +442,7 @@
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
                 const duration = 3 * 24 * 60 * 60;
                 const tx = await contract.createProposal(title, description, duration, { gasLimit: 600000 });
-                console.log("🔄 Proposal TX sent:", tx.hash);
                 await tx.wait();
-                console.log("✅ Proposal created successfully!");
                 document.getElementById("proposalTitle").value = "";
                 document.getElementById("proposalDescription").value = "";
                 loadProposals();
@@ -471,9 +458,7 @@
             try {
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
                 const tx = await contract.voteProposal(proposalId, support, { gasLimit: 400000 });
-                console.log("🔄 Vote TX sent:", tx.hash);
                 await tx.wait();
-                console.log("✅ Vote submitted successfully!");
                 loadProposals();
             } catch (error) {
                 console.error("❌ Voting error:", error);
@@ -606,13 +591,12 @@
             }
         }
 
-        // ---- WalletConnect v2 entegrasyonu (QR ile bağlanır) ----
+        // ---------- WalletConnect v2 (QR) -----------
         async function connectWalletWalletConnect() {
             try {
-                // UMD: window.WalletConnectEthereumProvider
                 const EthereumProviderWC = window.WalletConnectEthereumProvider;
                 if (!EthereumProviderWC || !EthereumProviderWC.init) {
-                    console.error("WalletConnect v2 script not loaded");
+                    alert("⚠️ WalletConnect provider yüklenemedi. Sayfayı yenileyip tekrar deneyin.");
                     return false;
                 }
 
@@ -644,6 +628,7 @@
                     themeMode: "light"
                 });
 
+                console.log("✅ WalletConnect initialized, QR modal açılıyor...");
                 await walletConnectProvider.connect(); // QR modal açılır
 
                 provider = new ethers.providers.Web3Provider(walletConnectProvider);
@@ -661,17 +646,16 @@
                 loadUserProfile();
                 closeWalletModal();
 
-                // Dinleyiciler
                 walletConnectProvider.on("accountsChanged", (accounts) => {
                     if (!accounts || accounts.length === 0) {
                         disconnectWallet();
                     }
                 });
-
-                walletConnectProvider.on("chainChanged", (chainId) => {
+                
+                walletConnectProvider.on("chainChanged", () => {
                     checkCurrentNetwork();
                 });
-
+                
                 walletConnectProvider.on("disconnect", () => {
                     disconnectWallet();
                 });
@@ -679,12 +663,14 @@
                 return true;
             } catch (error) {
                 console.error("WalletConnect v2 error:", error);
+                alert("Bağlantı başarısız. Lütfen QR kodu tekrar deneyin.");
                 closeWalletModal();
                 return false;
             }
         }
 
         function connectWallet() {
+            // Eski davranış korunuyor: modal aç
             openWalletModal();
         }
 
@@ -693,10 +679,7 @@
                 if (walletConnectProvider && walletConnectProvider.disconnect) {
                     walletConnectProvider.disconnect();
                 }
-            } catch (e) {
-                // ignore
-            }
-            walletConnectProvider = null;
+            } catch (e) {}
             isConnected = false;
             provider = null;
             signer = null;
@@ -751,14 +734,11 @@
                 if (userProfileData.isActive) {
                     document.getElementById("submitLinkBtn").textContent = "⏳ Updating...";
                     tx = await contract.connect(signer).updateProfile("User", { gasLimit: 300000 });
-                    console.log("🔄 Update transaction sent:", tx.hash);
                 } else {
                     document.getElementById("submitLinkBtn").textContent = "⏳ Registering...";
                     tx = await contract.connect(signer).registerUser("User", { gasLimit: 500000 });
-                    console.log("🔄 Register transaction sent:", tx.hash);
                 }
-                const receipt = await tx.wait();
-                console.log("✅ Transaction confirmed:", receipt);
+                await tx.wait();
                 const newLinkData = {
                     link: userLink,
                     clickCount: 0,
@@ -780,7 +760,6 @@
             }
         }
 
-        // UI bindings
         document.getElementById("connectWalletBtn").addEventListener("click", connectWallet);
         document.getElementById("modalMetaMaskBtn").addEventListener("click", connectWalletMetaMask);
         document.getElementById("modalWalletConnectBtn").addEventListener("click", connectWalletWalletConnect);
@@ -792,7 +771,6 @@
 
         if (window.ethereum) {
             window.ethereum.on('chainChanged', (chainId) => {
-                console.log("Chain changed to:", chainId);
                 currentChainId = parseInt(chainId, 16).toString();
                 checkCurrentNetwork();
                 if (isConnected) {
