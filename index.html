@@ -179,12 +179,11 @@
             </div>
         </div>
     </div>
-    <!-- Ethers v5 -->
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 
-    <!-- WalletConnect v2 (v1 kaldırıldı) -->
-    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/modal@2.6.2/dist/index.umd.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.11.2/dist/index.umd.min.js"></script>
+    <!-- Ethers -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <!-- WalletConnect v2 Ethereum Provider (UMD) - GÜNCELLENDİ -->
+    <script src="https://unpkg.com/@walletconnect/ethereum-provider@2.14.0/dist/umd/index.min.js"></script>
 
     <script>
         let provider = null;
@@ -196,7 +195,6 @@
         let userProfile = null;
         let walletConnectProvider = null;
 
-        // NEW: WalletConnect v2 Project ID
         const WALLETCONNECT_PROJECT_ID = "8b020ffbb31e5aba14160c27ca26540b";
 
         const CONTRACT_ADDRESS = "0x22eA49c074098931a478F381f971C77486d185b2";
@@ -363,10 +361,7 @@
         }
 
         async function setupUserProfile() {
-            if (!isConnected) {
-                const connected = await connectWallet();
-                if (!connected) return;
-            }
+            if (!isConnected) { openWalletModal(); return; }
             const username = document.getElementById("userUsername").value.trim();
             if (!username) {
                 console.log("Please enter your username");
@@ -378,17 +373,14 @@
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
                 const userProfileData = await contract.getUserProfile(userAddress);
                 let tx;
-                if (userProfileData.isActive) {
+                if (userProfileData[4]) {
                     document.getElementById("setupProfileBtn").textContent = "⏳ Updating...";
                     tx = await contract.connect(signer).updateProfile(username, { gasLimit: 300000 });
-                    console.log("🔄 Update profile TX:", tx.hash);
                 } else {
                     document.getElementById("setupProfileBtn").textContent = "⏳ Registering...";
                     tx = await contract.connect(signer).registerUser(username, { gasLimit: 500000 });
-                    console.log("🔄 Register TX:", tx.hash);
                 }
-                const receipt = await tx.wait();
-                console.log("✅ Transaction confirmed:", receipt);
+                await tx.wait();
                 loadUserProfile();
             } catch (error) {
                 console.error("❌ Profile setup error:", error);
@@ -449,9 +441,7 @@
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
                 const duration = 3 * 24 * 60 * 60;
                 const tx = await contract.createProposal(title, description, duration, { gasLimit: 600000 });
-                console.log("🔄 Proposal TX sent:", tx.hash);
                 await tx.wait();
-                console.log("✅ Proposal created successfully!");
                 document.getElementById("proposalTitle").value = "";
                 document.getElementById("proposalDescription").value = "";
                 loadProposals();
@@ -467,9 +457,7 @@
             try {
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
                 const tx = await contract.voteProposal(proposalId, support, { gasLimit: 400000 });
-                console.log("🔄 Vote TX sent:", tx.hash);
                 await tx.wait();
-                console.log("✅ Vote submitted successfully!");
                 loadProposals();
             } catch (error) {
                 console.error("❌ Voting error:", error);
@@ -500,41 +488,45 @@
             }
         }
 
+        function activeEip1193() {
+            if (walletConnectProvider) return walletConnectProvider;
+            if (window.ethereum) return window.ethereum;
+            return null;
+        }
+
         async function switchToCeloNetwork() {
+            const eip1193 = activeEip1193();
+            if (!eip1193) return false;
             try {
-                try {
-                    await window.ethereum.request({
-                        method: 'wallet_switchEthereumChain',
-                        params: [{ chainId: CELO_MAINNET_PARAMS.chainId }],
+                await eip1193.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: CELO_MAINNET_PARAMS.chainId }],
+                });
+                return true;
+            } catch (switchError) {
+                if (switchError.code === 4902) {
+                    await eip1193.request({
+                        method: 'wallet_addEthereumChain',
+                        params: [CELO_MAINNET_PARAMS],
                     });
                     return true;
-                } catch (switchError) {
-                    if (switchError.code === 4902) {
-                        await window.ethereum.request({
-                            method: 'wallet_addEthereumChain',
-                            params: [CELO_MAINNET_PARAMS],
-                        });
-                        return true;
-                    }
-                    throw switchError;
                 }
-            } catch (error) {
-                console.error("Error switching to Celo:", error);
                 try {
-                    await window.ethereum.request({
+                    await eip1193.request({
                         method: 'wallet_switchEthereumChain',
                         params: [{ chainId: CELO_ALFAJORES_PARAMS.chainId }],
                     });
                     return true;
                 } catch (testnetError) {
                     if (testnetError.code === 4902) {
-                        await window.ethereum.request({
+                        await eip1193.request({
                             method: 'wallet_addEthereumChain',
                             params: [CELO_ALFAJORES_PARAMS],
                         });
                         return true;
                     }
-                    throw testnetError;
+                    console.error("Error switching to Celo:", testnetError);
+                    return false;
                 }
             }
         }
@@ -602,104 +594,145 @@
             }
         }
 
-        // UPDATED: WalletConnect v2 entegrasyonu
+        // 🎯 WALLETCONNECT V2 FONKSİYONU GÜNCELLENDİ
         async function connectWalletWalletConnect() {
             try {
-                const WCProviderCtor = window.WalletConnectEthereumProvider || window.EthereumProvider;
-                if (!WCProviderCtor) {
-                    console.error("WalletConnect v2 UMD not found");
-                    return false;
-                }
-
-                walletConnectProvider = await WCProviderCtor.init({
+                console.log("🔄 WalletConnect v2 başlatılıyor...");
+                
+                // WalletConnect v2 Provider'ı başlat
+                walletConnectProvider = await EthereumProvider.init({
                     projectId: WALLETCONNECT_PROJECT_ID,
+                    chains: [1, 42220, 44787],
+                    optionalChains: [42220, 44787],
                     showQrModal: true,
-                    chains: [42220],                // CELO Mainnet
-                    optionalChains: [44787],        // Alfajores
+                    methods: [
+                        "eth_sendTransaction",
+                        "eth_signTransaction", 
+                        "eth_sign",
+                        "personal_sign",
+                        "eth_signTypedData"
+                    ],
+                    events: ["chainChanged", "accountsChanged", "connect", "disconnect"],
                     rpcMap: {
+                        1: "https://cloudflare-eth.com",
                         42220: "https://forno.celo.org",
                         44787: "https://alfajores-forno.celo-testnet.org"
                     },
-                    methods: [
-                        "eth_sendTransaction","personal_sign","eth_sign","eth_signTypedData","eth_signTypedData_v4",
-                        "wallet_switchEthereumChain","wallet_addEthereumChain"
-                    ],
-                    events: ["connect","disconnect","accountsChanged","chainChanged"],
                     metadata: {
                         name: "Celo Engage Hub",
-                        description: "Community engagement on Celo",
-                        url: window.location.origin,
-                        icons: ["https://celo.org/static/brand/celo-logo.png"]
+                        description: "Celo üzerinde sosyal etkileşim platformu",
+                        url: window.location.href,
+                        icons: ["https://celo.org/favicon.ico"]
                     }
                 });
 
-                await walletConnectProvider.connect();   // QR v2 açılır
+                console.log("✅ WalletConnect hazır, bağlanılıyor...");
 
+                // Bağlantıyı etkinleştir
+                await walletConnectProvider.enable();
+                
+                // Hesapları kontrol et
+                if (!walletConnectProvider.accounts || walletConnectProvider.accounts.length === 0) {
+                    throw new Error("WalletConnect'ten hesap alınamadı");
+                }
+
+                console.log("🎉 WalletConnect başarıyla bağlandı");
+
+                // Ethers provider oluştur
                 provider = new ethers.providers.Web3Provider(walletConnectProvider);
                 signer = provider.getSigner();
                 userAddress = await signer.getAddress();
-
+                
+                // UI'ı güncelle
                 document.getElementById('walletAddress').textContent = `${userAddress.substring(0, 6)}...${userAddress.substring(userAddress.length - 4)}`;
                 document.getElementById('walletInfo').classList.remove('hidden');
                 document.getElementById('connectWalletBtn').style.display = 'none';
                 isConnected = true;
-
+                
                 await checkCurrentNetwork();
                 loadPlatformStats();
                 loadUserProfile();
                 closeWalletModal();
-
+                
+                // Olay dinleyicileri
                 walletConnectProvider.on("accountsChanged", (accounts) => {
-                    if (accounts.length === 0) disconnectWallet();
+                    console.log("Hesaplar değişti:", accounts);
+                    if (!accounts || accounts.length === 0) {
+                        disconnectWallet();
+                    } else {
+                        userAddress = accounts[0];
+                        document.getElementById('walletAddress').textContent = `${userAddress.substring(0, 6)}...${userAddress.substring(userAddress.length - 4)}`;
+                        location.reload();
+                    }
                 });
-                walletConnectProvider.on("chainChanged", () => { checkCurrentNetwork(); });
-                walletConnectProvider.on("disconnect", () => { disconnectWallet(); });
+
+                walletConnectProvider.on("chainChanged", (chainId) => {
+                    console.log("Ağ değişti:", chainId);
+                    currentChainId = parseInt(chainId, 16).toString();
+                    checkCurrentNetwork();
+                });
+
+                walletConnectProvider.on("disconnect", (error) => {
+                    console.log("WalletConnect bağlantısı kesildi:", error);
+                    disconnectWallet();
+                });
 
                 return true;
+
             } catch (error) {
-                console.error("WalletConnect error:", error);
+                console.error("❌ WalletConnect v2 bağlantı hatası:", error);
+                
+                // Kullanıcı bağlantıyı reddetti
+                if (error?.message?.includes("User rejected") || error?.message?.includes("Connection rejected")) {
+                    alert("Bağlantı reddedildi. Lütfen tekrar deneyin ve cüzdanınızda bağlantıyı onaylayın.");
+                } else {
+                    alert(`WalletConnect hatası: ${error.message || "Bilinmeyen hata"}`);
+                }
+                
                 closeWalletModal();
                 return false;
             }
         }
 
-        function connectWallet() {
-            openWalletModal();
-            return true;
-        }
+        function connectWallet() { openWalletModal(); }
 
-        function disconnectWallet() {
-            if (walletConnectProvider && walletConnectProvider.disconnect) {
-                try { walletConnectProvider.disconnect(); } catch (_) {}
-                walletConnectProvider = null;
+        async function disconnectWallet() {
+            try {
+                // WalletConnect v2'yi düzgün kes
+                if (walletConnectProvider) {
+                    await walletConnectProvider.disconnect();
+                    walletConnectProvider = null;
+                }
+            } catch (error) {
+                console.log("WalletConnect kesme hatası:", error);
             }
+            
+            // Tüm state'i sıfırla
             isConnected = false;
             provider = null;
             signer = null;
             userAddress = '';
+            
+            // UI'ı sıfırla
             document.getElementById('walletInfo').classList.add('hidden');
             document.getElementById('connectWalletBtn').style.display = 'inline-block';
             document.getElementById('governanceSection').classList.add('hidden');
             document.getElementById('badgesSection').classList.add('hidden');
             document.getElementById('userProfileSection').classList.add('hidden');
+            
+            // Akışı sıfırla
             displaySupportLinks();
             document.getElementById('step2').classList.add('hidden');
             document.getElementById('step1').classList.remove('hidden');
+            
+            console.log("Cüzdan bağlantısı kesildi");
         }
 
-        function openWalletModal() {
-            document.getElementById('walletModal').classList.remove('hidden');
-        }
-
-        function closeWalletModal() {
-            document.getElementById('walletModal').classList.add('hidden');
-        }
+        function openWalletModal() { document.getElementById('walletModal').classList.remove('hidden'); }
+        function closeWalletModal() { document.getElementById('walletModal').classList.add('hidden'); }
 
         async function submitLink() {
-            if (!isConnected) {
-                const connected = await connectWalletMetaMask();
-                if (!connected) return;
-            }
+            if (!isConnected) { openWalletModal(); return; }
             if (!hasSupported) {
                 console.log("Please support at least one community member first!");
                 return;
@@ -724,17 +757,14 @@
                 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
                 const userProfileData = await contract.getUserProfile(userAddress);
                 let tx;
-                if (userProfileData.isActive) {
+                if (userProfileData[4]) {
                     document.getElementById("submitLinkBtn").textContent = "⏳ Updating...";
                     tx = await contract.connect(signer).updateProfile("User", { gasLimit: 300000 });
-                    console.log("🔄 Update transaction sent:", tx.hash);
                 } else {
                     document.getElementById("submitLinkBtn").textContent = "⏳ Registering...";
                     tx = await contract.connect(signer).registerUser("User", { gasLimit: 500000 });
-                    console.log("🔄 Register transaction sent:", tx.hash);
                 }
-                const receipt = await tx.wait();
-                console.log("✅ Transaction confirmed:", receipt);
+                await tx.wait();
                 const newLinkData = {
                     link: userLink,
                     clickCount: 0,
@@ -767,7 +797,6 @@
 
         if (window.ethereum) {
             window.ethereum.on('chainChanged', (chainId) => {
-                console.log("Chain changed to:", chainId);
                 currentChainId = parseInt(chainId, 16).toString();
                 checkCurrentNetwork();
                 if (isConnected) {
