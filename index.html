@@ -129,6 +129,7 @@
                         <button id="setupProfileBtn">🚀 Setup Profile</button>
                     </div>
                 </div>
+
                 <div id="step2" class="submit-section hidden">
                     <div class="step-indicator">
                         <span class="step-number">2</span> Submit Your Link
@@ -182,40 +183,8 @@
 
     <!-- Ethers v5 -->
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-    <script src="./walletconnect.js"></script>
-    <!-- WalletConnect v2: Dinamik yükleyici kullanacağız (jsDelivr -> unpkg fallback) -->
-    <script>
-      // Dinamik script yükleyici: jsDelivr sonra unpkg
-      function loadScript(src) {
-        return new Promise((resolve, reject) => {
-          const s = document.createElement('script');
-          s.src = src;
-          s.async = true;
-          s.onload = () => resolve(src);
-          s.onerror = () => reject(new Error('Failed to load ' + src));
-          document.body.appendChild(s);
-        });
-      }
-
-      async function ensureWalletConnectUMDLoaded() {
-        // Zaten yüklenmiş mi?
-        if (window.WalletConnectEthereumProvider || window.WalletConnectProvider) return true;
-
-        const primary = "https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.11.0/dist/index.min.js";
-        const fallback = "https://unpkg.com/@walletconnect/ethereum-provider@2.11.0/dist/index.umd.js";
-
-        try {
-          await loadScript(primary);
-        } catch (_) {
-          // jsDelivr olmadı, unpkg'e düş
-        }
-        // Hala yoksa unpkg dene
-        if (!(window.WalletConnectEthereumProvider || window.WalletConnectProvider)) {
-          try { await loadScript(fallback); } catch(e) {}
-        }
-        return Boolean(window.WalletConnectEthereumProvider || window.WalletConnectProvider);
-      }
-    </script>
+    <!-- WalletConnect Modal (QR için resmi modal) -->
+    <script src="https://unpkg.com/@walletconnect/modal@2.6.2/dist/index.umd.min.js"></script>
 
     <script>
         let provider = null;
@@ -611,7 +580,7 @@
             if (!checkMetaMask()) return false;
             try {
                 provider = new ethers.providers.Web3Provider(window.ethereum);
-                await switchToCeloNetwork(); // mainnet -> olmazsa alfajores
+                await switchToCeloNetwork();
                 await window.ethereum.request({ method: 'eth_requestAccounts' });
                 signer = provider.getSigner();
                 userAddress = await signer.getAddress();
@@ -630,29 +599,24 @@
             }
         }
 
-        // ---------- WalletConnect v2 (QR, Mainnet + Alfajores) -----------
+        // ---------- ✅ WalletConnect v2 (Modal ile QR; Celo Mainnet + Alfajores) -----------
         async function connectWalletWalletConnect() {
             try {
-                const loaded = await ensureWalletConnectUMDLoaded();
-                if (!loaded) {
-                    alert("⚠️ WalletConnect provider yüklenemedi. Lütfen sayfayı yenileyip tekrar deneyin.");
-                    console.error("WalletConnect UMD yüklenemedi (jsDelivr + unpkg denendi).");
+                const WC = window.WalletConnectModal;
+                if (!WC || !WC.EthereumProvider) {
+                    alert("WalletConnect modal kütüphanesi yüklenemedi!");
+                    console.error("window.WalletConnectModal.EthereumProvider bulunamadı.");
                     return false;
                 }
 
-                const EthereumProviderWC = window.WalletConnectEthereumProvider || window.WalletConnectProvider;
-                if (!EthereumProviderWC || !EthereumProviderWC.init) {
-                    alert("⚠️ WalletConnect init API bulunamadı.");
-                    console.error("Global provider var ama init yok:", EthereumProviderWC);
-                    return false;
-                }
+                const projectId = "8b020ffbb31e5aba14160c27ca26540b";
 
-                walletConnectProvider = await EthereumProviderWC.init({
-                    projectId: "8b020ffbb31e5aba14160c27ca26540b",
+                // Resmî modal ile provider oluştur
+                walletConnectProvider = await WC.EthereumProvider.init({
+                    projectId,
                     showQrModal: true,
-                    // Ana hedef chain Mainnet; Alfajores opsiyonel
-                    chains: [42220],
-                    optionalChains: [44787],
+                    chains: [42220],          // Celo Mainnet
+                    optionalChains: [44787],  // Celo Alfajores
                     rpcMap: {
                         42220: "https://forno.celo.org",
                         44787: "https://alfajores-forno.celo-testnet.org"
@@ -676,8 +640,8 @@
                     themeMode: "light"
                 });
 
-                console.log("✅ WalletConnect initialized, QR modal açılıyor...");
-                await walletConnectProvider.connect(); // QR modal açılır
+                console.log("✅ WalletConnect başlatıldı, QR modal açılıyor...");
+                await walletConnectProvider.enable(); // QR açılır, bağlantı kurulunca resolve olur
 
                 provider = new ethers.providers.Web3Provider(walletConnectProvider);
                 signer = provider.getSigner();
@@ -698,11 +662,14 @@
                 walletConnectProvider.on("accountsChanged", (accounts) => {
                     if (!accounts || accounts.length === 0) {
                         disconnectWallet();
+                    } else {
+                        location.reload();
                     }
                 });
                 
                 walletConnectProvider.on("chainChanged", () => {
                     checkCurrentNetwork();
+                    location.reload();
                 });
                 
                 walletConnectProvider.on("disconnect", () => {
@@ -719,7 +686,6 @@
         }
 
         function connectWallet() {
-            // Orijinal davranış: modal aç
             openWalletModal();
         }
 
@@ -739,8 +705,9 @@
             document.getElementById('badgesSection').classList.add('hidden');
             document.getElementById('userProfileSection').classList.add('hidden');
             displaySupportLinks();
-            document.getElementById('step2').classList.add('hidden');
-            document.getElementById('step1').classList.remove('hidden');
+            const s2 = document.getElementById('step2');
+            const s1 = document.getElementById('step1');
+            if (s2 && s1) { s2.classList.add('hidden'); s1.classList.remove('hidden'); }
         }
 
         function openWalletModal() {
@@ -840,19 +807,7 @@
                 }
             });
         }
-        // ✅ WalletConnect provider tamamen yüklendikten sonra başlat
-window.addEventListener("load", async () => {
-  console.log("🔄 Sayfa tamamen yüklendi, WalletConnect provider kontrol ediliyor...");
-  for (let i = 0; i < 10; i++) {
-    if (window.WalletConnectProvider) {
-      console.log("✅ WalletConnect provider başarıyla bulundu.");
-      break;
-    }
-    console.log("⏳ WalletConnect yükleniyor... (" + (i + 1) + ")");
-    await new Promise(r => setTimeout(r, 1000));
-  }
-  displaySupportLinks();
-});
+
         window.addEventListener('load', function() {
             displaySupportLinks();
         });
