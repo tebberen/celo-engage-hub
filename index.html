@@ -840,7 +840,19 @@
                 }
             });
         }
-
+        // ✅ WalletConnect provider tamamen yüklendikten sonra başlat
+window.addEventListener("load", async () => {
+  console.log("🔄 Sayfa tamamen yüklendi, WalletConnect provider kontrol ediliyor...");
+  for (let i = 0; i < 10; i++) {
+    if (window.WalletConnectProvider) {
+      console.log("✅ WalletConnect provider başarıyla bulundu.");
+      break;
+    }
+    console.log("⏳ WalletConnect yükleniyor... (" + (i + 1) + ")");
+    await new Promise(r => setTimeout(r, 1000));
+  }
+  displaySupportLinks();
+});
         window.addEventListener('load', function() {
             displaySupportLinks();
         });
