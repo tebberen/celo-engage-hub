@@ -179,12 +179,10 @@
             </div>
         </div>
     </div>
-
     <!-- Ethers v5 -->
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-    <!-- WalletConnect v2 Ethereum Provider (UMD) – v1 kaldırıldı -->
-    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider/dist/index.umd.min.js"></script>
-
+    <!-- WalletConnect v2 Ethereum Provider (UMD, unpkg – QR garanti) -->
+    <script src="https://unpkg.com/@walletconnect/ethereum-provider@2.11.0/dist/index.umd.js"></script>
     <script>
         let provider = null;
         let signer = null;
@@ -591,9 +589,10 @@
             }
         }
 
-        // ---------- WalletConnect v2 (QR) -----------
+        // ---- WalletConnect v2 entegrasyonu (QR ile bağlanır) ----
         async function connectWalletWalletConnect() {
             try {
+                // UMD global: window.WalletConnectEthereumProvider
                 const EthereumProviderWC = window.WalletConnectEthereumProvider;
                 if (!EthereumProviderWC || !EthereumProviderWC.init) {
                     alert("⚠️ WalletConnect provider yüklenemedi. Sayfayı yenileyip tekrar deneyin.");
@@ -646,16 +645,17 @@
                 loadUserProfile();
                 closeWalletModal();
 
+                // Dinleyiciler
                 walletConnectProvider.on("accountsChanged", (accounts) => {
                     if (!accounts || accounts.length === 0) {
                         disconnectWallet();
                     }
                 });
-                
+
                 walletConnectProvider.on("chainChanged", () => {
                     checkCurrentNetwork();
                 });
-                
+
                 walletConnectProvider.on("disconnect", () => {
                     disconnectWallet();
                 });
@@ -670,7 +670,6 @@
         }
 
         function connectWallet() {
-            // Eski davranış korunuyor: modal aç
             openWalletModal();
         }
 
@@ -679,7 +678,7 @@
                 if (walletConnectProvider && walletConnectProvider.disconnect) {
                     walletConnectProvider.disconnect();
                 }
-            } catch (e) {}
+            } catch (_) {}
             isConnected = false;
             provider = null;
             signer = null;
@@ -771,6 +770,7 @@
 
         if (window.ethereum) {
             window.ethereum.on('chainChanged', (chainId) => {
+                console.log("Chain changed to:", chainId);
                 currentChainId = parseInt(chainId, 16).toString();
                 checkCurrentNetwork();
                 if (isConnected) {
