@@ -53,8 +53,7 @@
         .badge-card { border: 2px solid #FBCC5C; padding: 15px; border-radius: 12px; background-color: #FFF9E6; margin: 10px 0; }
         .stats-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
         .stat-card { background: #FFFDF6; border: 2px solid #FBCC5C; padding: 15px; border-radius: 8px; text-align: center; }
-
-        /* Modal styles for Connect Wallet */
+        /* Modal stiller vs. medya sorguları da aynı kalmalı */
         .wallet-modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 9999; }
         .wallet-modal { background: #fff; width: 420px; max-width: calc(100% - 40px); border-radius: 28px; padding: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 1px solid rgba(0,0,0,0.08); }
         .wallet-modal h3 { text-align: center; margin: 6px 0 12px 0; }
@@ -68,7 +67,6 @@
         .wallet-install { color: #ef4444; font-weight:700; font-size:13px; }
         .modal-close { position:absolute; right:30px; top:22px; cursor:pointer; font-weight:bold; color:#999; }
         .wallet-list { display:flex; flex-direction:column; gap:8px; margin-top:6px; }
-
         @media (max-width: 720px) {
             .container { flex-direction: column; padding-bottom: 60px; }
             .sidebar { width: 100%; }
@@ -160,15 +158,16 @@
                 <h3>🟡 Celo Ecosystem</h3>
                 <a href="https://celo.org" target="_blank" class="celo-link"> <span class="celo-link-icon">🌐</span>Celo Official </a>
                 <a href="https://docs.celo.org" target="_blank" class="celo-link"> <span class="celo-link-icon">📚</span>Celo Documentation </a>
-                <a href="https://developers.celo.org" target="_blank" class="celo-link"> <span class="celo-link-icon">💼</span>Developer Portal </a>
-                <a href="https://celoscan.io" target="_blank" class="celo-link"> <span class="celo-link-icon">🔍</span>Celo Explorer </a>
-                <a href="https://forum.celo.org" target="_blank" class="celo-link"> <span class="celo-link-icon">💬</span>Celo Forum </a>
-                <a href="https://x.com/Celo" target="_blank" class="celo-link"> <span class="celo-link-icon">🐦</span>Celo Twitter </a>
+                <a href="https://developers.celo.org" target="_blank" class="celo-link"> < span class="celo-link-icon">💼</span>Developer Portal </a>
+                <a href="https://celoscan.io" target="_blank" class="celo-link"> < span class="celo-link-icon">🔍</span>Celo Explorer </a>
+                <a href="https://forum.celo.org" target="_blank" class="celo-link"> < span class="celo-link-icon">💬</span>Celo Forum </a>
+                <a href="https://x.com/Celo" target="_blank" class="celo-link"> < span class="celo-link-icon">🐦</span>Celo Twitter </a>
                 <a href="https://chat.celo.org" target="_blank" class="celo-link"> < span class="celo-link-icon">💬</span>Celo Discord </a>
-                <a href="https://blog.celo.org" target="_blank" class="celo-link"> <span class="celo-link-icon">📰</span>Celo Blog </a>
-                <a href="https://github.com/celo-org" target="_blank" class="celo-link"> <span class="celo-link-icon">💻</span>Celo GitHub </a>
+                <a href="https://blog.celo.org" target="_blank" class="celo-link"> < span class="celo-link-icon">📰</span>Celo Blog </a>
+                <a href="https://github.com/celo-org" target="_blank" class="celo-link"> < span class="celo-link-icon">💻</span>Celo GitHub </a>
             </div>
 
+            <!-- Platform Stats -->
             <div id="platformStats" class="stats-container hidden">
                 <div class="stat-card">
                     <div>👥 Total Users</div>
@@ -259,13 +258,10 @@
         </div>
     </div>
 
-    <!-- External libs -->
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-    <script src="https://unpkg.com/@walletconnect/ethereum-provider@2.10.4/dist/index.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@coinbase/wallet-sdk@4.3.7/dist/index.min.js"></script>
-
     <script>
-        // State
+        /***********************************************************************
+         * Celo Engage Hub - wallet connect kısmı V2 olarak entegre edildi
+         ***********************************************************************/
         let provider = null;
         let rawProvider = null;
         let signer = null;
@@ -302,14 +298,14 @@
         ];
 
         const CELO_MAINNET_PARAMS = {
-            chainId: "0xA4EC",
+            chainId: "0xA4EC", // 42220
             chainName: "Celo Mainnet",
             nativeCurrency: { name: "CELO", symbol: "CELO", decimals: 18 },
             rpcUrls: ["https://forno.celo.org"],
             blockExplorerUrls: ["https://celoscan.io/"]
         };
         const CELO_ALFAJORES_PARAMS = {
-            chainId: "0xAEF3",
+            chainId: "0xAEF3", // 44787
             chainName: "Celo Alfajores Testnet",
             nativeCurrency: { name: "CELO", symbol: "CELO", decimals: 18 },
             rpcUrls: ["https://alfajores-forno.celo-testnet.org"],
@@ -443,7 +439,7 @@
                 document.getElementById("setupProfileBtn").disabled = true;
                 document.getElementById("setupProfileBtn").textContent = "⏳ Processing...";
 
-                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
                 const existing = await contract.getUserProfile(userAddress);
 
                 let tx;
@@ -635,7 +631,6 @@
                     displaySupportLinks();
                     hasSupported = true;
                 }
-
                 if (linkUrl.includes('tebberen.github.io/celo-engage-hub')) {
                     window.open(linkUrl, '_blank');
                     document.getElementById('userLinkInput').value = linkUrl;
@@ -740,25 +735,36 @@
                     provider = new ethers.providers.Web3Provider(rawProvider);
                     await rawProvider.request({ method: 'eth_requestAccounts' });
                     signer = provider.getSigner();
-
                 } else if (method === 'walletconnect') {
-                    const EthereumProvider = window.WalletConnectEthereumProvider;
+                    try {
+                        const EthereumProvider = window.WalletConnectEthereumProvider;
+                        if (!EthereumProvider) {
+                            throw new Error("WalletConnectEthereumProvider is undefined");
+                        }
 
-                    rawProvider = await EthereumProvider.init({
-                        projectId: "35ad182479c056688f7334bfcd1eba51",
-                        chains: [42220],
-                        showQrModal: true,
-                        methods: ["eth_sendTransaction", "personal_sign", "eth_sign"],
-                        events: ["chainChanged", "accountsChanged"]
-                    });
-                    await rawProvider.enable();
-                    provider = new ethers.providers.Web3Provider(rawProvider);
-                    signer = provider.getSigner();
+                        rawProvider = await EthereumProvider.init({
+                            projectId: "35ad182479c056688f7334bfcd1eba51",
+                            chains: [42220],
+                            showQrModal: true,
+                            methods: ["eth_sendTransaction", "personal_sign", "eth_sign"],
+                            events: ["chainChanged", "accountsChanged"]
+                        });
 
-                    rawProvider.on("disconnect", () => {
-                        disconnectWallet();
-                    });
+                        await rawProvider.enable();
+                        provider = new ethers.providers.Web3Provider(rawProvider);
+                        signer = provider.getSigner();
 
+                        if (rawProvider.on) {
+                            rawProvider.on("disconnect", (code, reason) => {
+                                console.log("WalletConnect disconnected", code, reason);
+                                disconnectWallet();
+                            });
+                        }
+                    } catch (err) {
+                        console.error("WalletConnect V2 Error:", err);
+                        alert("❌ Connection failed: " + (err.message || err));
+                        return;
+                    }
                 } else if (method === 'coinbase') {
                     try {
                         const CoinbaseWalletSDK = window.CoinbaseWalletSDK || window.CoinbaseWalletSdk || window.CoinbaseWallet;
@@ -782,7 +788,6 @@
                         await connectWithWallet('walletconnect');
                         return;
                     }
-
                 } else if (method === 'rabby') {
                     if ((window.rabby) || (window.ethereum && window.ethereum.isRabby)) {
                         rawProvider = window.ethereum;
@@ -793,7 +798,6 @@
                         if (confirm("Rabby not detected. Open Rabby site?")) window.open('https://rabby.io/', '_blank');
                         return;
                     }
-
                 } else {
                     await connectWithWallet('walletconnect');
                     return;
@@ -810,7 +814,6 @@
                 loadUserProfile();
 
                 document.dispatchEvent(new Event('walletConnectedTemp'));
-
             } catch (err) {
                 console.error("connectWithWallet error:", err);
                 if (err && err.code === 4001) alert("❌ Connection request rejected");
