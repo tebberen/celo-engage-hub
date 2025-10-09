@@ -184,20 +184,19 @@
     <!-- Ethers v5 -->
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <!-- WalletConnect Modal (QR için resmi modal) -->
-    <script src="https://unpkg.com/@walletconnect/modal@2.6.2/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/modal@2.6.2/dist/index.umd.min.js"></script>
     
     <script>
 window.addEventListener("load", async () => {
-  // WalletConnect script tam yüklenene kadar bekle
   for (let i = 0; i < 10; i++) {
     if (window.WalletConnectModal && window.WalletConnectModal.EthereumProvider) {
-      console.log("✅ WalletConnect Modal kütüphanesi başarıyla yüklendi.");
+      console.log("✅ WalletConnect Modal başarıyla yüklendi.");
       return;
     }
-    console.log("⏳ WalletConnect yükleniyor...");
+    console.log("⏳ Modal yükleniyor...");
     await new Promise(r => setTimeout(r, 500));
   }
-  alert("⚠️ WalletConnect modal kütüphanesi yüklenemedi, sayfayı yenileyin.");
+  alert("⚠️ WalletConnect Modal yüklenemedi. Sayfayı yenileyip tekrar deneyin.");
 });
 </script>
 
