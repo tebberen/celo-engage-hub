@@ -25,6 +25,7 @@ A decentralized social engagement platform built on Celo blockchain that rewards
 · 🤝 Contributing
 · 📝 License
 · 🙏 Acknowledgments
+Base 
 
 🌟 Introduction
 
